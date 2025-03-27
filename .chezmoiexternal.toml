@@ -1,4 +1,8 @@
+{{ if eq .chezmoi.os "windows" }}
 [".config/nvim"]
+{{ else }}
+[".config/nvim"]
+{{ end }}
     type = "git-repo"
     url = "https://github.com/Meisterlala/nvim.git"
     refreshPeriod = "1h"
