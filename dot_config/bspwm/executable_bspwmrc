@@ -74,6 +74,10 @@ bspc rule -a "Nm-connection-editor" state=floating
 bspc rule -a paradiso state=floating
 
 
+# Restart Polybar
+$HOME/.config/polybar/launch.sh &
+
+
 # Load Background
 # nitrogen --random --set-zoom-fill &
 # systemctl start --user wallpaper
@@ -81,8 +85,6 @@ bspc rule -a paradiso state=floating
 # Apply last use background
 $HOME/.fehbg &
 
-# Restart Polybar
-$HOME/.config/polybar/launch.sh &
 
 
 # Polkit Authentication
