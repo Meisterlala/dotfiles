@@ -1,0 +1,94 @@
+#! /bin/sh
+
+# Logging
+# set -xv
+# exec 2>>/tmp/bspwm.log
+
+# Start Compositor
+if ! pgrep -x "picom" >/dev/null
+then
+    picom --config "$HOME/.config/picom.conf" -b --experimental-backend &
+fi
+
+# Keybord local
+# setxkbmap -layout de -variant nodeadkeys -option terminate:ctrl_alt_bksp &
+
+# Keybord shortcuts
+killall -e sxhkd; \
+sxhkd &
+
+# Init bspwm
+bspc monitor -d 1 2 3 4 5 6 7 8 9 code browser notes mail
+
+# Border Style
+bspc config border_width         0
+bspc config window_gap          12
+
+# Config
+bspc config split_ratio                0.52
+bspc config borderless_monocle         true
+bspc config gapless_monocle            true
+bspc config single_monocle	       true
+bspc config top_monocle_padding        0
+bspc config bottom_padding             0
+bspc config top_padding                25
+bspc config focus_follows_pointer      true
+bspc config merge_overlapping_monitors true
+
+# Mouse Movement
+bspc config pointer_action1 move
+bspc config pointer_action2 resize_side
+bspc config pointer_action2 resize_corner
+
+# Window Rules
+# Get Window class with:
+#   xprop WM_CLASS
+bspc rule -a Screenkey manage=off
+bspc rule -a firefox border=off desktop="browser" follow=on
+bspc rule -a obsidian desktop="notes" follow=on focus=on
+bspc rule -a Code desktop="code" follow=on focus=on
+bspc rule -a Sylpheed desktop="mail" follow=off focus=off
+bspc rule -a Thunderbird desktop="mail" follow=off focus=off
+bspc rule -a Zathura state=tiled
+bspc rule -a Xfce4-appfinder state=floating
+
+# Load Background
+# nitrogen --random --set-zoom-fill &
+systemctl start --user wallpaper
+
+# Restart Polybar
+$HOME/.config/polybar/launch.sh &
+
+# Polkit Authentication
+if ! pgrep -x "polkit-kde-authentication-agent-1" >/dev/null
+then
+    /usr/lib/polkit-kde-authentication-agent-1 &
+fi
+
+# Start Dunst Notifications
+if ! pgrep -x "dunst" >/dev/null
+then
+    ggdunst &
+fi
+
+# Start  nm-applet
+if ! pgrep -x "nm-applet" >/dev/null
+then
+    nm-applet &
+fi
+
+# Start Thunderbird
+#if ! pgrep -x "thunderbird" >/dev/null
+#then
+#    thunderbird &
+#fi
+
+# Start Sylpheed
+if ! pgrep -x "sylpheed" >/dev/null
+then
+   #  sylpheed &
+fi
+
+
+# Enviorment for vscode
+source /etc/X11/xinit/xinitrc.d/50-systemd-user.sh
