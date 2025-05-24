@@ -1,0 +1,242 @@
+# View Keyboard events with
+# 	xev -event keyboard
+
+#
+# wm independent hotkeys
+#
+
+# terminal emulator
+super + Return
+	alacritty msg --socket "$XDG_RUNTIME_DIR/alacritty.sock" create-window || alacritty --socket "$XDG_RUNTIME_DIR/alacritty.sock"
+#	alacritty
+
+# program launcher
+#super + space
+# 	xfce4-appfinder
+
+# D-Menu
+super + d
+	rofi -show combi -calc-command "echo -n '{result}' | xclip"
+
+# File Manager
+super + e
+	thunar &
+
+# Launch Bitwarden-rofi
+ctrl + alt + a
+	rofi-rbw &
+
+# Disable Middle Mouse paste
+~button2
+    echo -n | xsel -n -i
+
+# Update Wallpaper
+super + r
+	wp next
+#	systemctl start --user wallpaper.service
+
+# Hide Wallpaper
+super + shift + r
+	~/.config/sxhkd/wp_fallback.sh
+	
+#if wp get mode | grep -q 'Random'; then
+#	wp mode static
+#else
+#	wp mode random
+#fi
+	
+
+
+# Reload everything
+super + Escape
+	bspc wm -r
+#	pkill -USR1 -x sxhkd2
+	
+
+#
+# bspwm hotkeys
+#
+
+# quit/restart bspwm
+#super + alt + r
+#	bspc wm -r
+
+# close and kill
+super + {_,shift + }w
+	bspc node -{c,k}
+
+# alternate between the tiled and monocle layout
+super + m
+	bspc desktop -l next
+
+# send the newest marked node to the newest preselected node
+super + space
+# 	bspc node newesbt.marked.local -n newest.!automatic.local
+	bspc node -n last.!automatic
+
+    
+# swap the current node and the biggest window
+super + g
+	bspc node -s biggest.window.local
+
+#
+# state/flags
+#
+
+# hide node
+super + h
+	bspc node focused -g hidden=on
+
+# unhide all nodes
+super + {ctrl,shift} + h
+	/home/ninja/.config/bspwm/unhide.sh
+
+# set the window state
+super + {t,shift + t,s,f}
+	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
+
+# set the node flags
+super + ctrl + {m,y,p}
+	bspc node -g {marked,sticky,private}
+
+#
+# focus/swap
+#
+
+# focus the node in the given direction
+super + {_,shift + }{Left,Down,Up,Right}
+	bspc node -{f,s} {west,south,north,east}
+
+# focus the node for the given path jump
+super + {comma,period}
+	bspc node -f @{first,second}
+
+# focus the next/previous window in the current desktop
+super + {less,greater}
+	bspc node -f {next,prev}.local.!hidden.window
+
+# Tab to cycle nodes
+super + Tab
+	bspc node -f next.local.!hidden.window
+
+# focus the next/previous desktop in the current monitor
+ctrl + {Prior,Next}
+	bspc desktop -f {prev,next}.local.occupied
+
+
+
+# focus the last node/desktop
+#super + {grave,Tab}
+#	bspc {node,desktop} -f last
+
+# focus the older or newer node in the focus history
+#super + {o,i}
+#	bspc wm -h off; \
+#	bspc node {older,newer} -f; \
+#	bspc wm -h on
+
+
+
+#
+#  Move to selected Desktop 
+#
+
+# Open Desktop
+super + {1-9,0,b,n,c,v,x}
+	bspc desktop -f {1-9,10,browser,notes,code,mail,text}
+
+# Open Desktop and  follow
+super + shift + {1-9,0,b,n,c,v,x} {_, + ctrl}
+	bspc node -d {1-9,10,browser,notes,code,mail,text} {--follow, _} 
+
+
+#
+# preselect
+#
+
+# preselect the direction
+super + ctrl + {Left,Down,Up,Right}
+	bspc node -p {west,south,north,east}
+
+# preselect the ratio
+super + ctrl + {1-9}
+	bspc node -o 0.{1-9}
+
+# cancel the preselection for the focused node
+super + ctrl + space
+	bspc node -p cancel
+	
+
+#
+# move/resize
+#
+
+# Change Window Transparency
+super + {Prior,Next}
+	picom-trans -c {+5,-5}
+
+# Reset
+super + {BackSpace}
+	picom-trans -c --reset
+
+
+# expand a window by moving one of its side outward
+ctrl + {Left,Down,Up,Right}
+	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
+
+# contract a window by moving one of its side inward
+ctrl + shift + {Left,Down,Up,Right}
+	bspc node -z {right -20 0,top 0 20,bottom 0 -20,left 20 0}
+
+# move a floating window
+#super + {left,down,up,right}
+#	bspc node -v {-20 0,0 20,0 -20,20 0}
+
+#
+# Media Keys
+#
+
+XF86AudioRaiseVolume
+	pactl set-sink-mute @DEFAULT_SINK@ 0; pactl set-sink-volume @DEFAULT_SINK@ "+5%"
+
+XF86AudioLowerVolume 
+	pactl set-sink-volume @DEFAULT_SINK@ "-5%"
+
+XF86AudioMute
+	pactl set-sink-mute @DEFAULT_SINK@ toggle
+
+XF86AudioMicMute	
+	pactl set-source-mute @DEFAULT_SOURCE@ toggle
+
+# Switch to next Audio Sink
+{super,shift,ctrl} + XF86AudioMute
+	~/.config/sxhkd/sink.sh
+
+# Switch to next Audio source
+{super,shift,ctrl} + XF86AudioMicMute
+	~/.config/sxhkd/source.sh
+
+XF86MonBrightnessDown
+	light -U 5 ; dunstify -h string:x-dunst-stack-tag:brightness -a "Brightness" "`light`"
+
+XF86MonBrightnessUp
+	light -A 5 ; dunstify -h string:x-dunst-stack-tag:brightness -a "Brightness" "`light`"
+
+XF86Favorites
+	sleep 0.5; xset dpms force off
+
+super + XF86Favorites
+	sleep 0.5; systemctl suspend
+
+# Screenshot
+Print
+	flameshot gui
+#	spectacle -r -b -c
+
+# Color Picker
+super + Print
+	colorpicker --short --preview --one-shot | tr -d '\n' | xsel -b
+
+# Open notification
+super + a
+	dunstctl action
