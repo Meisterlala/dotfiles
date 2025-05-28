@@ -1,0 +1,25 @@
+# Select to Clipbaord
+set selection-clipboard clipboard
+
+# Scrolling
+map <S-Down> scroll half-down
+map <S-Up> scroll half-up
+
+map u scroll previous
+map i scroll next
+
+# Make Background Transparent
+set default-bg "rgba(0,0,0,0.3)"
+
+# Transparent Background on recolor
+map c recolor
+set recolor-lightcolor "rgba(0,0,0,0.5)"
+
+# Follow a mark with F
+map . mark_evaluate
+
+set guioptions ""
+
+# Make the key in the top right zoom out
+map = zoom in
+map — zoom in
