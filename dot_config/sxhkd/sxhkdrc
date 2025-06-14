@@ -32,15 +32,15 @@ ctrl + alt + a
 
 # Next wallpaper
 super + r
-	wp next
+	wp next &
 
 # Prev wallpaper
 super + ctrl + r
-	wp previous
+	wp previous &
 
 # Hide Wallpaper
 super + shift + r
-	~/.config/sxhkd/wp_toggle.sh
+	~/.config/sxhkd/wp_toggle.sh &
 
 
 # Reload everything
