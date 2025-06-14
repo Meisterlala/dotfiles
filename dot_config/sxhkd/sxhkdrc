@@ -30,21 +30,17 @@ ctrl + alt + a
 ~button2
     echo -n | xsel -n -i
 
-# Update Wallpaper
+# Next wallpaper
 super + r
 	wp next
-#	systemctl start --user wallpaper.service
+
+# Prev wallpaper
+super + ctrl + r
+	wp previous
 
 # Hide Wallpaper
 super + shift + r
-	~/.config/sxhkd/wp_fallback.sh
-	
-#if wp get mode | grep -q 'Random'; then
-#	wp mode static
-#else
-#	wp mode random
-#fi
-	
+	~/.config/sxhkd/wp_toggle.sh
 
 
 # Reload everything
