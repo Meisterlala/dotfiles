@@ -21,7 +21,7 @@ xsetroot -cursor_name left_ptr
 
 # Keybord shortcuts
 killall -e sxhkd; \
-sxhkd &
+sxhkd > /tmp/sxhkd.log 2>&1 &
 
 
 # Connect 2nd Monitor
