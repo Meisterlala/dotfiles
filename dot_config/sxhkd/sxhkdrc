@@ -40,7 +40,7 @@ super + ctrl + r
 
 # Hide Wallpaper
 super + shift + r
-	~/.config/sxhkd/wp_toggle.sh &
+	bash /home/ninja/.config/sxhkd/wp_toggle.sh &
 
 
 # Reload everything
