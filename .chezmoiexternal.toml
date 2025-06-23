@@ -1,5 +1,5 @@
 {{ if eq .chezmoi.os "windows" }}
-["~\\AppData\\Local\\nvim"]
+["AppData/Local/nvim"]
 {{ else }}
 [".config/nvim"]
 {{ end }}
