@@ -3,6 +3,7 @@
 #!/usr/bin/env bash
 
 if ! command -v oh-my-posh >/dev/null 2>&1; then
+  mkdir -p ~/.local/bin
   curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/.local/bin
 fi
 {{- end -}}
