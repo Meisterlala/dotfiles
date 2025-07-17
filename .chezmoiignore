@@ -13,5 +13,6 @@ Documents
 {{ end }}
 
 
-# Always include the api keys
+# Alawys include Powershell profiles and Keys
+!.config/profile.ps1
 !.config/api_keys.ps1
