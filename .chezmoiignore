@@ -16,3 +16,6 @@ Documents
 # Alawys include Powershell profiles and Keys
 !.config/profile.ps1
 !.config/api_keys.ps1
+
+# Oh-my-posh theme
+!.config/oh-my-posh.yaml
