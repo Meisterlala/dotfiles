@@ -1,11 +1,1 @@
-if (Get-Command eza -ErrorAction SilentlyContinue) {
-    function Eza-With-Color {
-        param (
-            [Parameter(ValueFromRemainingArguments = $true)]
-            [string[]]$Args
-        )
-        eza --icons=auto --color=always --color-scale=size -h @Args
-    }
-
-    Set-Alias -Name ls -Value Eza-With-Color | Out-Null
-} 
+{{- template "powershell_profile.ps1.tmpl" . -}}
