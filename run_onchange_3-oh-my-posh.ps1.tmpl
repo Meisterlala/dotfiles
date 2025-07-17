@@ -1,10 +1,23 @@
 {{- if .posh -}}
+
 {{- if eq .chezmoi.os "linux" -}}
 #!/usr/bin/env bash
 
 if ! command -v oh-my-posh >/dev/null 2>&1; then
+  echo "[Oh My Posh] Not found! Installing to ~/.local/bin..."
   mkdir -p ~/.local/bin
   curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/.local/bin
 fi
 {{- end -}}
+
+{{- if eq .chezmoi.os "windows" -}}
+# Ensure Oh My Posh is installed using winget
+
+if (-not (Get-Command oh-my-posh -ErrorAction SilentlyContinue)) {
+    Write-Host "[Oh My Posh] Not found! Installing using winget..."
+    winget install JanDeDobbeleer.OhMyPosh --source winget --scope user --force
+}
 {{- end -}}
+
+{{- end -}}
+
