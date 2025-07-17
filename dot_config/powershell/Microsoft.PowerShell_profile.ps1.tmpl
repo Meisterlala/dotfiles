@@ -1,2 +1,9 @@
-{{ template "powershell_profile.ps1.tmpl" . }}
-{{ joinPath .chezmoi.sourceDir "dot_config/encrypted_api_keys.ps1.tmpl.age" | include | decrypt }}
+# Linux Powershell
+
+# Load chezmoi data
+
+$chezmoiProfile = Join-Path $HOME ".config/profile.ps1"
+$chezmoiAPI = Join-Path $HOME ".config/api_keys.ps1"
+
+. $chezmoiProfile
+. $chezmoiAPI
