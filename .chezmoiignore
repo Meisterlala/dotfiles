@@ -7,11 +7,11 @@ scripts/
 
 {{ if ne .chezmoi.os "linux" }}
 # Ignore .config folder, when not on linux
-dot_config/
+.config
 {{ end }}
 
 {{ if ne .chezmoi.os "windows" }}
 # Ignore Documtent folder, when not on windows
-Documents/
+Documents
 {{ end }}
 
