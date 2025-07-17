@@ -31,7 +31,7 @@ save_to_clipboard = true
 semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
 
 [terminal.shell]
-program = "usr/bin/pwsh"
+program = "/usr/bin/pwsh"
 
 [window]
 dynamic_title = true
