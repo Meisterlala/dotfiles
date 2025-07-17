@@ -4,7 +4,7 @@ key.txt.age
 
 {{ if ne .chezmoi.os "linux" }}
 # Ignore .config folder, when not on linux
-.config
+.config/**/*
 {{ end }}
 
 {{ if ne .chezmoi.os "windows" }}
@@ -14,4 +14,4 @@ Documents
 
 
 # Always include the api keys
-!.config/api_keys.ps1
+!.config/*api_keys.*
