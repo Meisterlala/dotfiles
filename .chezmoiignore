@@ -1,1 +1,17 @@
+# Decryption Key
 key.txt.age
+
+# Scripts
+scripts/
+
+
+{{ if neq .chezmoi.os "linux" }}
+# Ignore .config folder, when not on linux
+dot_config/
+{{ end }}
+
+{{ if neq .chezmoi.os "windows" }}
+# Ignore Documtent folder, when not on windows
+Documents/
+{{ end }}
+
