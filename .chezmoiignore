@@ -14,4 +14,4 @@ Documents
 
 
 # Always include the api keys
-!.config/*api_keys.*
+!.config/api_keys.ps1
