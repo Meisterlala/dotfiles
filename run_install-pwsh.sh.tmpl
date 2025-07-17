@@ -1,4 +1,4 @@
-{{/* Install PowerShell on Arch Linux if missing */}}
+{{- /* Install PowerShell on Arch Linux if missing */ -}}
 {{ if and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.idLike "arch") -}}
 #!/bin/sh
 
