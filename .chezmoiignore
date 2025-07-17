@@ -1,11 +1,6 @@
 # Decryption Key
 key.txt.age
 
-# Scripts
-scripts/
-
-# API-Key
-encrypted_api_keys.ps1.tmpl.age 
 
 {{ if ne .chezmoi.os "linux" }}
 # Ignore .config folder, when not on linux
@@ -17,3 +12,6 @@ encrypted_api_keys.ps1.tmpl.age
 Documents
 {{ end }}
 
+
+# Always include the api keys
+!.config/api_keys.ps1
