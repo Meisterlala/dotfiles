@@ -5,12 +5,12 @@ key.txt.age
 scripts/
 
 
-{{ if neq .chezmoi.os "linux" }}
+{{ if ne .chezmoi.os "linux" }}
 # Ignore .config folder, when not on linux
 dot_config/
 {{ end }}
 
-{{ if neq .chezmoi.os "windows" }}
+{{ if ne .chezmoi.os "windows" }}
 # Ignore Documtent folder, when not on windows
 Documents/
 {{ end }}
