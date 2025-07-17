@@ -10,3 +10,6 @@ $env:TAVILY_API_KEY="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"
 
 
 $env:Path += ';Z:\replay_uploader\bin'
+
+{{- template "powershell_profile.ps1.tmpl" . -}}
+{{ joinPath .chezmoi.sourceDir "encrypted_api_keys.ps1.tmpl.age" | include | decrypt | template }}
