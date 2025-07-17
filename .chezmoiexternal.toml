@@ -5,4 +5,4 @@
 {{ end }}
     type = "git-repo"
     url = "https://github.com/Meisterlala/nvim.git"
-    refreshPeriod = "1h"
+    refreshPeriod = "30s"
