@@ -152,4 +152,4 @@ configuration {
 
   }
 }
-@theme "~/.config/rofi/themes/rounded-white.rasi"
+@theme "~/.config/rofi/themes/mine-rounded.rasi"
