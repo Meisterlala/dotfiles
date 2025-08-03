@@ -8,6 +8,7 @@
   fg0    : #ffffff;
   fg1    : #cecece;
   accent : #60cdff;
+  urgent : @accent;
 
   background-color : transparent;
   text-color       : @fg0;
@@ -86,6 +87,14 @@ element normal urgent {
 }
 
 element normal active {
+  text-color: @accent;
+}
+
+element alternate active {
+  text-color: @accent;
+}
+
+element selected active {
   text-color: @accent;
 }
 

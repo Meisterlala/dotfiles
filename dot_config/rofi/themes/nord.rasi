@@ -1,9 +1,5 @@
-/*******************************************************************************
- * ROFI VERTICAL THEME USING THE NORD COLOR PALETTE 
- * User                 : LR-Tech               
- * Theme Repo           : https://github.com/lr-tech/rofi-themes-collection
- * Nord Project Repo    : https://github.com/arcticicestudio/nord
- *******************************************************************************/
+/* ROFI VERTICAL THEME USING THE NORD COLOR PALETTE */
+/* Author: Newman Sanchez (https://github.com/newmanls) */
 
 * {
     font:   "IBM Plex Mono 12";
@@ -43,7 +39,6 @@ window {
 
     location:   center;
     width:      480px;
-    y-offset:   -160px;
     border:     1px;
 }
 
@@ -78,6 +73,10 @@ element normal urgent {
 }
 
 element normal active {
+    text-color: @accent-color;
+}
+
+element alternate active {
     text-color: @accent-color;
 }
 
