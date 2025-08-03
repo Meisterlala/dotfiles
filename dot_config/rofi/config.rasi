@@ -152,4 +152,4 @@ configuration {
 
   }
 }
-@theme "/home/ninja/.config/rofi/themes/nord-twoLines.rasi"
+@theme "~/.config/rofi/themes/nord-twoLines.rasi"
