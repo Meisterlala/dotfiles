@@ -1,11 +1,19 @@
-/* ROUNDED THEME FOR ROFI */
-/* Author: Newman Sanchez (https://github.com/newmanls) */
+* {
+    input-selected:     #89b4faB0;
+
+    background:         #1e1e2eE0;
+    input-bar-bg:       #313244;
+    bg-message:         #45475aE0;
+    fg-text:            #cdd6f4;
+    fg-promt:           #6c7086;
+    fg-placeholder:     #6c7086;
+}
 
 * {
-    font:   "Roboto 12";
+    font:   "FiraCode Nerd Font 15";
 
     background-color:   transparent;
-    text-color:         @fg0;
+    text-color:         @fg-text;
 
     margin:     0px;
     padding:    0px;
@@ -14,11 +22,11 @@
 
 window {
     location:       north;
-    y-offset:       calc(50% - 176px);
-    width:          480;
+    y-offset:       25%;
+    width:          800;
     border-radius:  24px;
 
-    background-color:   @bg0;
+    background-color:   @background;
 }
 
 mainbox {
@@ -26,8 +34,8 @@ mainbox {
 }
 
 inputbar {
-    background-color:   @bg1;
-    border-color:       @bg3;
+    background-color:   @input-bar-bg;
+    border-color:       @input-selected;
 
     border:         2px;
     border-radius:  16px;
@@ -38,19 +46,19 @@ inputbar {
 }
 
 prompt {
-    text-color: @fg2;
+    text-color: @fg-promt;
 }
 
 entry {
     placeholder:        "Search";
-    placeholder-color:  @fg3;
+    placeholder-color:  @fg-placeholder;
 }
 
 message {
     margin:             12px 0 0;
     border-radius:      16px;
-    border-color:       @bg2;
-    background-color:   @bg2;
+    border-color:       @bg-message;
+    background-color:   @bg-message;
 }
 
 textbox {
@@ -61,7 +69,7 @@ listview {
     background-color:   transparent;
 
     margin:     12px 0 0;
-    lines:      8;
+    lines:      12;
     columns:    1;
 
     fixed-height: false;
@@ -73,16 +81,9 @@ element {
     border-radius:  16px;
 }
 
-element normal active {
-    text-color: @bg3;
-}
-
-element alternate active {
-    text-color: @bg3;
-}
 
 element selected normal, element selected active {
-    background-color:   @bg3;
+    background-color:   @input-selected;
 }
 
 element-icon {
