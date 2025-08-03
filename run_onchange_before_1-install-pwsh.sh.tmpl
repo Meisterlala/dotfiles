@@ -1,5 +1,5 @@
 {{- /* Install PowerShell on Arch Linux if missing */ -}}
-{{ if and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.idLike "arch") -}}
+{{ if and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "arch") -}}
 #!/bin/sh
 
 if ! command -v pwsh >/dev/null 2>&1; then
