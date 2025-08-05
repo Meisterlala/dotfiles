@@ -4,6 +4,7 @@ if ($env:POWERSHELL_UPDATECHECK -ne 'LTS')
     [System.Environment]::SetEnvironmentVariable('POWERSHELL_UPDATECHECK', 'LTS', 'User')
 }
 
+$time = [System.Diagnostics.Stopwatch]::StartNew()
 
 # Related Files
 $filesDir = Join-Path $HOME ".config/powershell/"
@@ -46,3 +47,8 @@ oh-my-posh init --config "$HOME/.config/oh-my-posh.yaml" pwsh | Invoke-Expressio
 . $files.completion
 . $files.alias
 . $files.chezmoi
+
+
+# Print timing info
+$time.Stop()
+Write-Host "Profile loaded successfully in $([math]::Round($time.Elapsed.TotalMilliseconds))ms"
