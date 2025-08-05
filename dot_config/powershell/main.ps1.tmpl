@@ -6,23 +6,25 @@ if ($env:POWERSHELL_UPDATECHECK -ne 'LTS')
 
 
 # Related Files
-$scriptDir = Join-Path $HOME ".config/powershell/"
-$script = @{
-    zoxide = Join-Path $scriptDir "zoxide.ps1"
-    api-keys = Join-Path $scriptDir "api-keys.ps1"
-    completion = Join-Path $scriptDir "completion.ps1"
-    alias = Join-Path $scriptDir "alias.ps1"
-    chezmoi = Join-Path $scriptDir "chezmoi.ps1"
+$filesDir = Join-Path $HOME ".config/powershell/"
+$files = @{
+    zoxide = Join-Path $filesDir "zoxide.ps1"
+    apiKeys = Join-Path $filesDir "api-keys.ps1"
+    completion = Join-Path $filesDir "completion.ps1"
+    completionHelper = Join-Path $filesDir "bash-complete.sh"
+    alias = Join-Path $filesDir "alias.ps1"
+    chezmoi = Join-Path $filesDir "chezmoi.ps1"
 }
 
-# Ensure all scripts exist
-foreach ($key in $script.Keys) {
-    if (-Not (Test-Path $script[$key])) {
-        Write-Warning "Missing script: $key → $($script[$key])"
+# Ensure all files exist
+foreach ($key in $files.Keys) {
+    if (-Not (Test-Path $files[$key])) {
+        Write-Error "Missing File: $key → $($files[$key])"
     }
 }
 
-# Setup-PSReadline
+
+### Setup-PSReadline
 # Show multi line history (Toggle with F2)
 Set-PSReadLineOption -PredictionViewStyle ListView
 # Show multi line autocomplete
@@ -31,78 +33,14 @@ Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 # Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
 # Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 
-{{ if eq .chezmoi.os "linux" -}}
-# Setup sudo
-function sudo-last
-{
-    $history = Get-History -Count 3
 
-    if ($history.Count -lt 1)
-    {
-                    Write-Host "No previous command found."
-        return
-    }
-
-    $lastCommand = $history[-1].CommandLine
-
-    if ([string]::IsNullOrWhiteSpace($lastCommand))
-    {
-        Write-Host "Last command was empty."
-        return
-    }
-
-    Invoke-Expression "sudo $lastCommand"
-}
-Set-Alias -Name 's!' -Value sudo-last | Out-Null
-Set-Alias -Name 's!!' -Value sudo-last | Out-Null
-{{- end }}
-
-
-
-
-
+### Oh My Posh init
 {{ if .posh -}}
-# Oh My Posh init
 oh-my-posh init --config "$HOME/.config/oh-my-posh.yaml" pwsh | Invoke-Expression
 {{- end }}
 
-
-
-# EZA
-if (Get-Command eza -ErrorAction SilentlyContinue)
-{
-    function Eza-With-Color
-    {
-        param (
-            [Parameter(ValueFromRemainingArguments = $true)]
-            [string[]]$Args
-        )
-        eza --icons=auto --color=always --color-scale=size -h @Args
-    }
-    Set-Alias -Name ls -Value Eza-With-Color | Out-Null
-}
-
-
-# Setup Chezmoi
-if (Get-Command chezmoi -ErrorAction SilentlyContinue)
-{
-    Invoke-Expression (& { (chezmoi completion powershell | Out-String) })
-
-    function Chezmoi-Edit-With-Args
-    {
-        param (
-            [string]$FilePath
-        )
-        # List all if empty
-        if ([string]::IsNullOrWhiteSpace($FilePath))
-        {
-            chezmoi managed -t
-        } else
-        {
-            chezmoi edit --watch -a $FilePath
-        }
-    }
-    Set-Alias -Name ce -Value Chezmoi-Edit-With-Args | Out-Null
-}
-
-
+. $files.apiKeys
+. $files.zoxide
+. $files.completion
+. $files.alias
+. $files.chezmoi

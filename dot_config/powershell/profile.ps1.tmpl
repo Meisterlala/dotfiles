@@ -19,7 +19,4 @@ if (Get-Command yay -ErrorAction SilentlyContinue) {
 # Load chezmoi data
 
 $chezmoiMain = Join-Path $HOME ".config/powershell/main.ps1"
-$chezmoiAPI = Join-Path $HOME ".config/powershell/api_keys.ps1"
-
 . $chezmoiMain
-. $chezmoiAPI

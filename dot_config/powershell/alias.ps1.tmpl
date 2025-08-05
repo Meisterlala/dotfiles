@@ -1,0 +1,44 @@
+# Aliases
+
+### Sudo
+{{ if eq .chezmoi.os "linux" -}}
+function sudo-last
+{
+    $history = Get-History -Count 3
+
+    if ($history.Count -lt 1)
+    {
+                    Write-Host "No previous command found."
+        return
+    }
+
+    $lastCommand = $history[-1].CommandLine
+
+    if ([string]::IsNullOrWhiteSpace($lastCommand))
+    {
+        Write-Host "Last command was empty."
+        return
+    }
+
+    Invoke-Expression "sudo $lastCommand"
+}
+Set-Alias -Name 's!' -Value sudo-last | Out-Null
+Set-Alias -Name 's!!' -Value sudo-last | Out-Null
+{{- end }}
+
+
+
+### EZA
+
+if (Get-Command eza -ErrorAction SilentlyContinue)
+{
+    function Eza-With-Color
+    {
+        param (
+            [Parameter(ValueFromRemainingArguments = $true)]
+            [string[]]$Args
+        )
+        eza --icons=auto --color=always --color-scale=size -h @Args
+    }
+    Set-Alias -Name ls -Value Eza-With-Color | Out-Null
+}
