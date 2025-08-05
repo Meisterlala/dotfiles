@@ -4,6 +4,22 @@ if ($env:POWERSHELL_UPDATECHECK -ne 'LTS')
     [System.Environment]::SetEnvironmentVariable('POWERSHELL_UPDATECHECK', 'LTS', 'User')
 }
 
+
+# Related Files
+$scriptDir = Join-Path $HOME ".config/powershell/"
+$script = @{
+    zoxide = Join-Path $scriptDir "zoxide.ps1"
+    api-keys = Join-Path $scriptDir "api-keys.ps1"
+    completion = Join-Path $scriptDir "completion.ps1"
+}
+
+# Ensure all scripts exist
+foreach ($key in $script.Keys) {
+    if (-Not (Test-Path $script[$key])) {
+        Write-Warning "Missing script: $key → $($script[$key])"
+    }
+}
+
 # Setup-PSReadline
 # Show multi line history (Toggle with F2)
 Set-PSReadLineOption -PredictionViewStyle ListView
@@ -47,6 +63,7 @@ Set-Alias -Name 's!!' -Value sudo-last | Out-Null
 # Oh My Posh init
 oh-my-posh init --config "$HOME/.config/oh-my-posh.yaml" pwsh | Invoke-Expression
 {{- end }}
+
 
 
 # EZA
@@ -252,4 +269,4 @@ if (Test-Path '/usr/share/bash-completion/bash_completion')
 {
     Import-BashCompletionsToPwsh
 }
-{{- end }}}
+{{- end }}
