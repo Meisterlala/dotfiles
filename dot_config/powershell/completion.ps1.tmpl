@@ -14,8 +14,10 @@ if (-not (Get-Module -ListAvailable -Name PSCompletions))
 # Load the module if installed successfully
 if (Get-Module -ListAvailable -Name PSCompletions)
 {
-    Import-Module PSCompletions -ErrorAction SilentlyContinue
-    psc menu config enable_menu_enhance 0 *> $null
+    try {
+        Import-Module PSCompletions
+        psc menu config enable_menu_enhance 0 *> $null
+    } catch {}
 }
 
 
