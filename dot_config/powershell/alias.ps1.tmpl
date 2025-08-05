@@ -29,7 +29,6 @@ Set-Alias -Name 's!!' -Value sudo-last | Out-Null
 
 
 ### EZA
-
 if (Get-Command eza -ErrorAction SilentlyContinue)
 {
     function Eza-With-Color
@@ -41,4 +40,27 @@ if (Get-Command eza -ErrorAction SilentlyContinue)
         eza --icons=auto --color=always --color-scale=size -h @Args
     }
     Set-Alias -Name ls -Value Eza-With-Color | Out-Null
+}
+
+### Measure in a new Terminal
+function Measure-Script-Separate {
+    param(
+        [Parameter(Mandatory)]
+        [string]$ScriptPath
+    )
+
+    if (-not (Test-Path $ScriptPath)) {
+        throw "Script file '$ScriptPath' does not exist."
+    }
+
+    # Compose the command to run inside the new pwsh process
+    $pwshCommand = @"
+Import-Module PSProfiler -ErrorAction Stop
+Measure-Script -Path '$ScriptPath'
+"@
+
+    # Start new pwsh process with -NoProfile and run the above command
+    $result = pwsh -NoProfile -Command $pwshCommand
+
+    return $result
 }
