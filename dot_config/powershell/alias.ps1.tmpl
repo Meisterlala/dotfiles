@@ -64,3 +64,8 @@ Measure-Script -Path '$ScriptPath'
 
     return $result
 }
+
+### Reload
+function Reload-Profile {
+    . $PROFILE.CurrentUserAllHosts
+}
