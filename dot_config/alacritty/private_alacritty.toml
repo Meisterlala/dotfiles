@@ -32,7 +32,7 @@ semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
 
 [terminal.shell]
 program = "/usr/bin/pwsh"
-args = ["-Login", "-NoLogo"]
+args = ["-Login"]
 
 [window]
 dynamic_title = true
