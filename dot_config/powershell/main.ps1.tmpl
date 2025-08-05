@@ -14,6 +14,7 @@ $files = @{
     completionHelper = Join-Path $filesDir "bash_complete.sh"
     alias = Join-Path $filesDir "alias.ps1"
     chezmoi = Join-Path $filesDir "chezmoi.ps1"
+    measureTime = Join-Path $filesDir "measure_time.ps1"
 }
 
 # Ensure all files exist
@@ -23,6 +24,7 @@ foreach ($key in $files.Keys) {
     }
 }
 
+. $files.measureTime
 
 ### Setup-PSReadline
 # Show multi line history (Toggle with F2)

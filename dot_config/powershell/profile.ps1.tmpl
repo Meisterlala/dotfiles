@@ -16,7 +16,5 @@ if (Get-Command yay -ErrorAction SilentlyContinue) {
 }
 
 
-# Load chezmoi data
-
-$chezmoiMain = Join-Path $HOME ".config/powershell/main.ps1"
-. $chezmoiMain
+# Load Main Data
+. (Join-Path $HOME ".config/powershell/main.ps1")
