@@ -13,8 +13,5 @@ $env:Path += ';Z:\replay_uploader\bin'
 
 # Load chezmoi data
 
-$chezmoiProfile = Join-Path $HOME ".config/profile.ps1"
-$chezmoiAPI = Join-Path $HOME ".config/api_keys.ps1"
+$chezmoiProfile = Join-Path $HOME ".config/powershell/main.ps1"
 
-. $chezmoiProfile
-. $chezmoiAPI
