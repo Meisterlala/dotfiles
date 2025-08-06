@@ -1,8 +1,8 @@
 ### Setup Chezmoi
 
 # Start completion job
-$job = Start-Job {
-    chezmoi completion powershell | Out-String
+$chezmoiJob = Start-Job {
+    New-Module -Name chezmoi -ScriptBlock {Invoke-Expression (chezmoi completion powershell | Out-String)}
 }
 
 # Define the edit helper function and alias right away
@@ -20,13 +20,13 @@ Set-Alias -Name ce -Value Chezmoi-Edit-With-Args | Out-Null
 
 # Register idle handler to load completions when ready
 Register-EngineEvent -SourceIdentifier PowerShell.OnIdle -SupportEvent -Action {
-    if ($using:job.State -eq 'Completed') {
+    if ($chezmoiJob.State -eq 'Completed') {
         # Unregister this handler (needed because -SupportEvent was used)
         Unregister-Event -SubscriptionId $EventSubscriber.SubscriptionId -Force
 
-        $completion = Receive-Job -Job $using:job -Wait
-        Remove-Job $using:job
+        $completion = Receive-Job -Job $chezmoiJob -Wait
+        Remove-Job $chezmoiJob
 
-        Invoke-Expression $completion
+        $completion | Import-Module -Global
     }
 } | Out-Null
