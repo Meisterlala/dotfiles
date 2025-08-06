@@ -1,24 +1,32 @@
-
 ### Setup Chezmoi
-if (Get-Command chezmoi -ErrorAction SilentlyContinue)
-{
-    Invoke-Expression (& { (chezmoi completion powershell | Out-String) })
 
-    function Chezmoi-Edit-With-Args
-    {
-        param (
-            [string]$FilePath
-        )
-        # List all if empty
-        if ([string]::IsNullOrWhiteSpace($FilePath))
-        {
-            chezmoi managed -t
-        } else
-        {
-            chezmoi edit --watch -a $FilePath
-        }
-    }
-    Set-Alias -Name ce -Value Chezmoi-Edit-With-Args | Out-Null
+# Start completion job
+$job = Start-Job {
+    chezmoi completion powershell | Out-String
 }
 
+# Define the edit helper function and alias right away
+function Chezmoi-Edit-With-Args {
+    param (
+        [string]$FilePath
+    )
+    if ([string]::IsNullOrWhiteSpace($FilePath)) {
+        chezmoi managed -t
+    } else {
+        chezmoi edit --watch -a $FilePath
+    }
+}
+Set-Alias -Name ce -Value Chezmoi-Edit-With-Args | Out-Null
 
+# Register idle handler to load completions when ready
+Register-EngineEvent -SourceIdentifier PowerShell.OnIdle -SupportEvent -Action {
+    if ($using:job.State -eq 'Completed') {
+        # Unregister this handler (needed because -SupportEvent was used)
+        Unregister-Event -SubscriptionId $EventSubscriber.SubscriptionId -Force
+
+        $completion = Receive-Job -Job $using:job -Wait
+        Remove-Job $using:job
+
+        Invoke-Expression $completion
+    }
+} | Out-Null
