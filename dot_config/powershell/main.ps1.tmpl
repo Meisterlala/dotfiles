@@ -6,26 +6,17 @@ if ($env:POWERSHELL_UPDATECHECK -ne 'LTS')
 
 $time = [System.Diagnostics.Stopwatch]::StartNew()
 
-# Related Files
-$filesDir = Join-Path $HOME ".config/powershell/"
-$files = @{
-    zoxide = Join-Path $filesDir "zoxide.ps1"
-    apiKeys = Join-Path $filesDir "api_keys.ps1"
-    completion = Join-Path $filesDir "completion.ps1"
-    completionHelper = Join-Path $filesDir "bash_complete.sh"
-    alias = Join-Path $filesDir "alias.ps1"
-    chezmoi = Join-Path $filesDir "chezmoi.ps1"
-    measureTime = Join-Path $filesDir "measure_time.ps1"
+# Session-scoped issue collector for optional tooling
+if (-not $global:ProfileIssues) { $global:ProfileIssues = @() }
+function Add-ProfileIssue {
+    param(
+        [Parameter(Mandatory)][string]$Name,
+        [Parameter(Mandatory)][string]$Message
+    )
+    $global:ProfileIssues += "${Name}: ${Message}"
 }
 
-# Ensure all files exist
-foreach ($key in $files.Keys) {
-    if (-Not (Test-Path $files[$key])) {
-        Write-Warning "Missing File: $key → $($files[$key])"
-    }
-}
-
-. $files.measureTime
+Import-Module (Join-Path $HOME ".config/powershell/Modules/Profile.Core/Profile.Core.psm1") -ErrorAction SilentlyContinue
 
 ### Setup-PSReadline
 # Show multi line history (Toggle with F2)
@@ -39,16 +30,38 @@ Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 
 ### Oh My Posh init
 {{ if .posh -}}
-oh-my-posh init --config "$HOME/.config/oh-my-posh.yaml" pwsh | Invoke-Expression
+if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
+    oh-my-posh init --config "$HOME/.config/oh-my-posh.yaml" pwsh | Invoke-Expression
+} else { if (Get-Command Add-ProfileIssue -ErrorAction SilentlyContinue) { Add-ProfileIssue 'oh-my-posh' 'not installed' } }
 {{- end }}
 
-. $files.apiKeys
-. $files.zoxide
-. $files.completion
-. $files.alias
-. $files.chezmoi
+# Import modular components if available
+$modulesBase = Join-Path $HOME ".config/powershell/Modules"
+if (Test-Path (Join-Path $HOME ".config/powershell/api_keys.ps1")) { . (Join-Path $HOME ".config/powershell/api_keys.ps1") }
+Import-Module (Join-Path $modulesBase "Profile.Zoxide/Profile.Zoxide.psm1") -ErrorAction SilentlyContinue
+Import-Module (Join-Path $modulesBase "Profile.Completions/Profile.Completions.psm1") -ErrorAction SilentlyContinue
+Import-Module (Join-Path $modulesBase "Profile.Aliases/Profile.Aliases.psm1") -ErrorAction SilentlyContinue
+Import-Module (Join-Path $modulesBase "Profile.Chezmoi/Profile.Chezmoi.psm1") -ErrorAction SilentlyContinue
 
 
 # Print timing info
 $time.Stop()
 Write-Host "Profile loaded successfully in $([math]::Round($time.Elapsed.TotalMilliseconds))ms"
+
+# Optional tooling summary (printed once per session if issues exist)
+try {
+    # Post-load checks for common optional tools
+    if (-not (Get-Command zoxide -ErrorAction SilentlyContinue)) { Add-ProfileIssue 'zoxide' 'not installed' }
+    if (-not (Get-Module -ListAvailable -Name PSCompletions)) { Add-ProfileIssue 'PSCompletions' 'module missing' }
+    {{ if eq .chezmoi.os "linux" -}}
+    if (-not (Test-Path '/usr/share/bash-completion/bash_completion')) { Add-ProfileIssue 'bash-completion' 'system file missing' }
+    if (-not (Get-Command yay -ErrorAction SilentlyContinue)) { Add-ProfileIssue 'yay' 'not installed' }
+    if (-not (Get-Command pacman -ErrorAction SilentlyContinue)) { Add-ProfileIssue 'pacman' 'not installed' }
+    {{- end }}
+
+    $issueCount = $global:ProfileIssues.Count
+    if ($issueCount -gt 0) {
+        $preview = ($global:ProfileIssues | Select-Object -First 4) -join '; '
+        Write-Host ("Optional tools missing or failed to load: {0}. {1}" -f $issueCount, $preview) -ForegroundColor Yellow
+    }
+} catch {}

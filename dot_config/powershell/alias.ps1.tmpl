@@ -41,6 +41,9 @@ if (Get-Command eza -ErrorAction SilentlyContinue)
     }
     Set-Alias -Name ls -Value Eza-With-Color | Out-Null
 }
+elseif (Get-Command ls -ErrorAction SilentlyContinue) {
+    # Leave default 'ls' as-is if eza not installed
+}
 
 ### Measure in a new Terminal
 function Measure-Script-Separate {
@@ -67,7 +70,7 @@ Measure-Script -Path '$ScriptPath'
 
 ### Reload
 function Reload-Profile {
-    . $PROFILE.CurrentUserAllHosts
+    if (Test-Path $PROFILE.CurrentUserAllHosts) { . $PROFILE.CurrentUserAllHosts }
 }
 
 
@@ -95,5 +98,9 @@ if ($Webcam) {
 
 
 # Start scrcpy and get the process object
-Start-Process "scrcpy" -ArgumentList $args -Wait
+if (Get-Command scrcpy -ErrorAction SilentlyContinue) {
+    Start-Process "scrcpy" -ArgumentList $args -Wait
+} else {
+    Write-Warning "scrcpy not found. Please install it first."
+}
 }
