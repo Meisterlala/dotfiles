@@ -1,24 +1,14 @@
-# Ensure PSCompletions is installed and loaded
-if (-not (Get-Module -ListAvailable -Name PSCompletions))
-{
-    try
-    {
-        Install-Module PSCompletions -Scope CurrentUser -Force -ErrorAction Stop
-        psc add 7z arch  basename  bun cargo chfs choco cksum conda date dd deno df dircolors dirname docker du env fold git hashsum head join kubectl link ln md5sum ngrok nl npm nproc oh-my-posh paste pip pnpm powershell psc pwsh python scoop scoop-install scoop-update sfsu uv volta winget wsh wsl wt yarn
-    } catch
-    {
-        Write-Warning "Failed to install PSCompletions: $_"
-    }
-}
-
-# Load the module if installed successfully
-if (Get-Module -ListAvailable -Name PSCompletions)
-{
-    try {
-        Import-Module PSCompletions
+# Load PSCompletions if available (installation handled by run-once script)
+try {
+    if (Get-Module -ListAvailable -Name PSCompletions) {
+        # Avoid re-import
+        if (-not (Get-Module PSCompletions)) {
+            Import-Module PSCompletions -ErrorAction Stop
+        }
+        # Keep menu minimal for speed
         psc menu config enable_menu_enhance 0 *> $null
-    } catch {}
-}
+    }
+} catch {}
 
 
 
@@ -59,7 +49,8 @@ function Get-PackageCompletions
     return $global:PackageCache[$Command]
 }
 
-# Register completions for pacman
+# Register completions for pacman (Arch)
+if (Get-Command pacman -ErrorAction SilentlyContinue) {
 Register-ArgumentCompleter -Native -CommandName 'pacman' -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
 
@@ -78,8 +69,10 @@ Register-ArgumentCompleter -Native -CommandName 'pacman' -ScriptBlock {
             )
         }
 }
+}
 
-# Register completions for yay
+# Register completions for yay (Arch AUR helper)
+if (Get-Command yay -ErrorAction SilentlyContinue) {
 Register-ArgumentCompleter -Native -CommandName 'yay' -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
 
@@ -97,6 +90,7 @@ Register-ArgumentCompleter -Native -CommandName 'yay' -ScriptBlock {
                 "$($_.Description) [$($_.Repo)/$($_.Version)]"
             )
         }
+}
 }
 {{- end }}
 
@@ -117,7 +111,10 @@ function Register-BashCompletion
         $cmd = $commandAst.GetCommandName()
 
         $helper = $files.completionHelper
-        $results = @(bash $helper  $cmd "$cmd $wordToComplete")
+        $results = @()
+        if (Test-Path $helper) {
+            $results = @(bash $helper  $cmd "$cmd $wordToComplete")
+        }
 
         foreach ($item in $results)
         {
@@ -162,9 +159,6 @@ function Import-BashCompletionsToPwsh
 {{ if eq .chezmoi.os "linux" -}}
 if (Test-Path '/usr/share/bash-completion/bash_completion')
 {
-    # Require bash-helper
-
-
     Import-BashCompletionsToPwsh
 }
 {{- end }}

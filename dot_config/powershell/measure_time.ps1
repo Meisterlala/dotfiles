@@ -1,19 +1,15 @@
-# Check if PSProfiler is installed
-if (-not (Get-Module -ListAvailable -Name PSProfiler)) {
-    try {
-        Write-Host "Installing PSProfiler..."
-        Install-Module PSProfiler -Scope CurrentUser -Force -ErrorAction Stop
+function Measure-Script {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path
+    )
+    if (-not (Test-Path $Path)) {
+        throw "Script '$Path' does not exist."
     }
-    catch {
-        Write-Warning "Failed to install PSProfiler: $_"
+    $sw = [System.Diagnostics.Stopwatch]::StartNew()
+    try { & $Path } finally {
+        $sw.Stop();
+        Write-Host ("{0} ms" -f [math]::Round($sw.Elapsed.TotalMilliseconds))
     }
-}
-
-# Try to import the module
-try {
-    Import-Module PSProfiler -ErrorAction Stop
-}
-catch {
-    Write-Warning "⚠ Could not load PSProfiler: $_"
 }
 
