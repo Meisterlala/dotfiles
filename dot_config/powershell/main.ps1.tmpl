@@ -28,12 +28,9 @@ Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 # Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 
 
-### Oh My Posh init
-{{ if .posh -}}
-if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
-    oh-my-posh init --config "$HOME/.config/oh-my-posh.yaml" pwsh | Invoke-Expression
-} else { if (Get-Command Add-ProfileIssue -ErrorAction SilentlyContinue) { Add-ProfileIssue 'oh-my-posh' 'not installed' } }
-{{- end }}
+### Prompt init
+Import-Module (Join-Path $modulesBase "Profile.Prompt/Profile.Prompt.psm1") -ErrorAction SilentlyContinue
+if (Get-Command Initialize-PromptTheme -ErrorAction SilentlyContinue) { Initialize-PromptTheme } else { if (Get-Command Add-ProfileIssue -ErrorAction SilentlyContinue) { Add-ProfileIssue 'prompt' 'not initialized' } }
 
 # Import modular components if available
 $modulesBase = Join-Path $HOME ".config/powershell/Modules"
@@ -42,6 +39,12 @@ Import-Module (Join-Path $modulesBase "Profile.Zoxide/Profile.Zoxide.psm1") -Err
 Import-Module (Join-Path $modulesBase "Profile.Completions/Profile.Completions.psm1") -ErrorAction SilentlyContinue
 Import-Module (Join-Path $modulesBase "Profile.Aliases/Profile.Aliases.psm1") -ErrorAction SilentlyContinue
 Import-Module (Join-Path $modulesBase "Profile.Chezmoi/Profile.Chezmoi.psm1") -ErrorAction SilentlyContinue
+
+# Lazy init hooks (register on-demand initializers without blocking startup)
+if (Get-Command Initialize-Zoxide -ErrorAction SilentlyContinue) {
+    # Warm up zoxide init shortly after prompt shows without blocking
+    Start-Job -ScriptBlock { pwsh -NoProfile -Command "Import-Module '$HOME/.config/powershell/Modules/Profile.Zoxide/Profile.Zoxide.psm1'; Initialize-Zoxide" } | Out-Null
+}
 
 
 # Print timing info
