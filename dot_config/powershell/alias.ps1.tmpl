@@ -69,3 +69,31 @@ Measure-Script -Path '$ScriptPath'
 function Reload-Profile {
     . $PROFILE.CurrentUserAllHosts
 }
+
+
+
+function Start-Scrcpy() {
+param(
+  # Use -Webcam to enable webcam mode
+  [switch]$Webcam
+)
+
+$IP = "pocof2"
+
+$args = @(
+  "--video-codec=h264",
+  "--video-bit-rate=16M",
+  "--audio-bit-rate=128K",
+  "--max-fps=60"
+  "--v4l2-sink=/dev/video0"
+  "--camera-size=1920x1080"
+)
+
+if ($Webcam) {
+  $args += "--video-source=camera", "--camera-id=0", "--no-video-playback", "--camera-size=1920x1080"
+}
+
+
+# Start scrcpy and get the process object
+Start-Process "scrcpy" -ArgumentList $args -Wait
+}
