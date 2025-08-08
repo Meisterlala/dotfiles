@@ -1,10 +1,10 @@
 function Install-Zoxide {
-    if (Get-OS -eq "windows") {
-        Write-Host (Get-Color-String "<Teal>Installing zoxide via winget…<Clear>")
+    if (Get-OperatingSystem -eq "windows") {
+        Write-Host (Get-ColorString "<Teal>Installing zoxide via winget…<Clear>")
         winget install --silent ajeetdsouza.zoxide
     }
     else {
-        Write-Host (Get-Color-String "<Teal>Installing zoxide via curl…<Clear>")
+        Write-Host (Get-ColorString "<Teal>Installing zoxide via curl…<Clear>")
         bash -c "curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh"
     }
 }

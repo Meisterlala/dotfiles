@@ -1,5 +1,5 @@
 # Core functions
-function Get-OS {
+function Get-OperatingSystem {
     if ($env:OS -eq "Windows_NT") {
         return "windows"
     }
@@ -8,28 +8,28 @@ function Get-OS {
     }
 }
 
-function Get-Profile-Issues {
+function Show-ProfileIssues {
     # Render all errors
     foreach ($issue in $global:ProfileIssues) {
-        Write-Warning (Get-Color-String $issue)
+        Write-Warning (Get-ColorString $issue)
     }
 }
 
-function Get-Profile-Async {
+function Show-ProfileAsync {
     # Render all errors
     foreach ($issue in $global:ProfileLoadedAsync) {
-        Write-Host (Get-Color-String $issue)
+        Write-Host (Get-ColorString $issue)
     }
 }
 
-function Get-Color-String {
+function Get-ColorString {
     param (
         [Parameter(Mandatory)]
         [string] $in
     )
-    $handler = Get-Command -Name 'Get-Color-String-Catppucci' -CommandType Function -ErrorAction SilentlyContinue
+    $handler = Get-Command -Name 'Get-ColorStringCatppuccin' -CommandType Function -ErrorAction SilentlyContinue
     if ($null -ne $handler) {
-        return (Get-Color-String-Catppucci -in $in)
+        return (Get-ColorStringCatppuccin -in $in)
     }
 
     # Fallback: strip tags if handler isn't loaded yet
@@ -94,7 +94,7 @@ function Start-AsyncModuleInitialization {
                 }
 
                 # Display all errors
-                Get-Profile-Issues
+                Show-ProfileIssues
             }
         }
         catch {

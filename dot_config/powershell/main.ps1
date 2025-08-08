@@ -33,11 +33,11 @@ if (Test-Path $myFiles.core) {
     . $myFiles.core
 }
 else {
-    Write-Error (Get-Color-String "<Red>Cant find core module of cutom profile")
+    Write-Error (Get-ColorString "<Red>Cant find core module of cutom profile")
 }
 
 # Add Modules to PS Module load list
-if (Get-Os -eq "windows") {
+if (Get-OperatingSystem -eq "windows") {
     $env:PSModulePath += ";$powershellModules"
 }
 else {
@@ -54,12 +54,7 @@ foreach ($key in $myFilesAndModules.Keys) {
 
 ### Setup Temporary promt
 function prompt {
-    if ($global:Flavor) {
-        "$($global:Flavor.Peach.Foreground())[Loading] $($global:Flavor.Text.Foreground())$($executionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1)) ";
-    }
-    else {
-        "$([char]0x1b)[93m[Loading]$([char]0x1b)[0m $($executionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1)) ";
-    }
+    return Get-ColorString ("<Peach>[Loading]<Clear> $($executionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1)) ")
 }
 
 ### Setup-PSReadline
@@ -81,14 +76,14 @@ $time.Stop()
 # Pretty print profile load result with timing
 $elapsedMs = [math]::Round($time.Elapsed.TotalMilliseconds)
 if ($elapsedMs -lt 250) {
-    Write-Host (Get-Color-String "<Text>Profile loaded in <Green>$elapsedMs ms<Clear>")
+    Write-Host (Get-ColorString "<Text>Profile loaded in <Green>$elapsedMs ms<Clear>")
 }
 elseif ($elapsedMs -lt 750) {
-    Write-Host (Get-Color-String "<Text>Profile loaded in <Text>$elapsedMs ms<Clear>")
+    Write-Host (Get-ColorString "<Text>Profile loaded in <Text>$elapsedMs ms<Clear>")
 }
 elseif ($elapsedMs -lt 2000) {
-    Write-Host (Get-Color-String "<Text>Profile loaded in <Yellow>$elapsedMs ms<Clear>")
+    Write-Host (Get-ColorString "<Text>Profile loaded in <Yellow>$elapsedMs ms<Clear>")
 }
 else {
-    Write-Host (Get-Color-String "<Text>Profile loaded in <Red>$elapsedMs ms<Clear>")
+    Write-Host (Get-ColorString "<Text>Profile loaded in <Red>$elapsedMs ms<Clear>")
 }
