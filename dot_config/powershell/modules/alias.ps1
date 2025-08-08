@@ -25,14 +25,14 @@ Set-Alias -Name 's!!' -Value sudo-last | Out-Null
 
 ### EZA
 if (Get-Command eza -ErrorAction SilentlyContinue) {
-    function Eza-With-Color {
+    function Get-Eza-With-Color {
         param (
             [Parameter(ValueFromRemainingArguments = $true)]
             [string[]]$Args
         )
         eza --icons=auto --color=always --color-scale=size -h @Args
     }
-    Set-Alias -Name ls -Value Eza-With-Color | Out-Null
+    Set-Alias -Name ls -Value Get-Eza-With-Color | Out-Null
 }
 
 ### Measure in a new Terminal
@@ -64,7 +64,7 @@ function Reload-Profile {
 }
 
 # yay no confirm alias
-function yay-no-confirm {
+function Invoke-yay-no-confirm {
     param (
         [Parameter(ValueFromRemainingArguments = $true)]
         [string[]]$Args
@@ -72,7 +72,7 @@ function yay-no-confirm {
     yay --noconfirm @Args
 }
 
-Set-Alias -Name yyay -Value yay-no-confirm | Out-Null
+Set-Alias -Name yyay -Value Invoke-yay-no-confirm | Out-Null
 
 
 function Start-Scrcpy() {
