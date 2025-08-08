@@ -20,7 +20,7 @@ if (-not $global:PackageCache) {
 }
 
 # Function to fetch and parse packages
-function Get-PackageCompletions {
+function Get-PackageCompletion {
     param (
         [string]$Command
     )
@@ -50,7 +50,7 @@ function Get-PackageCompletions {
 Register-ArgumentCompleter -Native -CommandName 'pacman' -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
 
-    $packages = Get-PackageCompletions 'pacman'
+    $packages = Get-PackageCompletion 'pacman'
     $prefix = [regex]::Escape($wordToComplete)
 
     $packages |
@@ -70,7 +70,7 @@ Register-ArgumentCompleter -Native -CommandName 'pacman' -ScriptBlock {
 Register-ArgumentCompleter -Native -CommandName 'yay' -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
 
-    $packages = Get-PackageCompletions 'yay'
+    $packages = Get-PackageCompletion 'yay'
     $prefix = [regex]::Escape($wordToComplete)
 
     $packages |
@@ -110,7 +110,7 @@ function Register-BashCompletion {
     }
 }
 
-function Get-BashCompletions {
+function Get-BashCompletion {
     # Get commands that have registered completions
     $cmds = bash -c 'source /usr/share/bash-completion/bash_completion; complete -p' |
     ForEach-Object {
@@ -130,10 +130,10 @@ function Get-BashCompletions {
     Sort-Object -Unique
 }
 
-function Import-BashCompletionsToPwsh {
-    $commands = Get-BashCompletions
+function Import-BashCompletionIntoPwsh {
+    $commands = Get-BashCompletion
 
-    Write-Host (Get-Color-String "<Green>Registering $($commands.Count) commands for pwsh completion...<Clear>")
+    Write-Host (Get-ColorString "<Green>Registering $($commands.Count) commands for pwsh completion...<Clear>")
     foreach ($cmd in $commands) {
         Register-BashCompletion $cmd
     }
@@ -141,5 +141,5 @@ function Import-BashCompletionsToPwsh {
 
 if (Test-Path '/usr/share/bash-completion/bash_completion') {
     # Require bash-helper
-    Import-BashCompletionsToPwsh
+    Import-BashCompletionIntoPwsh
 }

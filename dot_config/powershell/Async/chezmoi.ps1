@@ -3,7 +3,7 @@
 if (Get-Command chezmoi -ErrorAction SilentlyContinue) {
     Invoke-Expression (& { (chezmoi completion powershell | Out-String) })
 
-    function Edit-Chezmoi{
+    function Edit-Chezmoi {
         param (
             [string]$FilePath
         )
