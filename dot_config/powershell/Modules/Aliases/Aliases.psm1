@@ -31,3 +31,16 @@ function Start-Scrcpy {
 }
 
 
+# yay no confirm alias
+if (Get-Command yay -ErrorAction SilentlyContinue) {
+    function yay-no-confirm {
+        param (
+            [Parameter(ValueFromRemainingArguments = $true)]
+            [string[]]$Args
+        )
+        yay --noconfirm @Args
+    }
+
+    Set-Alias -Name yyay -Value yay-no-confirm | Out-Null
+}
+
