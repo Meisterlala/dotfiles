@@ -4,6 +4,7 @@ if ($env:POWERSHELL_UPDATECHECK -ne 'LTS') {
 }
 
 $time = [System.Diagnostics.Stopwatch]::StartNew()
+$modulesBase = Join-Path $HOME ".config/powershell/Modules"
 
 # Session-scoped issue collector for optional tooling
 if (-not $global:ProfileIssues) { $global:ProfileIssues = @() }
@@ -15,8 +16,21 @@ function Add-ProfileIssue {
     $global:ProfileIssues += "${Name}: ${Message}"
 }
 
-$modulesBase = Join-Path $HOME ".config/powershell/Modules"
-Import-Module (Join-Path $modulesBase "Core/Core.psm1") 
+function Import-Module-Try {
+    param(
+        [Parameter(Mandatory)][string]$Name
+    )
+    try {
+        Import-Module (Join-Path $modulesBase "$Name/$Name.psm1")
+        return $true
+    }
+    catch {
+        Add-ProfileIssue "Could not import module $Name :" $_.Exception.Message
+        return $false
+    }
+}
+
+Import-Module-Try "Core"
 
 ### Setup-PSReadline
 # Show multi line history (Toggle with F2)
@@ -29,42 +43,25 @@ Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 
 
 ### Prompt init
-Import-Module (Join-Path $modulesBase "Prompt/Prompt.psm1")
-if (Get-Command Initialize-PromptTheme -ErrorAction SilentlyContinue) { Initialize-PromptTheme } else { if (Get-Command Add-ProfileIssue -ErrorAction SilentlyContinue) { Add-ProfileIssue 'prompt' 'not initialized' } }
+if (Import-Module-Try "Prompt") {
+    Initialize-PromptTheme
+}
 
 # Import modular components if available
-if (Test-Path (Join-Path $HOME ".config/powershell/api_keys.ps1")) { . (Join-Path $HOME ".config/powershell/api_keys.ps1") }
-Import-Module (Join-Path $modulesBase "Zoxide/Zoxide.psm1") -ErrorAction SilentlyContinue
-Import-Module (Join-Path $modulesBase "Completions/Completions.psm1") -ErrorAction SilentlyContinue
-Import-Module (Join-Path $modulesBase "Aliases/Aliases.psm1") -ErrorAction SilentlyContinue
-Import-Module (Join-Path $modulesBase "Chezmoi/Chezmoi.psm1") -ErrorAction SilentlyContinue
+if (Test-Path (Join-Path $HOME ".config/powershell/api_keys.ps1")) { . (Join-Path $HOME ".config/powershell/api_keys.ps1") } else { Add-ProfileIssue "api_keys.ps1" "not found" }
 
-# Lazy init hooks (register on-demand initializers without blocking startup)
-if (Get-Command Initialize-Zoxide -ErrorAction SilentlyContinue) {
-    # Warm up zoxide init shortly after prompt shows without blocking
-    Start-Job -ScriptBlock { Import-Module (Join-Path $using:modulesBase 'Zoxide/Zoxide.psm1'); Initialize-Zoxide } | Out-Null
-}
+if (Import-Module-Try "Zoxide") { Initialize-Zoxide }
+if (Import-Module-Try "Completions") { Import-BashCompletionsToPwsh }
+Import-Module-Try "Aliases"
+Import-Module-Try "Chezmoi" 
 
 
 # Print timing info
 $time.Stop()
-Write-Host "Profile loaded successfully in $([math]::Round($time.Elapsed.TotalMilliseconds))ms"
+Write-Host "Profile loaded $(if ($global:ProfileIssues.Count -gt 0) { "with $($global:ProfileIssues.Count) issues" } else { "successfully" }) in $([math]::Round($time.Elapsed.TotalMilliseconds))ms"
 
-# Optional tooling summary (printed once per session if issues exist)
-try {
-    # Post-load checks for common optional tools
-    if (-not (Get-Command zoxide -ErrorAction SilentlyContinue)) { Add-ProfileIssue 'zoxide' 'not installed' }
-    if (-not (Get-Module -ListAvailable -Name PSCompletions)) { Add-ProfileIssue 'PSCompletions' 'module missing' }
-    # {{ if eq .chezmoi.os "linux" -}}
-    if (-not (Test-Path '/usr/share/bash-completion/bash_completion')) { Add-ProfileIssue 'bash-completion' 'system file missing' }
-    if (-not (Get-Command yay -ErrorAction SilentlyContinue)) { Add-ProfileIssue 'yay' 'not installed' }
-    if (-not (Get-Command pacman -ErrorAction SilentlyContinue)) { Add-ProfileIssue 'pacman' 'not installed' }
-    # {{- end }}
-
-    $issueCount = $global:ProfileIssues.Count
-    if ($issueCount -gt 0) {
-        $preview = ($global:ProfileIssues | Select-Object -First 4) -join '; '
-        Write-Host ("Optional tools missing or failed to load: {0}. {1}" -f $issueCount, $preview) -ForegroundColor Yellow
-    }
+# Print issues if any
+if ($global:ProfileIssues.Count -gt 0) {
+    $preview = ($global:ProfileIssues | Select-Object -First 4) -join '; '
+    Write-Host "Failed: $preview" -ForegroundColor Yellow
 }
-catch {}
