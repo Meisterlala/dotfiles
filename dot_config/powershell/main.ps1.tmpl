@@ -33,7 +33,6 @@ Import-Module (Join-Path $modulesBase "Prompt/Prompt.psm1")
 if (Get-Command Initialize-PromptTheme -ErrorAction SilentlyContinue) { Initialize-PromptTheme } else { if (Get-Command Add-ProfileIssue -ErrorAction SilentlyContinue) { Add-ProfileIssue 'prompt' 'not initialized' } }
 
 # Import modular components if available
-$modulesBase = Join-Path $HOME ".config/powershell/Modules"
 if (Test-Path (Join-Path $HOME ".config/powershell/api_keys.ps1")) { . (Join-Path $HOME ".config/powershell/api_keys.ps1") }
 Import-Module (Join-Path $modulesBase "Zoxide/Zoxide.psm1") -ErrorAction SilentlyContinue
 Import-Module (Join-Path $modulesBase "Completions/Completions.psm1") -ErrorAction SilentlyContinue
@@ -43,7 +42,7 @@ Import-Module (Join-Path $modulesBase "Chezmoi/Chezmoi.psm1") -ErrorAction Silen
 # Lazy init hooks (register on-demand initializers without blocking startup)
 if (Get-Command Initialize-Zoxide -ErrorAction SilentlyContinue) {
     # Warm up zoxide init shortly after prompt shows without blocking
-    Start-Job -ScriptBlock { pwsh -NoProfile -Command "Import-Module '$HOME/.config/powershell/Modules/Zoxide/Zoxide.psm1'; Initialize-Zoxide" } | Out-Null
+    Start-Job -ScriptBlock { Import-Module (Join-Path $using:modulesBase 'Zoxide/Zoxide.psm1'); Initialize-Zoxide } | Out-Null
 }
 
 
