@@ -33,7 +33,7 @@ if (Test-Path $myFiles.core) {
     . $myFiles.core
 }
 else {
-    Write-Error "Cant find core module of cutom profile"
+    Write-Error (Get-Color-String "<Red>Cant find core module of cutom profile")
 }
 
 # Add Modules to PS Module load list
@@ -80,16 +80,15 @@ $time.Stop()
 
 # Pretty print profile load result with timing
 $elapsedMs = [math]::Round($time.Elapsed.TotalMilliseconds)
-Write-Host "Profile loaded in " -NoNewline
 if ($elapsedMs -lt 250) {
-    Write-Host "$elapsedMs ms" -ForegroundColor Green
+    Write-Host (Get-Color-String "<Text>Profile loaded in <Green>$elapsedMs ms<Clear>")
 }
 elseif ($elapsedMs -lt 750) {
-    Write-Host "$elapsedMs ms"
+    Write-Host (Get-Color-String "<Text>Profile loaded in <Text>$elapsedMs ms<Clear>")
 }
 elseif ($elapsedMs -lt 2000) {
-    Write-Host "$elapsedMs ms" -ForegroundColor Yellow
+    Write-Host (Get-Color-String "<Text>Profile loaded in <Yellow>$elapsedMs ms<Clear>")
 }
 else {
-    Write-Host "$elapsedMs ms" -ForegroundColor Red
+    Write-Host (Get-Color-String "<Text>Profile loaded in <Red>$elapsedMs ms<Clear>")
 }

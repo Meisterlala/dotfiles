@@ -4,7 +4,7 @@ if (-not (Get-Module -ListAvailable -Name PSCompletions)) {
         Install-Module PSCompletions -Scope CurrentUser -Force -ErrorAction Stop
     }
     catch {
-        $global:ProfileIssues += "Failed to install PSCompletions: $_"
+        $global:ProfileIssues += "<Red>Failed to install PSCompletions<Clear>: $_"
     }
 }
 
@@ -133,7 +133,7 @@ function Get-BashCompletions {
 function Import-BashCompletionsToPwsh {
     $commands = Get-BashCompletions
 
-    Write-Host "Registering $($commands.Count) commands for pwsh completion..." -ForegroundColor Green
+    Write-Host (Get-Color-String "<Green>Registering $($commands.Count) commands for pwsh completion...<Clear>")
     foreach ($cmd in $commands) {
         Register-BashCompletion $cmd
     }
