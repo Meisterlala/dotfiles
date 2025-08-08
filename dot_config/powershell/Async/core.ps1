@@ -22,6 +22,16 @@ function Get-Profile-Async {
     }
 }
 
+function Get-Color-String {
+    param (
+        [Parameter(Mandatory)]
+        [string] $in
+    )
+    # Ceck if catppucin is loaded
+
+}
+
+
 # Schedules module/script loading to occur asynchronously during idle time.
 # Each queued script is executed one-at-a-time on each idle event, which keeps
 # the initial prompt responsive.
@@ -72,7 +82,7 @@ function Start-AsyncModuleInitialization {
 
                 # Re-render the prompt as soon as possible
                 try {
-                    [Microsoft.PowerShell.PSConsoleReadLine]::InvokePrompt()
+                    # [Microsoft.PowerShell.PSConsoleReadLine]::InvokePrompt()
                 }
                 catch {
                     # PSReadLine not available; ignore
