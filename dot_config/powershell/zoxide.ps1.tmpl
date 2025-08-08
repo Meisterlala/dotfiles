@@ -1,5 +1,0 @@
-# Initialize zoxide (installation handled by run-once script)
-if (Get-Command zoxide -ErrorAction SilentlyContinue)
-{
-    Invoke-Expression (& { (zoxide init --cmd cd powershell | Out-String) })
-}
