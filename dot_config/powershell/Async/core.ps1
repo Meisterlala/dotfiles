@@ -11,14 +11,14 @@ function Get-OS {
 function Get-Profile-Issues {
     # Render all errors
     foreach ($issue in $global:ProfileIssues) {
-        Write-Warning $issue
+        Write-Warning (Get-Color-String $issue)
     }
 }
 
 function Get-Profile-Async {
     # Render all errors
     foreach ($issue in $global:ProfileLoadedAsync) {
-        Write-Host $issue
+        Write-Host (Get-Color-String $issue)
     }
 }
 
@@ -27,8 +27,13 @@ function Get-Color-String {
         [Parameter(Mandatory)]
         [string] $in
     )
-    # Ceck if catppucin is loaded
+    $handler = Get-Command -Name 'Get-Color-String-Catppucci' -CommandType Function -ErrorAction SilentlyContinue
+    if ($null -ne $handler) {
+        return (Get-Color-String-Catppucci -in $in)
+    }
 
+    # Fallback: strip tags if handler isn't loaded yet
+    return [regex]::Replace($in, '<([A-Za-z0-9]+)>', '')
 }
 
 
@@ -68,11 +73,11 @@ function Start-AsyncModuleInitialization {
                     
                     # Track it
                     $elapesdmoduleMS = [math]::Round($moduleTime.Elapsed.TotalMilliseconds)
-                    $global:ProfileLoadedAsync += "$($file.Name) ($elapesdmoduleMS ms) from $($file.Path)"
+                    $global:ProfileLoadedAsync += "<Teal>$($file.Name) <Rosewater>($elapesdmoduleMS ms)<Clear> from $($file.Path)"
                 }
                 catch {
                     $moduleTime.Stop() 
-                    $global:ProfileIssues += "Async init failed (${$file.Name}): $($_.Exception.Message)"
+                    $global:ProfileIssues += "Async init failed <Teal>(${$file.Name})<Clear>: $($_.Exception.Message)"
                     return
                 }
             }
