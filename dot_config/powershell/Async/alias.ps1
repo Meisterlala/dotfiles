@@ -5,14 +5,14 @@ function sudo-last {
     $history = Get-History -Count 3
 
     if ($history.Count -lt 1) {
-        Write-Host "No previous command found."
+        Write-Host (Get-Color-String "<Peach>No previous command found.<Clear>")
         return
     }
 
     $lastCommand = $history[-1].CommandLine
 
     if ([string]::IsNullOrWhiteSpace($lastCommand)) {
-        Write-Host "Last command was empty."
+        Write-Host (Get-Color-String "<Peach>Last command was empty.<Clear>")
         return
     }
 

@@ -1,10 +1,10 @@
 function Install-Zoxide {
     if (Get-OS -eq "windows") {
-        Write-Host "Installing zoxide via winget…" -ForegroundColor Cyan
+        Write-Host (Get-Color-String "<Teal>Installing zoxide via winget…<Clear>")
         winget install --silent ajeetdsouza.zoxide
     }
     else {
-        Write-Host "Installing zoxide via curl…" -ForegroundColor Cyan
+        Write-Host (Get-Color-String "<Teal>Installing zoxide via curl…<Clear>")
         bash -c "curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh"
     }
 }
@@ -16,9 +16,9 @@ try {
 }
 catch {
     if (-not (Get-Command zoxide -ErrorAction SilentlyContinue)) {
-        $global:ProfileIssues += "zoxide is not installed. Call Install-Zoxide to install it."
+        $global:ProfileIssues += "<Peach>zoxide is not installed. Call Install-Zoxide to install it.<Clear>"
     }
     else {
-        $global:ProfileIssues += "zoxide could not be initialized"
+        $global:ProfileIssues += "<Peach>zoxide could not be initialized<Clear>"
     }
 }
