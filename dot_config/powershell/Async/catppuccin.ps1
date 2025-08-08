@@ -87,11 +87,3 @@ $global:PSStyle.Formatting.TableHeader = $Flavor.Rosewater.Foreground()
 $global:PSStyle.Formatting.Verbose = $Flavor.Yellow.Foreground()
 $global:PSStyle.Formatting.Warning = $Flavor.Peach.Foreground()
 
-
-# Re-render the prompt as soon as possible
-try {
-	[Microsoft.PowerShell.PSConsoleReadLine]::InvokePrompt()
-}
-catch {
-	# PSReadLine not available; ignore
-}
