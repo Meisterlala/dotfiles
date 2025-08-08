@@ -17,12 +17,13 @@ $myFiles = @{
     apiKeys          = Join-Path $powershellDir "api_keys.ps1"
     core             = Join-Path $powershellModules "core.ps1"
 }
-$myModules = @{
+$myModules = [ordered]@{
     zoxide     = Join-Path $powershellModules "zoxide.ps1"
     completion = Join-Path $powershellModules "completion.ps1"
     alias      = Join-Path $powershellModules "alias.ps1"
     chezmoi    = Join-Path $powershellModules "chezmoi.ps1"
     psprofiler = Join-Path $powershellModules "psprofiler.ps1"
+    ohMyPosh   = Join-Path $powershellModules "oh-my-posh.ps1"
 }
 
 # Load Core
@@ -33,7 +34,6 @@ else {
     Write-Error "Cant find core module of cutom profile"
 }
 
-
 # Ensure all files exist
 $myFilesAndModules = $myFiles + $myModules
 foreach ($key in $myFilesAndModules.Keys) {
@@ -42,7 +42,11 @@ foreach ($key in $myFilesAndModules.Keys) {
     }
 }
 
-
+### Setup Temporary promt
+function prompt {
+    # We will override this prompt, however because it is loading async we want to communicate that the real prompt is still loading.
+    "$([char]0x1b)[93m[Loading]$([char]0x1b)[0m $($executionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1)) ";
+}
 
 ### Setup-PSReadline
 # Show multi line history (Toggle with F2)
@@ -53,11 +57,9 @@ Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 # Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
 # Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 
-### Oh My Posh init
-oh-my-posh init --config "$HOME/.config/oh-my-posh.yaml" pwsh | Invoke-Expression
 
 # Defer module/script loading asynchronously during idle
-Start-AsyncModuleInitialization -FilePaths $myModules 
+Start-AsyncModuleInitialization $myModules 
 
 # Print timing info
 $time.Stop()
