@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Usage: ./complete.sh "sed --r"
 input="$1"

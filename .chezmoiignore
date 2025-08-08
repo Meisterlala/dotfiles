@@ -15,7 +15,7 @@ Documents
 
 # Alawys include Powershell profiles and Keys
 !.config/powershell
-!.config/powershell/**/*
+!.config/powershell/*
 
 # Oh-my-posh theme
 !.config/oh-my-posh.yaml

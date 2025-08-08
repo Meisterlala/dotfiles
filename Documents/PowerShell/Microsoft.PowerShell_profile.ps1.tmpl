@@ -1,5 +1,18 @@
-# Windows PowerShell
-# Intentionally minimal: load main config from .config
+# Windows Powershell
+
+k3d completion powershell | Out-String | Invoke-Expression
+pv-migrate completion powershell | Out-String | Invoke-Expression
+flux completion powershell | Out-String | Invoke-Expression
+
+$env:EDITOR="nvim"
+$env:GEMINI_API="AIzaSyCKiR-bb51iqvAPDntOA3AXioZBXj9JLkE"
+$env:TAVILY_API_KEY="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"
+
+$env:Path += ';Z:\replay_uploader\bin'
+
+
+# Load chezmoi data
+
 . (Join-Path $HOME ".config\powershell\main.ps1")
 
 
