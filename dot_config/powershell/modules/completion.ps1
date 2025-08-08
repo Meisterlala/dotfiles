@@ -2,7 +2,6 @@
 if (-not (Get-Module -ListAvailable -Name PSCompletions)) {
     try {
         Install-Module PSCompletions -Scope CurrentUser -Force -ErrorAction Stop
-        psc add 7z arch  basename  bun cargo chfs choco cksum conda date dd deno df dircolors dirname docker du env fold git hashsum head join kubectl link ln md5sum ngrok nl npm nproc oh-my-posh paste pip pnpm powershell psc pwsh python scoop scoop-install scoop-update sfsu uv volta winget wsh wsl wt yarn
     }
     catch {
         $global:ProfileIssues += "Failed to install PSCompletions: $_"
@@ -11,13 +10,8 @@ if (-not (Get-Module -ListAvailable -Name PSCompletions)) {
 
 # Load the module if installed successfully
 if (Get-Module -ListAvailable -Name PSCompletions) {
-    try {
-        Import-Module PSCompletions
-        # psc menu config enable_menu_enhance 0 *> $null
-    }
-    catch {
-        $global:ProfileIssues += "Couldt not load PSCompletions"
-    }
+    # TODO: somehow broken??
+    # Import-Module PSCompletions
 }
 
 # Global cache

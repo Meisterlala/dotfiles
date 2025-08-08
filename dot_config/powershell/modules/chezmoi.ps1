@@ -3,7 +3,7 @@
 if (Get-Command chezmoi -ErrorAction SilentlyContinue) {
     Invoke-Expression (& { (chezmoi completion powershell | Out-String) })
 
-    function Chezmoi-Edit-With-Args {
+    function Edit-Chezmoi{
         param (
             [string]$FilePath
         )
@@ -15,7 +15,7 @@ if (Get-Command chezmoi -ErrorAction SilentlyContinue) {
             chezmoi edit --watch -a $FilePath
         }
     }
-    Set-Alias -Name ce -Value Chezmoi-Edit-With-Args | Out-Null
+    Set-Alias -Name ce -Value Edit-Chezmoi | Out-Null
 }
 
 
