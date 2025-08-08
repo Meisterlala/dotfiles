@@ -10,8 +10,7 @@ if (-not (Test-Path $keyPath)) {
         New-Item -ItemType Directory -Path $dir -Force | Out-Null
     }
 
-    # Decrypt passphrase-encrypted age file into identity path
-    # Requires interactive passphrase entry on first apply
-    chezmoi age decrypt --passphrase --input $agePath --output $keyPath
+    # Decrypt using chezmoi and age
+    chezmoi age decrypt --output $keyPath --passphrase $agePath
 }
 

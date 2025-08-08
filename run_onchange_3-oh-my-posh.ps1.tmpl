@@ -15,7 +15,7 @@ fi
 
 if (-not (Get-Command oh-my-posh -ErrorAction SilentlyContinue)) {
     Write-Host "[Oh My Posh] Not found! Installing using winget..."
-    winget install JanDeDobbeleer.OhMyPosh --source winget --scope user --force --accept-package-agreements --accept-source-agreements
+    winget install JanDeDobbeleer.OhMyPosh --source winget --scope user --force
 }
 {{- end -}}
 

@@ -1,0 +1,99 @@
+# Aliases
+
+### Sudo
+{{ if eq .chezmoi.os "linux" -}}
+function sudo-last
+{
+    $history = Get-History -Count 3
+
+    if ($history.Count -lt 1)
+    {
+                    Write-Host "No previous command found."
+        return
+    }
+
+    $lastCommand = $history[-1].CommandLine
+
+    if ([string]::IsNullOrWhiteSpace($lastCommand))
+    {
+        Write-Host "Last command was empty."
+        return
+    }
+
+    Invoke-Expression "sudo $lastCommand"
+}
+Set-Alias -Name 's!' -Value sudo-last | Out-Null
+Set-Alias -Name 's!!' -Value sudo-last | Out-Null
+{{- end }}
+
+
+
+### EZA
+if (Get-Command eza -ErrorAction SilentlyContinue)
+{
+    function Eza-With-Color
+    {
+        param (
+            [Parameter(ValueFromRemainingArguments = $true)]
+            [string[]]$Args
+        )
+        eza --icons=auto --color=always --color-scale=size -h @Args
+    }
+    Set-Alias -Name ls -Value Eza-With-Color | Out-Null
+}
+
+### Measure in a new Terminal
+function Measure-Script-Separate {
+    param(
+        [Parameter(Mandatory)]
+        [string]$ScriptPath
+    )
+
+    if (-not (Test-Path $ScriptPath)) {
+        throw "Script file '$ScriptPath' does not exist."
+    }
+
+    # Compose the command to run inside the new pwsh process
+    $pwshCommand = @"
+Import-Module PSProfiler -ErrorAction Stop
+Measure-Script -Path '$ScriptPath'
+"@
+
+    # Start new pwsh process with -NoProfile and run the above command
+    $result = pwsh -NoProfile -Command $pwshCommand
+
+    return $result
+}
+
+### Reload
+function Reload-Profile {
+    . $PROFILE.CurrentUserAllHosts
+}
+
+
+
+function Start-Scrcpy() {
+param(
+  # Use -Webcam to enable webcam mode
+  [switch]$Webcam
+)
+
+$IP = "pocof2"
+
+$args = @(
+  "--video-codec=h264",
+  "--video-bit-rate=16M",
+  "--audio-bit-rate=128K",
+  "--max-fps=60"
+  "--v4l2-sink=/dev/video0"
+  "--camera-size=1920x1080"
+)
+
+if ($Webcam) {
+  $args += "--video-source=camera", "--camera-id=0", "--no-video-playback", "--camera-size=1920x1080"
+}
+
+
+# Start scrcpy and get the process object
+Start-Process "scrcpy" -ArgumentList $args -Wait
+}

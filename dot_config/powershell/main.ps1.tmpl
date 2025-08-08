@@ -1,36 +1,31 @@
 # Disable update check
-if ($env:POWERSHELL_UPDATECHECK -ne 'LTS') {
+if ($env:POWERSHELL_UPDATECHECK -ne 'LTS')
+{
     [System.Environment]::SetEnvironmentVariable('POWERSHELL_UPDATECHECK', 'LTS', 'User')
 }
 
 $time = [System.Diagnostics.Stopwatch]::StartNew()
-$modulesBase = Join-Path $HOME ".config/powershell/Modules"
 
-# Session-scoped issue collector for optional tooling
-if (-not $global:ProfileIssues) { $global:ProfileIssues = @() }
-function Add-ProfileIssue {
-    param(
-        [Parameter(Mandatory)][string]$Name,
-        [Parameter(Mandatory)][string]$Message
-    )
-    $global:ProfileIssues += "${Name}: ${Message}"
+# Related Files
+$filesDir = Join-Path $HOME ".config/powershell/"
+$files = @{
+    zoxide = Join-Path $filesDir "zoxide.ps1"
+    apiKeys = Join-Path $filesDir "api_keys.ps1"
+    completion = Join-Path $filesDir "completion.ps1"
+    completionHelper = Join-Path $filesDir "bash_complete.sh"
+    alias = Join-Path $filesDir "alias.ps1"
+    chezmoi = Join-Path $filesDir "chezmoi.ps1"
+    measureTime = Join-Path $filesDir "measure_time.ps1"
 }
 
-function Import-Module-Try {
-    param(
-        [Parameter(Mandatory)][string]$Name
-    )
-    try {
-        Import-Module (Join-Path $modulesBase "$Name/$Name.psm1")
-        return $true
-    }
-    catch {
-        Add-ProfileIssue "Could not import module $Name :" $_.Exception.Message
-        return $false
+# Ensure all files exist
+foreach ($key in $files.Keys) {
+    if (-Not (Test-Path $files[$key])) {
+        Write-Warning "Missing File: $key → $($files[$key])"
     }
 }
 
-Import-Module-Try "Core"
+. $files.measureTime
 
 ### Setup-PSReadline
 # Show multi line history (Toggle with F2)
@@ -42,26 +37,18 @@ Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 # Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 
 
-### Prompt init
-if (Import-Module-Try "Prompt") {
-    Initialize-PromptTheme
-}
+### Oh My Posh init
+{{ if .posh -}}
+oh-my-posh init --config "$HOME/.config/oh-my-posh.yaml" pwsh | Invoke-Expression
+{{- end }}
 
-# Import modular components if available
-if (Test-Path (Join-Path $HOME ".config/powershell/api_keys.ps1")) { . (Join-Path $HOME ".config/powershell/api_keys.ps1") } else { Add-ProfileIssue "api_keys.ps1" "not found" }
-
-if (Import-Module-Try "Zoxide") { Initialize-Zoxide }
-if (Import-Module-Try "Completions") { Import-BashCompletionsToPwsh }
-Import-Module-Try "Aliases"
-Import-Module-Try "Chezmoi" 
+. $files.apiKeys
+. $files.zoxide
+. $files.completion
+. $files.alias
+. $files.chezmoi
 
 
 # Print timing info
 $time.Stop()
-Write-Host "Profile loaded $(if ($global:ProfileIssues.Count -gt 0) { "with $($global:ProfileIssues.Count) issues" } else { "successfully" }) in $([math]::Round($time.Elapsed.TotalMilliseconds))ms"
-
-# Print issues if any
-if ($global:ProfileIssues.Count -gt 0) {
-    $preview = ($global:ProfileIssues | Select-Object -First 4) -join '; '
-    Write-Host "Failed: $preview" -ForegroundColor Yellow
-}
+Write-Host "Profile loaded successfully in $([math]::Round($time.Elapsed.TotalMilliseconds))ms"
