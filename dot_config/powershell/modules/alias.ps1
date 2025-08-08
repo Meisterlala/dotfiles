@@ -1,21 +1,17 @@
 # Aliases
 
 ### Sudo
-{{ if eq .chezmoi.os "linux" -}}
-function sudo-last
-{
+function sudo-last {
     $history = Get-History -Count 3
 
-    if ($history.Count -lt 1)
-    {
-                    Write-Host "No previous command found."
+    if ($history.Count -lt 1) {
+        Write-Host "No previous command found."
         return
     }
 
     $lastCommand = $history[-1].CommandLine
 
-    if ([string]::IsNullOrWhiteSpace($lastCommand))
-    {
+    if ([string]::IsNullOrWhiteSpace($lastCommand)) {
         Write-Host "Last command was empty."
         return
     }
@@ -24,15 +20,12 @@ function sudo-last
 }
 Set-Alias -Name 's!' -Value sudo-last | Out-Null
 Set-Alias -Name 's!!' -Value sudo-last | Out-Null
-{{- end }}
 
 
 
 ### EZA
-if (Get-Command eza -ErrorAction SilentlyContinue)
-{
-    function Eza-With-Color
-    {
+if (Get-Command eza -ErrorAction SilentlyContinue) {
+    function Eza-With-Color {
         param (
             [Parameter(ValueFromRemainingArguments = $true)]
             [string[]]$Args
@@ -70,30 +63,40 @@ function Reload-Profile {
     . $PROFILE.CurrentUserAllHosts
 }
 
+# yay no confirm alias
+function yay-no-confirm {
+    param (
+        [Parameter(ValueFromRemainingArguments = $true)]
+        [string[]]$Args
+    )
+    yay --noconfirm @Args
+}
+
+Set-Alias -Name yyay -Value yay-no-confirm | Out-Null
 
 
 function Start-Scrcpy() {
-param(
-  # Use -Webcam to enable webcam mode
-  [switch]$Webcam
-)
+    param(
+        # Use -Webcam to enable webcam mode
+        [switch]$Webcam
+    )
 
-$IP = "pocof2"
+    $IP = "pocof2"
 
-$args = @(
-  "--video-codec=h264",
-  "--video-bit-rate=16M",
-  "--audio-bit-rate=128K",
-  "--max-fps=60"
-  "--v4l2-sink=/dev/video0"
-  "--camera-size=1920x1080"
-)
+    $args = @(
+        "--video-codec=h264",
+        "--video-bit-rate=16M",
+        "--audio-bit-rate=128K",
+        "--max-fps=60"
+        "--v4l2-sink=/dev/video0"
+        "--camera-size=1920x1080"
+    )
 
-if ($Webcam) {
-  $args += "--video-source=camera", "--camera-id=0", "--no-video-playback", "--camera-size=1920x1080"
-}
+    if ($Webcam) {
+        $args += "--video-source=camera", "--camera-id=0", "--no-video-playback", "--camera-size=1920x1080"
+    }
 
 
-# Start scrcpy and get the process object
-Start-Process "scrcpy" -ArgumentList $args -Wait
+    # Start scrcpy and get the process object
+    Start-Process "scrcpy" -ArgumentList $args -Wait
 }

@@ -1,20 +1,17 @@
 
 ### Setup Chezmoi
-if (Get-Command chezmoi -ErrorAction SilentlyContinue)
-{
+if (Get-Command chezmoi -ErrorAction SilentlyContinue) {
     Invoke-Expression (& { (chezmoi completion powershell | Out-String) })
 
-    function Chezmoi-Edit-With-Args
-    {
+    function Chezmoi-Edit-With-Args {
         param (
             [string]$FilePath
         )
         # List all if empty
-        if ([string]::IsNullOrWhiteSpace($FilePath))
-        {
+        if ([string]::IsNullOrWhiteSpace($FilePath)) {
             chezmoi managed -t
-        } else
-        {
+        }
+        else {
             chezmoi edit --watch -a $FilePath
         }
     }

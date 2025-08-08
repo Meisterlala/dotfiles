@@ -1,50 +1,43 @@
 # Ensure PSCompletions is installed and loaded
-if (-not (Get-Module -ListAvailable -Name PSCompletions))
-{
-    try
-    {
+if (-not (Get-Module -ListAvailable -Name PSCompletions)) {
+    try {
         Install-Module PSCompletions -Scope CurrentUser -Force -ErrorAction Stop
         psc add 7z arch  basename  bun cargo chfs choco cksum conda date dd deno df dircolors dirname docker du env fold git hashsum head join kubectl link ln md5sum ngrok nl npm nproc oh-my-posh paste pip pnpm powershell psc pwsh python scoop scoop-install scoop-update sfsu uv volta winget wsh wsl wt yarn
-    } catch
-    {
-        Write-Warning "Failed to install PSCompletions: $_"
+    }
+    catch {
+        $global:ProfileIssues += "Failed to install PSCompletions: $_"
     }
 }
 
 # Load the module if installed successfully
-if (Get-Module -ListAvailable -Name PSCompletions)
-{
+if (Get-Module -ListAvailable -Name PSCompletions) {
     try {
         Import-Module PSCompletions
-        psc menu config enable_menu_enhance 0 *> $null
-    } catch {}
+        # psc menu config enable_menu_enhance 0 *> $null
+    }
+    catch {
+        $global:ProfileIssues += "Couldt not load PSCompletions"
+    }
 }
 
-
-
-{{ if eq .chezmoi.os "linux" -}}
 # Global cache
-if (-not $global:PackageCache)
-{
+if (-not $global:PackageCache) {
     $global:PackageCache = @{}
 }
 
 # Function to fetch and parse packages
-function Get-PackageCompletions
-{
+function Get-PackageCompletions {
     param (
         [string]$Command
     )
 
-    if (-not $global:PackageCache.ContainsKey($Command))
-    {
+    if (-not $global:PackageCache.ContainsKey($Command)) {
         $output = & $Command -Ss | Out-String
 
         $pattern = '^(?<repo>\S+)/(?<name>\S+)\s+(?<version>\S+)[^\n]*\n\s+(?<desc>[^\n]+)$'
-        $matches = [regex]::Matches($output, $pattern, 'Multiline')
+        $pmatches = [regex]::Matches($output, $pattern, 'Multiline')
 
-        $pkgs = foreach ($match in $matches)
-        {
+        $pkgs = foreach ($match in $pmatches) {
             [PSCustomObject]@{
                 Repo        = $match.Groups['repo'].Value
                 Name        = $match.Groups['name'].Value
@@ -67,16 +60,16 @@ Register-ArgumentCompleter -Native -CommandName 'pacman' -ScriptBlock {
     $prefix = [regex]::Escape($wordToComplete)
 
     $packages |
-        Where-Object { $_.Name -match "^$prefix" } |
-        Sort-Object -Property Name -Unique |
-        ForEach-Object {
-            [System.Management.Automation.CompletionResult]::new(
-                $_.Name,
-                $_.Name,
-                'ParameterValue',
-                "$($_.Description) [$($_.Repo)/$($_.Version)]"
-            )
-        }
+    Where-Object { $_.Name -match "^$prefix" } |
+    Sort-Object -Property Name -Unique |
+    ForEach-Object {
+        [System.Management.Automation.CompletionResult]::new(
+            $_.Name,
+            $_.Name,
+            'ParameterValue',
+            "$($_.Description) [$($_.Repo)/$($_.Version)]"
+        )
+    }
 }
 
 # Register completions for yay
@@ -87,22 +80,20 @@ Register-ArgumentCompleter -Native -CommandName 'yay' -ScriptBlock {
     $prefix = [regex]::Escape($wordToComplete)
 
     $packages |
-        Where-Object { $_.Name -match "^$prefix" } |
-        Sort-Object -Property Name -Unique |
-        ForEach-Object {
-            [System.Management.Automation.CompletionResult]::new(
-                $_.Name,
-                $_.Name,
-                'ParameterValue',
-                "$($_.Description) [$($_.Repo)/$($_.Version)]"
-            )
-        }
+    Where-Object { $_.Name -match "^$prefix" } |
+    Sort-Object -Property Name -Unique |
+    ForEach-Object {
+        [System.Management.Automation.CompletionResult]::new(
+            $_.Name,
+            $_.Name,
+            'ParameterValue',
+            "$($_.Description) [$($_.Repo)/$($_.Version)]"
+        )
+    }
 }
-{{- end }}
 
 ### Bash Autocomplete
-function Register-BashCompletion
-{
+function Register-BashCompletion {
     param(
         # The name of the command to register for completion
         [string]$Command
@@ -119,52 +110,42 @@ function Register-BashCompletion
         $helper = $files.completionHelper
         $results = @(bash $helper  $cmd "$cmd $wordToComplete")
 
-        foreach ($item in $results)
-        {
+        foreach ($item in $results) {
             [System.Management.Automation.CompletionResult]::new($item, $item, 'ParameterValue', $item)
         }
     }
 }
 
-function Get-BashCompletions
-{
+function Get-BashCompletions {
     # Get commands that have registered completions
     $cmds = bash -c 'source /usr/share/bash-completion/bash_completion; complete -p' |
-        ForEach-Object {
-            if ($_ -match 'complete .* ([\w.-]+)$')
-            {
-                $matches[1]
-            }
+    ForEach-Object {
+        if ($_ -match 'complete .* ([\w.-]+)$') {
+            $matches[1]
         }
+    }
 
     # Get filenames ignoring those starting with underscore
     $completionFiles = Get-ChildItem -Path '/usr/share/bash-completion/completions' -File |
-        Where-Object { -not $_.Name.StartsWith('_') } |
-        ForEach-Object { $_.Name }
+    Where-Object { -not $_.Name.StartsWith('_') } |
+    ForEach-Object { $_.Name }
 
     # Combine, filter out '-D', and get unique sorted list
     ($cmds + $completionFiles) |
-        Where-Object { $_ -ne '-D' } |
-        Sort-Object -Unique
+    Where-Object { $_ -ne '-D' } |
+    Sort-Object -Unique
 }
 
-function Import-BashCompletionsToPwsh
-{
+function Import-BashCompletionsToPwsh {
     $commands = Get-BashCompletions
 
     Write-Host "Registering $($commands.Count) commands for pwsh completion..." -ForegroundColor Green
-    foreach ($cmd in $commands)
-    {
+    foreach ($cmd in $commands) {
         Register-BashCompletion $cmd
     }
 }
 
-{{ if eq .chezmoi.os "linux" -}}
-if (Test-Path '/usr/share/bash-completion/bash_completion')
-{
+if (Test-Path '/usr/share/bash-completion/bash_completion') {
     # Require bash-helper
-
-
     Import-BashCompletionsToPwsh
 }
-{{- end }}
