@@ -1,5 +1,7 @@
 # Aliases
 
+
+
 ### Sudo
 function Invoke-LastCommandAsSudo {
     $history = Get-History -Count 3
@@ -33,6 +35,19 @@ if (Get-Command eza -ErrorAction SilentlyContinue) {
         eza --icons=auto --color=always --color-scale=size -h @Args
     }
     Set-Alias -Name ls -Value Get-EzaWithColor -Scope Global | Out-Null
+}
+else {
+    $Global:ProfileHints += "<Teal>eza<Clear> not installed. Please Run <Mauve>Install-Eza"
+}
+function Install-Eza {
+    try {
+        if (Get-OperatingSystem -eq "windows") {
+            Install-WithWinget "eza-community.eza"
+        }
+    }
+    catch {
+        Write-Warning "Error during the install: $_"
+    }
 }
 
 ### Measure in a new Terminal
