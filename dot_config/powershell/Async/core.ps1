@@ -16,8 +16,12 @@ function Show-ProfileIssues {
 }
 
 function Show-ProfileHints {
+    param(
+        [string[]] $hints = $Global:ProfileHints
+    )
+
     # Render all errors
-    foreach ($issue in $global:ProfileHints) {
+    foreach ($issue in $hints) {
         Write-Host (Get-ColorString $issue)
     }
 }
@@ -72,8 +76,9 @@ function Install-WithWinget {
         [Parameter(Mandatory)]
         [string] $name
     )
-    if (Get-OperatingSystem -ne "windows") {
-        Write-Warning "You can use winget on windows"
+    if ((Get-OperatingSystem) -ne "windows") {
+        Write-Warning "You can only use winget on windows"
+        return
     }
 
     try {
@@ -90,7 +95,7 @@ function Install-WithYayPacman {
         [string[]] $Name
     )
 
-    if (Get-OperatingSystem -ne "linux") {
+    if ((Get-OperatingSystem) -ne "linux") {
         Write-Warning "You can use yay/pacman on linux"
         return
     }
@@ -124,7 +129,7 @@ function install-withapt {
         [string[]] $Name
     )
 
-    if (Get-OperatingSystem -ne "linux") {
+    if ((Get-OperatingSystem) -ne "linux") {
         Write-Warning "You can use apt on linux"
         return
     }
@@ -222,6 +227,9 @@ function Start-AsyncModuleInitialization {
 
                 # Display all errors
                 Show-ProfileIssues
+
+                # Save all hints for next time
+                Save-ProfileHints
             }
         }
         catch {

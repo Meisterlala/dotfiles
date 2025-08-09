@@ -38,7 +38,7 @@ else {
 }
 
 # Add Modules to PS Module load list
-if (Get-OperatingSystem -eq "windows") {
+if ((Get-OperatingSystem) -eq "windows") {
     $env:PSModulePath += "; $powershellModules"
 }
 else {
@@ -71,8 +71,17 @@ Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 # Defer module/script loading asynchronously during idle
 Start-AsyncModuleInitialization $myAsync 
 
+# Load last Profile hints
+$lastProfileHints = (Get-LastProfileHints).hints
+
 # Print timing info
 $time.Stop()
+
+# Show any hints from the last session
+if ($lastProfileHints.Count -gt 0) {
+    $hintName = if ($lastProfileHints.Count -eq 1) { "Hint" } else { "Hints" }
+    Write-Host "$([char]0x1b)[38;2;238;190;190m$($lastProfileHints.Count) $hintName $([char]0x1b)[0mavalible with $([char]0x1b)[38;2;202;158;230mShow-ProfileHints$([char]0x1b)[0m, " -NoNewline
+} 
 
 # Pretty print profile load result with timing
 $elapsedMs = [math]::Round($time.Elapsed.TotalMilliseconds)
