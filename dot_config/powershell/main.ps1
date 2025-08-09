@@ -6,6 +6,7 @@ if ($env:POWERSHELL_UPDATECHECK -ne 'LTS') {
 $time = [System.Diagnostics.Stopwatch]::StartNew()
 # Global vars
 $global:ProfileIssues = @()
+$global:ProfileHints = @()
 $global:ProfileLoadedAsync = @()
 
 
