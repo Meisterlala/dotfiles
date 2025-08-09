@@ -41,7 +41,7 @@ else {
 }
 function Install-Eza {
     try {
-        if (Get-OperatingSystem -eq "windows") {
+        if ((Get-OperatingSystem) -eq "windows") {
             Install-WithWinget "eza-community.eza"
         }
     }

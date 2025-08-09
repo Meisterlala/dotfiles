@@ -1,5 +1,5 @@
 function Install-Zoxide {
-    if (Get-OperatingSystem -eq "windows") {
+    if ((Get-OperatingSystem) -eq "windows") {
         Write-Host (Get-ColorString "<Teal>Installing zoxide via winget…<Clear>")
         winget install --silent ajeetdsouza.zoxide
     }
