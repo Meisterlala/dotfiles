@@ -44,7 +44,6 @@ function Save-ProfileHints {
         $payload = @{ hints = @($global:ProfileHints) }
         $json = $payload | ConvertTo-Json -Depth 5
         Set-Content -Path $filePath -Value $json -Encoding utf8
-        return $payload
     }
     catch {
         $global:ProfileIssues += "Failed to save profile hints: $($_.Exception.Message)"
@@ -87,6 +86,7 @@ function Install-WithWinget {
     catch {
         throw "Could not install $name with winget: $_"
     }
+    Update-Async
 }
 
 function Install-WithYayPacman {
@@ -120,6 +120,7 @@ function Install-WithYayPacman {
     catch {
         throw "Could not install $([string]::Join(', ', $Name)) with $([bool]$useYay ? 'yay' : 'pacman'): $_"
     }
+    Update-Async
 }
 
 
@@ -182,6 +183,9 @@ function Start-AsyncModuleInitialization {
         return
     }
 
+    # Reset Global counter
+    $Global:ProfileLoadedAsync = @()
+
     $global:__initQueue = New-Object System.Collections.Queue
     foreach ($file in $myModules.Keys) { 
         [void]$global:__initQueue.Enqueue(@{
@@ -237,4 +241,60 @@ function Start-AsyncModuleInitialization {
             $global:ProfileIssues += "Async init handler error: $($_.Exception.Message)"
         }
     } | Out-Null
+}
+
+
+function Update-Async {
+    param(
+        [hashtable] $Modules
+    )
+
+    try {
+        # Resolve module map to (re)load
+        if (-not $Modules -or $Modules.Count -eq 0) {
+            $var = Get-Variable -Name 'myAsync' -Scope Global -ErrorAction SilentlyContinue
+            if ($null -ne $var) { $Modules = $var.Value }
+        }
+
+        # Compute Async directory for matching loaded modules
+        $asyncDirectory = $null
+        if ($Modules -and $Modules.Count -gt 0) {
+            $firstPath = ($Modules.GetEnumerator() | Select-Object -First 1).Value
+            if ($firstPath) { $asyncDirectory = [IO.Path]::GetDirectoryName($firstPath) }
+        }
+        if (-not $asyncDirectory) { $asyncDirectory = Join-Path $HOME '.config/powershell/Async' }
+
+        # Unregister existing idle handler and clear queue guard
+        Get-EventSubscriber -SourceIdentifier 'PowerShell.OnIdle' -ErrorAction SilentlyContinue |
+        Unregister-Event -Force -ErrorAction SilentlyContinue
+        if (Get-Variable -Name '__initQueue' -Scope Global -ErrorAction SilentlyContinue) {
+            Remove-Variable -Name '__initQueue' -Scope Global -Force -ErrorAction SilentlyContinue
+        }
+
+        # Unload previously loaded Async modules
+        $loadedAsyncModules = Get-Module |
+        Where-Object {
+            ($_.Name -like '.async*') -or
+            ($_.Path -and ($_.Path -like (Join-Path $asyncDirectory '*'))) -or
+            ($Modules -and ($Modules.Keys -contains $_.Name))
+        }
+        foreach ($m in $loadedAsyncModules) {
+            Remove-Module -Name $m.Name -Force -ErrorAction SilentlyContinue
+        }
+
+        if ($Modules -and $Modules.Count -gt 0) {
+            # Reset the profile hints
+            $Global:ProfileHints = @()
+            Save-ProfileHints
+
+            Start-AsyncModuleInitialization -myModules $Modules
+        }
+        else {
+            $global:ProfileIssues += "Update-Async: No async modules found to load."
+        }
+    }
+    catch {
+        $global:ProfileIssues += "Update-Async failed: $($_.Exception.Message)"
+        throw
+    }
 }

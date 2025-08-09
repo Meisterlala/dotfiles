@@ -1,9 +1,10 @@
+$time = [System.Diagnostics.Stopwatch]::StartNew()
+
 # Disable update check
 if ($env:POWERSHELL_UPDATECHECK -ne 'LTS') {
     [System.Environment]::SetEnvironmentVariable('POWERSHELL_UPDATECHECK', 'LTS', 'User')
 }
 
-$time = [System.Diagnostics.Stopwatch]::StartNew()
 # Global vars
 $global:ProfileIssues = @()
 $global:ProfileHints = @()
@@ -69,7 +70,10 @@ Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 
 
 # Defer module/script loading asynchronously during idle
-Start-AsyncModuleInitialization $myAsync 
+function Initialize-Async {
+    Start-AsyncModuleInitialization $myAsync 
+}
+Initialize-Async
 
 # Load last Profile hints
 $lastProfileHints = (Get-LastProfileHints).hints
