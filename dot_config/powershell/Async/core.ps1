@@ -7,6 +7,7 @@ function Get-OperatingSystem {
         return "linux"
     }
 }
+$global:os = Get-OperatingSystem
 
 function Show-ProfileIssues {
     # Render all errors
@@ -227,6 +228,13 @@ function Start-AsyncModuleInitialization {
                 }
                 catch {
                     # PSReadLine not available; ignore
+                }
+
+                # Needs to be as the last thing
+                try {
+#                    Initilize-Inshellisense
+                } catch {
+                    $global:ProfileIssues += "Could not load <Teal>Inshellisense"
                 }
 
                 # Display all errors
