@@ -15,7 +15,7 @@ if (Get-Command chezmoi -ErrorAction SilentlyContinue) {
             chezmoi edit --watch -a $FilePath
         }
     }
-    Set-Alias -Name ce -Value Edit-Chezmoi | Out-Null
+    Set-Alias -Name ce -Value Edit-Chezmoi -Scope Global | Out-Null
 }
 
 
