@@ -28,6 +28,7 @@ $global:myAsync = [ordered]@{
     psprofiler = Join-Path $powershellAsync "psprofiler.ps1"
     ohMyPosh   = Join-Path $powershellAsync "oh-my-posh.ps1"
     catppuccin = Join-Path $powershellAsync "catppuccin.ps1"
+    env        = Join-Path $powershellAsync "env.ps1"
 }
 
 # Load Core
@@ -36,7 +37,13 @@ if (Test-Path $global:myFiles.core) {
 }
 else {
     Write-Error "Cant find core module of custom profile (main.ps1)"
+    return
 }
+
+if (Test-Path $global:myFiles.apiKeys) {
+    . $global:myFiles.apiKeys
+}
+
 
 # Add Modules to PS Module load list
 if ((Get-OperatingSystem) -eq "windows") {
@@ -68,6 +75,7 @@ Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 # Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
 # Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 
+Set-PSReadLineKeyHandler -Key Alt+e -Function ViEditVisually
 
 # Defer module/script loading asynchronously during idle
 function Initialize-Async {

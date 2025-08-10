@@ -10,8 +10,11 @@ if (-not (Get-Module -ListAvailable -Name PSCompletions)) {
 
 # Load the module if installed successfully
 if (Get-Module -ListAvailable -Name PSCompletions) {
-    # TODO: somehow broken??
-    Import-Module PSCompletions
+    try {
+        # Import-Module PSCompletions -ErrorAction Stop -Global
+    } catch {
+        $Global:ProfileIssues += "Could not load PSCompletions"
+    }
 }
 
 Function Get-ArgumentCompleters {
@@ -143,6 +146,7 @@ if (-not $global:PackageCache) {
     $global:PackageCache = @{}
 }
 
+
 # Function to fetch and parse packages
 function Get-PackageCompletion {
     param (
@@ -169,6 +173,7 @@ function Get-PackageCompletion {
 
     return $global:PackageCache[$Command]
 }
+
 
 # Register completions for pacman
 Register-ArgumentCompleter -Native -CommandName 'pacman' -ScriptBlock {
@@ -210,3 +215,111 @@ Register-ArgumentCompleter -Native -CommandName 'yay' -ScriptBlock {
     }
 }
 
+# Function to get inshellisense completions
+function Get-InShellisenseCompletion {
+    param(
+        [string]$Command
+    )
+    
+    # Call inshellisense to get completions
+    $jsonResult = inshellisense complete "$Command" 2>$null
+    
+    if ($jsonResult) {
+        try {
+            $completionData = $jsonResult | ConvertFrom-Json
+            return $completionData
+        }
+        catch {
+            # If JSON parsing fails, return null
+            return $null
+        }
+    }
+    
+    return $null
+}
+
+# Function to register inshellisense completions
+function Register-InShellisenseCompletion {
+    param(
+        [string]$Command
+    )
+
+    Register-ArgumentCompleter -Native -CommandName $Command -ScriptBlock {
+        param($wordToComplete, $commandAst, $cursorPosition)
+
+        # Get the full command line
+        $commandLine = $commandAst.ToString()
+        $cmd = $commandAst.GetCommandName()
+        if ($commandLine -eq $cmd) {
+            $commandLine += " "
+        }
+        
+        # Call inshellisense to get completions
+        $completionData = Get-InShellisenseCompletion -Command "$commandLine"
+        
+        if ($completionData -and $completionData.suggestions) {
+            # Convert suggestions to completion results
+            $completionData.suggestions | ForEach-Object {
+                $name = $_.name
+                $description = $_.description
+                
+                # If we have multiple names, use the first one as the main name
+                if ($_.allNames -and $_.allNames.Count -gt 0) {
+                    $name = $_.allNames[0]
+                }
+                
+                # Include icon in display text if available
+                $displayText = $name
+                if ($_.icon) {
+                    $displayText = "$($_.icon) $name"
+                }
+
+                # Write-Host "$name, $displayText, $description"
+                
+                # Create completion result with description (description can be empty/null)
+                [System.Management.Automation.CompletionResult]::new(
+                    $name,
+                    $displayText,
+                    'ParameterValue',
+                    $description
+                )
+            }
+        }
+    }
+}
+
+# Inshellisense
+function Install-Inshellisense {
+    if (-not (Get-Command -Name "pnpm" -ErrorAction SilentlyContinue)) {
+        Write-Error "pnpm is not installed. Aborting"
+        Install-pnpm
+    }
+
+    pnpm install -g @microsoft/inshellisense
+    Update-Async
+}
+
+function Install-pnpm {
+    if ($global:os -eq "windows") {
+    } else {
+        Install-WithYayPacman "pnpm"
+        pnpm setup
+    }
+}
+
+
+function Initilize-Inshellisense {
+    if (-not (Get-Command inshellisense -ErrorAction SilentlyContinue)) {
+        $Global:ProfileHints += "<Teal>inshellisense<Clear> not found. Install with <Mauve>Install-Inshellisense"
+        return
+    }
+
+    $packagesRaw = inshellisense specs list 2>$nul
+    $packages = ($packagesRaw | ConvertFrom-Json)
+
+    foreach ($cmd in $packages) {
+        Register-InShellisenseCompletion -Command $cmd
+    }
+}
+
+Initilize-Inshellisense
