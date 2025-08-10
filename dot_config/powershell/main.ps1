@@ -19,6 +19,7 @@ $global:myFiles = @{
     completionHelper = Join-Path $powershellDir "bash_complete.sh"
     apiKeys          = Join-Path $powershellDir "api_keys.ps1"
     core             = Join-Path $powershellAsync "core.ps1"
+    env              = Join-Path $powershellAsync "env.ps1"
 }
 $global:myAsync = [ordered]@{
     zoxide     = Join-Path $powershellAsync "zoxide.ps1"
@@ -28,7 +29,6 @@ $global:myAsync = [ordered]@{
     psprofiler = Join-Path $powershellAsync "psprofiler.ps1"
     ohMyPosh   = Join-Path $powershellAsync "oh-my-posh.ps1"
     catppuccin = Join-Path $powershellAsync "catppuccin.ps1"
-    env        = Join-Path $powershellAsync "env.ps1"
 }
 
 # Load Core
@@ -40,9 +40,15 @@ else {
     return
 }
 
+# Load apiKeys
 if (Test-Path $global:myFiles.apiKeys) {
     . $global:myFiles.apiKeys
 }
+# Load Env variables
+if (Test-Path $global:myFiles.env) {
+    . $global:myFiles.env
+}
+
 
 
 # Add Modules to PS Module load list

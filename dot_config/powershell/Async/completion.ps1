@@ -307,8 +307,16 @@ function Install-pnpm {
     }
 }
 
-
 function Initilize-Inshellisense {
+    # Somehow really broken :c
+    if (-not (Test-Path '~/.inshellisense/pwsh/init.ps1' -PathType Leaf))  {
+        $Global:ProfileHints += "<Teal>inshellisense<Clear> not found. Install with <Mauve>Install-Inshellisense"
+        return
+    }
+    . '~/.inshellisense/pwsh/init.ps1'
+}
+
+function Initilize-InshellisenseCompletion {
     if (-not (Get-Command inshellisense -ErrorAction SilentlyContinue)) {
         $Global:ProfileHints += "<Teal>inshellisense<Clear> not found. Install with <Mauve>Install-Inshellisense"
         return
@@ -322,4 +330,4 @@ function Initilize-Inshellisense {
     }
 }
 
-Initilize-Inshellisense
+Initilize-InshellisenseCompletion

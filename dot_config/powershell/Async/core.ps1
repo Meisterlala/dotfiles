@@ -232,9 +232,9 @@ function Start-AsyncModuleInitialization {
 
                 # Needs to be as the last thing
                 try {
-#                    Initilize-Inshellisense
+                #   Initilize-Inshellisense
                 } catch {
-                    $global:ProfileIssues += "Could not load <Teal>Inshellisense"
+                    $global:ProfileIssues += "Could not load <Teal>Inshellisense: $_"
                 }
 
                 # Display all errors
