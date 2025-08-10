@@ -15,12 +15,12 @@ $global:ProfileLoadedAsync = @()
 $powershellDir = Join-Path $HOME ".config/powershell/"
 $powershellAsync = Join-Path $powershellDir "/Async/"
 $powershellModules = Join-Path $powershellDir "/Modules/"
-$myFiles = @{
+$global:myFiles = @{
     completionHelper = Join-Path $powershellDir "bash_complete.sh"
     apiKeys          = Join-Path $powershellDir "api_keys.ps1"
     core             = Join-Path $powershellAsync "core.ps1"
 }
-$myAsync = [ordered]@{
+$global:myAsync = [ordered]@{
     zoxide     = Join-Path $powershellAsync "zoxide.ps1"
     completion = Join-Path $powershellAsync "completion.ps1"
     alias      = Join-Path $powershellAsync "alias.ps1"
@@ -31,8 +31,8 @@ $myAsync = [ordered]@{
 }
 
 # Load Core
-if (Test-Path $myFiles.core) {
-    . $myFiles.core
+if (Test-Path $global:myFiles.core) {
+    . $global:myFiles.core
 }
 else {
     Write-Error "Cant find core module of custom profile (main.ps1)"
@@ -71,7 +71,7 @@ Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 
 # Defer module/script loading asynchronously during idle
 function Initialize-Async {
-    Start-AsyncModuleInitialization $myAsync 
+    Start-AsyncModuleInitialization $global:myAsync 
 }
 Initialize-Async
 
