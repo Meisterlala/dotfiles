@@ -43,6 +43,8 @@ function Install-Eza {
     try {
         if ((Get-OperatingSystem) -eq "windows") {
             Install-WithWinget "eza-community.eza"
+        } else {
+            Install-WithYayPacman "eza"
         }
     }
     catch {
