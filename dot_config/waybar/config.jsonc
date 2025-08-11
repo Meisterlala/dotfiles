@@ -127,5 +127,7 @@
     "format": " {nr_failed}",
     "system": true, // Monitor failed systemwide units.
     "user": true, // Ignore failed user units.
+    "on-click": "~/.config/waybar/failed-units.sh",
+    "on-click-right": "~/.config/waybar/restart-failed.sh",
   },
 }
