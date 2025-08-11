@@ -62,9 +62,12 @@
 
   "wireplumber": {
     "format": "{volume}% {icon}",
-    "format-muted": "",
+    "format-muted": "󰖁",
+    "max-volume": 200,
+    "scroll-step": 2.5,
     "on-click": "pwvucontrol",
     "on-click-right": "helvum",
+    "on-click-middle": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
     "format-icons": ["", "", ""],
   },
 
