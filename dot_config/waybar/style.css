@@ -3,9 +3,7 @@
 
 * {
   /* `otf-font-awesome` is required to be installed for icons */
-  font-family:
-    FiraCode Nerd Font,
-    sans-serif;
+  font-family: FiraCode Nerd Font;
   font-size: 14px;
   border: 0px;
   -gtk-icon-effect: none;
@@ -93,6 +91,7 @@ box.#workspaces {
   box-shadow: inset 0px -4px @rosewater;
 }
 
+#systemd-failed-units,
 #tray,
 #wireplumber,
 #cpu,
@@ -108,18 +107,24 @@ box.#workspaces {
 #cpu:hover,
 #memory:hover,
 #clock:hover {
-  border-radius: 8px;
   background-color: alpha(@surface2, 1);
   box-shadow: inset 0px -4px @rosewater;
 }
 
 #cpu {
   color: @sky;
-  min-width: 80px;
 }
 
 #memory {
   color: @maroon;
+}
+
+#systemd-failed-units {
+  background-color: shade(@red, 0.6);
+}
+
+#systemd-failed-units:hover {
+  box-shadow: inset 0px -4px @rosewater;
 }
 
 #clock {

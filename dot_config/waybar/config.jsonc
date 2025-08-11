@@ -9,10 +9,10 @@
   "modules-left": ["hyprland/workspaces"],
   "modules-center": ["wlr/taskbar"],
   "modules-right": [
-    "systemd-failed-units",
     "load",
     "privacy",
     "tray",
+    "systemd-failed-units",
     "wireplumber",
     "cpu",
     "memory",
@@ -20,10 +20,9 @@
   ],
 
   "wlr/taskbar": {
-    "format": "{icon} {title}",
-    "markup": true,
+    "format": "{icon} {title:.45}",
     "icon-size": 30,
-    "tooltip-format": "{icon} {title}",
+    "tooltip-format": "{title}",
     "on-click": "activate",
     "on-click-middle": "close",
     "ignore-list": ["Alacritty"],
@@ -48,24 +47,25 @@
 
   "cpu": {
     "tooltip": true,
-    "interval": 1,
-    "format": "{load}% ",
+    "interval": 3,
+    "format": "{usage:>3}% ",
+  },
+
+  "memory": {
+    "format": "{percentage:>2}% ",
   },
 
   "load": {
     "interval": 10,
-    "format": "{load1} {load5} {load15}",
+    "format": "{load1:.1f} {load5:.1f} {load15:.1f}",
   },
 
   "wireplumber": {
-    "format": "{volume}% {icon} {format_source}",
-    "format-muted": " {format_source}",
-    "format-source": "{source_volume}% ",
-    "format-source-muted": " ",
-    "format-icons": {
-      "default": ["", ""],
-    },
-    "on-click": "helvum",
+    "format": "{volume}% {icon}",
+    "format-muted": "",
+    "on-click": "pwvucontrol",
+    "on-click-right": "helvum",
+    "format-icons": ["", "", ""],
   },
 
   "clock": {
@@ -124,9 +124,5 @@
     "format": " {nr_failed}",
     "system": true, // Monitor failed systemwide units.
     "user": true, // Ignore failed user units.
-  },
-
-  "memory": {
-    "format": "{}% ",
   },
 }
