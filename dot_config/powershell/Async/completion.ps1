@@ -128,18 +128,20 @@ function Install-BashCompletion {
     Install-WithYayPacman "bash-completion"
 }
 
-if (Test-Path '/usr/share/bash-completion/bash_completion') {
-    # Require bash-helper
-    if (-not (Test-Path $global:myFiles.completionHelper) )
-    {
-        $Global:ProfileIssues += "Could not find bash_completion helper"
+# Load Bash-complettions
+if ($Global:os -eq "linux"){
+    if (Test-Path '/usr/share/bash-completion/bash_completion') {
+        # Require bash-helper
+        if (-not (Test-Path $global:myFiles.completionHelper) )
+        {
+            $Global:ProfileIssues += "Could not find bash_completion helper"
+        } else {
+            Import-BashCompletionIntoPwsh
+        }
     } else {
-        Import-BashCompletionIntoPwsh
+        $Global:ProfileHints += "<Teal>bash-completion<Clear> not installed. Please install it with <Mauve>Install-BashCompletion"
     }
-} else {
-    $Global:ProfileHints += "<Teal>bash-completion<Clear> not installed. Please install it with <Mauve>Install-BashCompletion"
 }
-
 
 # Global cache
 if (-not $global:PackageCache) {
