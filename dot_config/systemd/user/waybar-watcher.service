@@ -1,0 +1,9 @@
+[Unit]
+Description=Restart Waybar when config changes
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl --user reload waybar.service
+
+[Install]
+WantedBy=default.target
