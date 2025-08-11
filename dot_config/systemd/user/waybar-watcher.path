@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch Waybar config for changes
+
+[Path]
+Unit=waybar-watcher.service
+PathModified=%h/.config/waybar
+
+[Install]
+WantedBy=default.target
