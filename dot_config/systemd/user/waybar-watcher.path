@@ -4,6 +4,8 @@ Description=Watch Waybar config for changes
 [Path]
 Unit=waybar-watcher.service
 PathModified=%h/.config/waybar
+TriggerLimitIntervalSec=0
+TriggerLimitBurst=0
 
 [Install]
 WantedBy=default.target
