@@ -9,6 +9,7 @@
   -gtk-icon-effect: none;
   -gtk-icon-shadow: none;
   text-shadow: none;
+  box-shadow: inset 0px 0px @rosewater;
 }
 
 window#waybar {
@@ -104,6 +105,7 @@ box.#workspaces {
   border-radius: 8px;
 }
 
+#wireplumber:hover,
 #cpu:hover,
 #memory:hover,
 #clock:hover {
