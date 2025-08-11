@@ -4,6 +4,8 @@ Documentation=https://github.com/Alexays/Waybar/wiki/
 PartOf=graphical-session.target
 After=graphical-session.target
 Requisite=graphical-session.target
+StartLimitIntervalSec=5
+StartLimitBurst=10
 
 [Service]
 ExecStart=/usr/bin/waybar
