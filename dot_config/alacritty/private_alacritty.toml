@@ -35,7 +35,7 @@ program = "/usr/bin/pwsh"
 args = ["-Login", "-NoLogo"]
 
 [window]
-dynamic_title = true
+dynamic_title = false
 opacity = 0.8
 
 [scrolling]
