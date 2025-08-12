@@ -1,0 +1,139 @@
+/* Import cattpuccin */
+@import "mocha.css";
+
+* {
+  /* `otf-font-awesome` is required to be installed for icons */
+  font-family: FiraCode Nerd Font;
+  font-size: 14px;
+  border: 0px;
+  -gtk-icon-effect: none;
+  -gtk-icon-shadow: none;
+  text-shadow: none;
+  box-shadow: inset 0px 0px @rosewater;
+}
+
+window#waybar {
+  color: @text;
+  background-color: alpha(@base, 0.5);
+  transition-duration: 0.5s;
+}
+
+box.#workspaces {
+  margin: 0px 0px 0px 0px;
+}
+
+#workspaces label {
+  padding: 0px 8px;
+  font-stretch: ultra-expanded;
+}
+
+#workspaces button {
+  transition-duration: 0.1s;
+  padding: 0px 6px;
+  min-width: 40px;
+  margin: 2px 4px;
+  border-radius: 8px;
+  background: @surface0;
+  color: @text;
+}
+
+#workspaces button.empty {
+  background-color: alpha(@surface0, 0.2);
+  color: alpha(@text, 0.3);
+}
+
+#workspaces button.active {
+  background-color: @surface1;
+}
+
+@keyframes blinkurgent {
+  to {
+    background-color: shade(@red, 0.6);
+  }
+}
+
+#workspaces button.urgent {
+  animation-name: blinkurgent;
+  animation-duration: 0.4s;
+  animation-timing-function: steps(16);
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+#workspaces button:hover {
+  color: @text;
+  background-color: @surface2;
+  box-shadow: inset 0px -4px @rosewater;
+}
+
+#workspaces button:hover {
+  color: @text;
+  background-color: @surface2;
+  box-shadow: inset 0px -4px @rosewater;
+}
+
+#taskbar box {
+  color: @text;
+  padding: 0px;
+  margin: 2px 4px;
+  border-radius: 8px;
+}
+
+#taskbar * {
+  transition-duration: 0.1s;
+  background: transparent;
+  color: @text;
+  box-shadow: 0px 0px;
+  padding: 0px;
+}
+
+#taskbar button:hover {
+  background-color: alpha(@surface2, 1);
+  box-shadow: inset 0px -4px @rosewater;
+}
+
+#systemd-failed-units,
+#tray,
+#wireplumber,
+#cpu,
+#memory,
+#clock {
+  background-color: alpha(@surface0, 0.2);
+  color: @text;
+  padding: 0px 8px;
+  margin: 2px 4px;
+  border-radius: 8px;
+}
+
+#wireplumber:hover,
+#cpu:hover,
+#memory:hover,
+#clock:hover {
+  background-color: alpha(@surface2, 1);
+  box-shadow: inset 0px -4px @rosewater;
+}
+
+#cpu {
+  color: @sky;
+}
+
+#memory {
+  color: @maroon;
+}
+
+#systemd-failed-units {
+  background-color: shade(@red, 0.6);
+}
+
+#systemd-failed-units:hover {
+  box-shadow: inset 0px -4px @rosewater;
+}
+
+#clock {
+  color: @lavender;
+}
+
+tooltip {
+  background-color: @surface1;
+  border: 2px solid @rosewater;
+}
