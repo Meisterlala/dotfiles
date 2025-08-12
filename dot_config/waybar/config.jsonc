@@ -37,6 +37,7 @@
       "class<zen>": "", // Windows whose classes are "firefox"
       "class<Alacritty>": "",
       "class<Discord>": "",
+      "class<vesktop>": "",
     },
   },
 

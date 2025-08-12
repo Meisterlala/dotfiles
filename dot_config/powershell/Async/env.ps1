@@ -11,3 +11,14 @@ if (Get-Command -Name "pnpm" -ErrorAction SilentlyContinue) {
     }
 }
 
+
+# Test for cargo bin folder and add it (cross-platform)
+$CARGO_BIN = Join-Path $HOME ".cargo/bin"
+if (Test-Path -Path $CARGO_BIN) {
+    if ($global:os -eq "windows") {
+        $env:PATH += ";$CARGO_BIN"
+    } else {
+        $env:PATH += ":$CARGO_BIN"
+    }
+}
+
