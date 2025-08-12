@@ -1,0 +1,5 @@
+wallpaper_directory = "~/wallpapers/"
+interval = 300
+history_length = 25
+mode = "Random"
+wallpaper_change_command = "swww img --transition-step 1 --transition-fps 165 %wallpaper%"
