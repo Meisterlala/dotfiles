@@ -1,0 +1,15 @@
+[Unit]
+Description=Wallpaper utility
+After=swww.service
+BindsTo=swww.service
+
+After=graphical-session.target
+PartOf=graphical-session.target
+Requisite=graphical-session.target
+
+[Service]
+ExecStart=%h/.cargo/bin/wp daemon
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target
