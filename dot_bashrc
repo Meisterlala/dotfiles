@@ -1,0 +1,20 @@
+#
+# ~/.bashrc
+#
+
+# Only run this for interactive shells
+[[ $- != *i* ]] && return
+
+# Only run pwsh if we're NOT on a login TTY and not already in pwsh
+if [[ $(ps --no-header --pid=$PPID --format=comm) != "pwsh" ]] && [[ $TERM != "linux" ]]; then
+    # Check if BASH_EXECUTION_STRING is empty to avoid non-interactive execs
+    [[ -z $BASH_EXECUTION_STRING ]] && exec pwsh
+fi
+
+# Set a basic prompt
+PS1='[\u@\h \W]\$ '
+
+# Use bash-completion, if available
+[[ $PS1 && -f /usr/share/bash-completion/bash_completion ]] && \
+    . /usr/share/bash-completion/bash_completion
+
