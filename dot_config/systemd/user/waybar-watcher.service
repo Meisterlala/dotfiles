@@ -2,10 +2,13 @@
 Description=Restart Waybar when config changes
 StartLimitIntervalSec=0
 StartLimitBurst=0
+PartOf=graphical-session.target
+After=waybar.service
+Requisite=graphical-session.targe
 
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/systemctl --user restart waybar.service
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical-session.target
