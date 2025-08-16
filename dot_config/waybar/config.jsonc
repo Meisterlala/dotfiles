@@ -8,7 +8,10 @@
 
   // Choose the order of the modules
   "modules-left": ["hyprland/workspaces"],
-  "modules-center": ["wlr/taskbar"],
+  "modules-center": [
+    // "wlr/taskbar",
+    "hyprland/window",
+  ],
   "modules-right": [
     "load",
     "privacy",
@@ -27,6 +30,15 @@
     "on-click": "activate",
     "on-click-middle": "close",
     "ignore-list": ["Alacritty", "com.mitchellh.ghostty"],
+  },
+
+  "hyprland/window": {
+    "format": "{}",
+    "rewrite": {
+      "(.*) — Mozilla Firefox": "🌎 $1",
+      "(.*) - fish": "> [$1]",
+    },
+    "separate-outputs": true,
   },
 
   "hyprland/workspaces": {
