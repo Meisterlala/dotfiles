@@ -22,3 +22,7 @@ if (Test-Path -Path $CARGO_BIN) {
     }
 }
 
+# Set SOPS Key if it exists
+if (Test-Path -Path (Join-Path $HOME ".config/age/sops")) {
+    $env:SOPS_AGE_KEY_FILE = Join-Path $HOME ".config/age/sops"
+}

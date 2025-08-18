@@ -33,14 +33,17 @@
   },
 
   "hyprland/window": {
-    "format": "{}",
+    "format": "{title}",
+    "icon": false,
     "rewrite": {
-      "(.*) — Mozilla Firefox": "🌎 $1",
-      "(.*) - fish": "> [$1]",
+      "(.*) — Zen Browser": "$1",
+      "class<com.mitchellh.ghostty>": "sdf",
     },
     "separate-outputs": true,
   },
 
+  // Check with `hyprctl clients`
+  // https://www.nerdfonts.com/cheat-sheet
   "hyprland/workspaces": {
     "format": "{windows}",
     "format-window-separator": " ",
@@ -51,7 +54,8 @@
       "class<Alacritty>": "",
       "class<com.mitchellh.ghostty>": "",
       "class<Discord>": "",
-      "class<vesktop>": "",
+      "class<Spotify>": "",
+      "class<org.gnome.Nautilus>": "",
     },
   },
 
