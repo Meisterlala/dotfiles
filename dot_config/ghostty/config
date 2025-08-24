@@ -20,12 +20,11 @@ command = pwsh -Login -NoLogo
 # Theme
 theme = catppuccin-mocha
 
-background-opacity = 0.7
+background-opacity = 0.85
 background-blur = 20
 
 window-decoration = none
 
-# 
 alpha-blending = linear-corrected
 
 # Performance
@@ -45,6 +44,6 @@ confirm-close-surface = false
 clipboard-read = allow
 clipboard-write = allow
 clipboard-trim-trailing-spaces = true
-clipboard-paste-protection = true
+clipboard-paste-protection = false
 copy-on-select = true
 
