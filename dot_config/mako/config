@@ -10,5 +10,15 @@ margin=10
 padding=10
 border-radius=8
 
+
+# Timeout
+default-timeout=3000
+
 [urgency=high]
 border-color=#fab387
+
+
+# makoctl mode -a do-not-disturb
+# makoctl mode -r do-not-disturb
+[mode=do-not-disturb]
+invisible=1 
