@@ -92,6 +92,8 @@ box.#workspaces {
   box-shadow: inset 0px -4px @rosewater;
 }
 
+#custom-updates,
+#custom-weather,
 #systemd-failed-units,
 #tray,
 #wireplumber,
@@ -105,6 +107,8 @@ box.#workspaces {
   border-radius: 8px;
 }
 
+#custom-weather:hover,
+#custom-updates:hover,
 #wireplumber:hover,
 #cpu:hover,
 #memory:hover,

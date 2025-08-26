@@ -1,152 +1,272 @@
 // -*- mode: jsonc -*-
-{
-  "height": 38, // Waybar height (to be removed for auto height)
-  "spacing": 4, // Gaps between modules (4px)
-  "fixed-center": true, // Center the middle in the Display middle
-  "reload_style_on_change": false,
-  "layer": "top",
+[
+  {
+    // Main
+    "height": 38, // Waybar height (to be removed for auto height)
+    "spacing": 4, // Gaps between modules (4px)
+    "fixed-center": true, // Center the middle in the Display middle
+    "reload_style_on_change": false,
+    "layer": "top",
+    "output": "DP-3",
 
-  // Choose the order of the modules
-  "modules-left": ["hyprland/workspaces"],
-  "modules-center": [
-    // "wlr/taskbar",
-    "hyprland/window",
-  ],
-  "modules-right": [
-    "load",
-    "privacy",
-    "tray",
-    "systemd-failed-units",
-    "wireplumber",
-    "cpu",
-    "memory",
-    "clock",
-  ],
-
-  "wlr/taskbar": {
-    "format": "{icon} {title:.45}",
-    "icon-size": 30,
-    "tooltip-format": "{title}",
-    "on-click": "activate",
-    "on-click-middle": "close",
-    "ignore-list": ["Alacritty", "com.mitchellh.ghostty"],
-  },
-
-  "hyprland/window": {
-    "format": "{title}",
-    "icon": false,
-    "rewrite": {
-      "(.*) — Zen Browser": "$1",
-      "class<com.mitchellh.ghostty>": "sdf",
-    },
-    "separate-outputs": true,
-  },
-
-  // Check with `hyprctl clients`
-  // https://www.nerdfonts.com/cheat-sheet
-  "hyprland/workspaces": {
-    "format": "{windows}",
-    "format-window-separator": " ",
-    "window-rewrite-default": "",
-    "window-rewrite": {
-      "title<.*youtube.*>": "", // Windows whose titles contain "youtube"
-      "class<zen>": "", // Windows whose classes are "firefox"
-      "class<Alacritty>": "",
-      "class<com.mitchellh.ghostty>": "",
-      "class<Discord>": "",
-      "class<Spotify>": "",
-      "class<org.gnome.Nautilus>": "",
-    },
-  },
-
-  "tray": {
-    "icon-size": 20,
-    "spacing": 10,
-  },
-
-  "cpu": {
-    "tooltip": true,
-    "interval": 3,
-    "format": "{usage:>3}% ",
-  },
-
-  "memory": {
-    "format": "{percentage:>2}% ",
-  },
-
-  "load": {
-    "interval": 10,
-    "format": "{load1:.1f} {load5:.1f} {load15:.1f}",
-  },
-
-  "wireplumber": {
-    "format": "{volume}% {icon}",
-    "format-muted": "󰖁",
-    "max-volume": 200,
-    "scroll-step": 2.5,
-    "on-click": "pwvucontrol",
-    "on-click-right": "helvum",
-    "on-click-middle": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
-    "format-icons": ["", "", ""],
-  },
-
-  "clock": {
-    "locale": "de_DE.UTF-8",
-    "format": "{:%H:%M}  ",
-    "format-alt": "{:%A %d.%m.%Y  %H:%M}  ",
-    "tooltip-format": "<tt><small>{calendar}</small></tt>",
-    "calendar": {
-      "mode": "year",
-      "mode-mon-col": 3,
-      "weeks-pos": "right",
-      "on-scroll": 1,
-      "format": {
-        "months": "<span color='#ffead3'><b>{}</b></span>",
-        "days": "<span color='#ecc6d9'><b>{}</b></span>",
-        "weeks": "<span color='#99ffdd'><b>W{}</b></span>",
-        "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
-        "today": "<span color='#ff6699'><b><u>{}</u></b></span>",
-      },
-    },
-    "actions": {
-      "on-click-right": "mode",
-    },
-  },
-
-  "privacy": {
-    "icon-spacing": 4,
-    "icon-size": 18,
-    "transition-duration": 250,
-    "modules": [
-      {
-        "type": "screenshare",
-        "tooltip": true,
-        "tooltip-icon-size": 24,
-      },
-      {
-        "type": "audio-in",
-        "tooltip": true,
-        "tooltip-icon-size": 24,
-      },
+    // Choose the order of the modules
+    "modules-left": ["hyprland/workspaces"],
+    "modules-center": [
+      // "wlr/taskbar",
+      "hyprland/window",
     ],
-    "ignore": [
-      {
-        "type": "audio-in",
-        "name": "cava",
-      },
-      {
-        "type": "screenshare",
-        "name": "obs",
-      },
+    "modules-right": [
+      "privacy",
+      "tray",
+      "systemd-failed-units",
+      "custom/updates",
+      "wireplumber",
+      "clock",
     ],
-  },
 
-  "systemd-failed-units": {
-    "hide-on-ok": true, // Do not hide if there is zero failed units.
-    "format": " {nr_failed}",
-    "system": true, // Monitor failed systemwide units.
-    "user": true, // Ignore failed user units.
-    "on-click": "~/.config/waybar/failed-units.sh",
-    "on-click-right": "~/.config/waybar/restart-failed.sh",
+    "wlr/taskbar": {
+      "format": "{icon} {title:.45}",
+      "icon-size": 30,
+      "tooltip-format": "{title}",
+      "on-click": "activate",
+      "on-click-middle": "close",
+      "ignore-list": ["Alacritty", "com.mitchellh.ghostty"],
+    },
+
+    "hyprland/window": {
+      "format": "{title}",
+      "icon": false,
+      "rewrite": {
+        "(.*) — Zen Browser": "$1",
+        "class<com.mitchellh.ghostty>": "sdf",
+      },
+      "separate-outputs": true,
+    },
+
+    // Check with `hyprctl clients`
+    // https://www.nerdfonts.com/cheat-sheet
+    "hyprland/workspaces": {
+      "format": "{windows}",
+      "format-window-separator": " ",
+      "window-rewrite-default": "",
+      "window-rewrite": {
+        "title<.*youtube.*>": "", // Windows whose titles contain "youtube"
+        "class<zen>": "", // Windows whose classes are "firefox"
+        "class<Alacritty>": "",
+        "class<com.mitchellh.ghostty>": "",
+        "class<Discord>": "",
+        "class<Spotify>": "",
+        "class<org.gnome.Nautilus>": "",
+        "class<superProductivity>": "",
+      },
+    },
+
+    "custom/updates": {
+      "format": "{} {icon} ",
+      "return-type": "json",
+      "format-icons": {
+        "has-updates": "󱍷",
+        "updated": "󰒘",
+      },
+      "exec-if": "which waybar-module-pacman-updates",
+      "exec": "waybar-module-pacman-updates --interval-seconds 5 --network-interval-seconds 300 --tooltip-align-columns --color-semver-updates eba0ac,cba6f7,cdd6f4,cdd6f4,cdd6f4,cdd6f4,cdd6f4,cdd6f4,cdd6f4 --no-zero-output",
+      "on-click": "ghostty -e paru -Syu",
+    },
+
+    "tray": {
+      "icon-size": 20,
+      "spacing": 10,
+    },
+
+    "cpu": {
+      "tooltip": true,
+      "interval": 3,
+      "format": "{usage:>3}% ",
+    },
+
+    "memory": {
+      "format": "{percentage:>2}% ",
+    },
+
+    "load": {
+      "interval": 10,
+      "format": "{load1:.1f} {load5:.1f} {load15:.1f}",
+    },
+
+    "wireplumber": {
+      "format": "{volume}% {icon} ",
+      "format-muted": "󰖁",
+      "max-volume": 200,
+      "scroll-step": 2.5,
+      "on-click": "pwvucontrol",
+      "on-click-right": "helvum",
+      "on-click-middle": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+      "format-icons": ["", "", ""],
+    },
+
+    "clock": {
+      "locale": "de_DE.UTF-8",
+      "format": "{:%H:%M}  ",
+      "format-alt": "{:%A %d.%m.%Y  %H:%M}  ",
+      "tooltip-format": "<tt><small>{calendar}</small></tt>",
+      "calendar": {
+        "mode": "year",
+        "mode-mon-col": 3,
+        "weeks-pos": "right",
+        "on-scroll": 1,
+        "format": {
+          "months": "<span color='#ffead3'><b>{}</b></span>",
+          "days": "<span color='#ecc6d9'><b>{}</b></span>",
+          "weeks": "<span color='#99ffdd'><b>W{}</b></span>",
+          "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
+          "today": "<span color='#ff6699'><b><u>{}</u></b></span>",
+        },
+      },
+      "actions": {
+        "on-click-right": "mode",
+      },
+    },
+
+    "privacy": {
+      "icon-spacing": 4,
+      "icon-size": 18,
+      "transition-duration": 250,
+      "modules": [
+        {
+          "type": "screenshare",
+          "tooltip": true,
+          "tooltip-icon-size": 24,
+        },
+        {
+          "type": "audio-in",
+          "tooltip": true,
+          "tooltip-icon-size": 24,
+        },
+      ],
+      "ignore": [
+        {
+          "type": "audio-in",
+          "name": "cava",
+        },
+        {
+          "type": "screenshare",
+          "name": "obs",
+        },
+        {
+          "type": "audio-in",
+          "name": "discord_capture",
+        },
+      ],
+    },
+
+    "systemd-failed-units": {
+      "hide-on-ok": true, // Do not hide if there is zero failed units.
+      "format": " {nr_failed}",
+      "system": true, // Monitor failed systemwide units.
+      "user": true, // Ignore failed user units.
+      "on-click": "~/.config/waybar/failed-units.sh",
+      "on-click-right": "~/.config/waybar/restart-failed.sh",
+    },
   },
-}
+  {
+    // Secondary
+    "height": 38, // Waybar height (to be removed for auto height)
+    "spacing": 4, // Gaps between modules (4px)
+    "fixed-center": true, // Center the middle in the Display middle
+    "reload_style_on_change": false,
+    "layer": "top",
+    "output": "DP-2",
+
+    // Choose the order of the modules
+    "modules-left": ["hyprland/workspaces"],
+    "modules-center": [
+      // "wlr/taskbar",
+      "hyprland/window",
+    ],
+    "modules-right": ["load", "custom/weather", "cpu", "memory", "clock"],
+
+    "wlr/taskbar": {
+      "format": "{icon} {title:.45}",
+      "icon-size": 30,
+      "tooltip-format": "{title}",
+      "on-click": "activate",
+      "on-click-middle": "close",
+      "ignore-list": ["Alacritty", "com.mitchellh.ghostty"],
+    },
+
+    "hyprland/window": {
+      "format": "{title}",
+      "icon": false,
+      "rewrite": {
+        "(.*) — Zen Browser": "$1",
+        "class<com.mitchellh.ghostty>": "sdf",
+      },
+      "separate-outputs": true,
+    },
+
+    // Check with `hyprctl clients`
+    // https://www.nerdfonts.com/cheat-sheet
+    "hyprland/workspaces": {
+      "format": "{windows}",
+      "format-window-separator": " ",
+      "window-rewrite-default": "",
+      "window-rewrite": {
+        "title<.*youtube.*>": "", // Windows whose titles contain "youtube"
+        "class<zen>": "", // Windows whose classes are "firefox"
+        "class<Alacritty>": "",
+        "class<com.mitchellh.ghostty>": "",
+        "class<Discord>": "",
+        "class<Spotify>": "",
+        "class<org.gnome.Nautilus>": "",
+        "class<superProductivity>": "",
+      },
+    },
+
+    "cpu": {
+      "tooltip": true,
+      "interval": 3,
+      "format": "{usage:>3}% ",
+    },
+
+    "memory": {
+      "format": "{percentage:>2}% ",
+    },
+
+    "load": {
+      "interval": 10,
+      "format": "{load1:.1f} {load5:.1f} {load15:.1f}",
+    },
+
+    "custom/weather": {
+      "format": " {}",
+      "tooltip": true,
+      "interval": 3600,
+      "exec-if": "which wttrbar",
+      "exec": "wttrbar --location Frankfurt --hide-conditions --lang de",
+      "return-type": "json",
+    },
+
+    "clock": {
+      "locale": "de_DE.UTF-8",
+      "format": "{:%H:%M}  ",
+      "format-alt": "{:%A %d.%m.%Y  %H:%M}  ",
+      "tooltip-format": "<tt><small>{calendar}</small></tt>",
+      "calendar": {
+        "mode": "year",
+        "mode-mon-col": 3,
+        "weeks-pos": "right",
+        "on-scroll": 1,
+        "format": {
+          "months": "<span color='#ffead3'><b>{}</b></span>",
+          "days": "<span color='#ecc6d9'><b>{}</b></span>",
+          "weeks": "<span color='#99ffdd'><b>W{}</b></span>",
+          "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
+          "today": "<span color='#ff6699'><b><u>{}</u></b></span>",
+        },
+      },
+      "actions": {
+        "on-click-right": "mode",
+      },
+    },
+  },
+]
