@@ -9,7 +9,6 @@ function Install-Zoxide {
     }
 }
 
-
 # Initialize zoxide
 try {
     Invoke-Expression (& { (zoxide init --cmd cd powershell | Out-String) })

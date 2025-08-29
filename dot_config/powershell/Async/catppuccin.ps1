@@ -1,5 +1,5 @@
-Import-Module Catppuccin -Global
-$global:Flavor = $catppuccin['Frappe']
+Import-Module Catppuccin
+$global:Flavor = $Catppuccin['Frappe']
 
 
 function Get-ColorStringCatppuccin {

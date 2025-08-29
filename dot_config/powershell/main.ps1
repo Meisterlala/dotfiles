@@ -49,8 +49,6 @@ if (Test-Path $global:myFiles.env) {
     . $global:myFiles.env
 }
 
-
-
 # Add Modules to PS Module load list
 if ((Get-OperatingSystem) -eq "windows") {
     $env:PSModulePath += "; $powershellModules"
@@ -80,14 +78,23 @@ Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 # Match with already written command
 # Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
 # Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
-
 Set-PSReadLineKeyHandler -Key Alt+e -Function ViEditVisually
 
-# Defer module/script loading asynchronously during idle
-function Initialize-Async {
-    Start-AsyncModuleInitialization $global:myAsync 
+
+
+Import-Module ProfileAsync
+# Load with AsyncProfile
+$AsyncScriptblock = {
+    . $global:myAsync.zoxide
+    . $global:myAsync.completion
+    . $global:myAsync.alias
+    . $global:myAsync.chezmoi
+    . $global:myAsync.psprofiler
+    . $global:myAsync.ohMyPosh
+    . $global:myAsync.catppuccin
 }
-Initialize-Async
+
+Import-ProfileAsync $AsyncScriptblock -Delay 200
 
 # Load last Profile hints
 $lastProfileHints = (Get-LastProfileHints).hints
