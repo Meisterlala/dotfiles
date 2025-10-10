@@ -11,7 +11,7 @@ k9s:
   ui:
     enableMouse: true
     headless: false
-    logoless: false
+    logoless: true
     crumbsless: false
     splashless: true
     reactive: false
