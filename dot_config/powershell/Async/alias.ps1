@@ -32,7 +32,7 @@ if (Get-Command eza -ErrorAction SilentlyContinue) {
             [Parameter(ValueFromRemainingArguments = $true)]
             [string[]]$Args
         )
-        eza --icons=auto --color=always --color-scale=size -h @Args
+        eza --icons=auto --color=always --color-scale=size -I lost+found -h @Args
     }
     Set-Alias -Name ls -Value Get-EzaWithColor -Scope Global | Out-Null
 }
