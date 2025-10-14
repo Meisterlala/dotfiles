@@ -80,7 +80,8 @@ Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 # Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 Set-PSReadLineKeyHandler -Key Alt+e -Function ViEditVisually
 
-
+# Load last Profile hints
+$lastProfileHints = (Get-LastProfileHints).hints
 
 Import-Module ProfileAsync
 # Load with AsyncProfile
@@ -92,12 +93,11 @@ $AsyncScriptblock = {
     . $global:myAsync.psprofiler
     . $global:myAsync.ohMyPosh
     . $global:myAsync.catppuccin
+
+    Save-ProfileHints
 }
 
 Import-ProfileAsync $AsyncScriptblock -Delay 200
-
-# Load last Profile hints
-$lastProfileHints = (Get-LastProfileHints).hints
 
 # Print timing info
 $time.Stop()

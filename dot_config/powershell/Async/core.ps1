@@ -87,7 +87,7 @@ function Install-WithWinget {
     catch {
         throw "Could not install $name with winget: $_"
     }
-    Update-Async
+    pwsh -NoLogo -WorkingDirectory $pwd
 }
 
 function Install-WithYayPacman {
@@ -121,7 +121,7 @@ function Install-WithYayPacman {
     catch {
         throw "Could not install $([string]::Join(', ', $Name)) with $([bool]$useYay ? 'yay' : 'pacman'): $_"
     }
-    Update-Async
+    pwsh -NoLogo -WorkingDirectory $pwd
 }
 
 
@@ -154,6 +154,7 @@ function install-withapt {
     catch {
         throw "Could not install $([string]::Join(', ', $Name)) with apt: $_"
     }
+    pwsh -NoLogo -WorkingDirectory $pwd
 }
 
 function Get-ColorString {
