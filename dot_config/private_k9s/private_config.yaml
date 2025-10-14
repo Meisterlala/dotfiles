@@ -14,7 +14,7 @@ k9s:
     logoless: true
     crumbsless: false
     splashless: true
-    reactive: false
+    reactive: true
     noIcons: false
     defaultsToFullScreen: false
     useFullGVRTitle: false
@@ -28,7 +28,7 @@ k9s:
       cpu: 100m
       memory: 100Mi
   imageScans:
-    enable: true
+    enable: false
     exclusions:
       namespaces: []
       labels: {}
