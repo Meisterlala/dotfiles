@@ -1,5 +1,6 @@
 function Install-Carapace {
     If ($global:os -eq "windows") {
+        Install-WithWinget "rsteube.Carapace"
 
     } else {
         Install-WithYayPacman "carapace-bin"
