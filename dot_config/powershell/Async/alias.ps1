@@ -116,6 +116,37 @@ function Start-Scrcpy {
     }
 
 
+    # Run Link-ScrcpyToVirtualMic in the background
+    Start-Job -ScriptBlock { Link-ScrcpyToVirtualMic } | Out-Null
+
     # Start scrcpy and get the process object
     Start-Process "scrcpy" -ArgumentList $scrcpyArgs -Wait
+}
+
+function Link-ScrcpyToVirtualMic {
+    param(
+        [string]$AppNodeName = "scrcpy",
+        [string]$VirtualMicName = "scrcpySource"
+    )
+
+    # wait until both nodes exist
+    do {
+        $nodes = pw-cli ls Node
+        $appExists = $nodes -match "node.name = `"$AppNodeName`""
+        $micExists = pw-link -l | Select-String $VirtualMicName
+
+        if (-not ($appExists -and $micExists)) {
+            Start-Sleep -Seconds 1
+        }
+    } until ($appExists -and $micExists)
+
+    # remove existing links from the app
+    $links = pw-link -l | Select-String "^${AppNodeName}:" | ForEach-Object { ($_ -split '\s+')[0] }
+    foreach ($link in $links) {
+        pw-link -d $link | Out-Null
+    }
+
+    # create new links quietly
+    pw-link "${AppNodeName}:output_FL" "${VirtualMicName}:input_FL" | Out-Null
+    pw-link "${AppNodeName}:output_FR" "${VirtualMicName}:input_FR" | Out-Null
 }
