@@ -95,7 +95,9 @@ Set-Alias -Name yyay -Value Invoke-YayNoConfirm -Scope Global | Out-Null
 function Start-Scrcpy {
     param(
         # Use -Webcam to enable webcam mode
-        [switch]$Webcam
+        [switch]$Webcam,
+        # Optionally specify the V4L2 device for webcam mode
+        [string]$V4l2Device = "/dev/video0"
     )
 
     $scrcpyArgs = @(
@@ -103,12 +105,11 @@ function Start-Scrcpy {
         "--video-bit-rate=16M",
         "--audio-bit-rate=128K",
         "--max-fps=60"
-        "--v4l2-sink=/dev/video0"
         "--camera-size=1920x1080"
     )
 
     if ($Webcam) {
-        $scrcpyArgs += "--video-source=camera", "--camera-id=0", "--no-video-playback", "--camera-size=1920x1080"
+        $scrcpyArgs += "--v4l2-sink=$V4l2Device --video-source=camera", "--camera-id=0", "--no-video-playback", "--camera-size=1920x1080"
     }
 
 
