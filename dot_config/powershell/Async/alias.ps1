@@ -97,19 +97,22 @@ function Start-Scrcpy {
         # Use -Webcam to enable webcam mode
         [switch]$Webcam,
         # Optionally specify the V4L2 device for webcam mode
-        [string]$V4l2Device = "/dev/video0"
+        [string]$V4l2Device = "/dev/video0",
+        # Specify the camera ID for webcam mode
+        [int]$CameraId = 0,
+        # Specify the maximum FPS
+        [int]$MaxFps = 60
     )
 
     $scrcpyArgs = @(
         "--video-codec=h264",
         "--video-bit-rate=16M",
         "--audio-bit-rate=128K",
-        "--max-fps=60"
-        "--camera-size=1920x1080"
+        "--max-fps=$MaxFps"
     )
 
     if ($Webcam) {
-        $scrcpyArgs += "--v4l2-sink=$V4l2Device --video-source=camera", "--camera-id=0", "--no-video-playback", "--camera-size=1920x1080"
+        $scrcpyArgs += "--v4l2-sink=$V4l2Device", "--video-source=camera", "--camera-id=$CameraId", "--no-video-playback", "--camera-size=1920x1080"
     }
 
 
