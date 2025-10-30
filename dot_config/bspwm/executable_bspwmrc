@@ -1,8 +1,8 @@
 #! /bin/sh
 
 # Logging
-# set -xv
-# exec 2>>/tmp/bspwm.log
+set -xv
+exec 2>>/tmp/bspwm.log
 
 # Start Compositor
 if ! pgrep -x "picom" >/dev/null
