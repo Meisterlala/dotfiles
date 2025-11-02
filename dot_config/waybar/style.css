@@ -94,6 +94,7 @@ box.#workspaces {
 
 #custom-updates,
 #custom-weather,
+#custom-scrcpy-active,
 #systemd-failed-units,
 #tray,
 #wireplumber,
@@ -109,6 +110,7 @@ box.#workspaces {
 
 #custom-weather:hover,
 #custom-updates:hover,
+#custom-scrcpy-active:hover,
 #wireplumber:hover,
 #cpu:hover,
 #memory:hover,

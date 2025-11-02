@@ -19,6 +19,7 @@
       "privacy",
       "tray",
       "systemd-failed-units",
+      "custom/scrcpy-active",
       "custom/updates",
       "wireplumber",
       "clock",
@@ -72,6 +73,13 @@
       "exec-if": "which waybar-module-pacman-updates",
       "exec": "waybar-module-pacman-updates --interval-seconds 5 --network-interval-seconds 300 --tooltip-align-columns --color-semver-updates eba0ac,cba6f7,cdd6f4,cdd6f4,cdd6f4,cdd6f4,cdd6f4,cdd6f4,cdd6f4 --no-zero-output",
       "on-click": "ghostty -e paru -Syu",
+    },
+
+    "custom/scrcpy-active": {
+      "exec": "~/.config/waybar/scrcpy-active.sh",
+      "on-click": "~/.config/waybar/scrcpy-active.sh --kill",
+      "hode-empty-text": true,
+      "interval": 2,
     },
 
     "tray": {
