@@ -91,6 +91,44 @@ function Invoke-YayNoConfirm {
 
 Set-Alias -Name yyay -Value Invoke-YayNoConfirm -Scope Global | Out-Null
 
+function Link-ScrcpyToVirtualMic {
+    param(
+        [string]$AppNodeName = "scrcpy",
+        [string]$VirtualMicName = "scrcpySource"
+    )
+
+    # wait until both nodes exist
+    do {
+        $nodes = pw-cli ls Node
+        $appExists = $nodes -match "node.name = `"$AppNodeName`""
+        $micExists = pw-link -i | Select-String $VirtualMicName
+
+        if (-not ($appExists -and $micExists)) {
+            Start-Sleep -Seconds 1
+        }
+    } until ($appExists -and $micExists)
+
+    # remove existing links from the app
+    $nodes = pw-cli ls Node
+    $appNodeId = $nodes | Select-String "node.name = `"$AppNodeName`"" | ForEach-Object {
+        if ($_.Line -match 'id (\d+),') { $matches[1] }
+    }
+    $links = pw-cli ls Link
+    $linkIdsToRemove = $links | ForEach-Object {
+        if ($_ -match 'id (\d+),') { $linkId = $matches[1] }
+        $outputNodeMatch = $_ -match 'link\.output\.node = "(\d+)"'
+        $inputNodeMatch = $_ -match 'link\.input\.node = "(\d+)"'
+        if ($outputNodeMatch -and $matches[1] -eq $appNodeId) { $linkId }
+        elseif ($inputNodeMatch -and $matches[2] -eq $appNodeId) { $linkId }
+    }
+    foreach ($linkId in $linkIdsToRemove | Where-Object { $_ }) {
+        pw-link -d $linkId | Out-Null
+    }
+
+    # create new links quietly
+    pw-link "${AppNodeName}:output_FL" "${VirtualMicName}:input_FL" | Out-Null
+    pw-link "${AppNodeName}:output_FR" "${VirtualMicName}:input_FR" | Out-Null
+}
 
 function Start-Scrcpy {
     param(
@@ -117,11 +155,8 @@ function Start-Scrcpy {
 
 
     # Run Link-ScrcpyToVirtualMic in the background
-    Start-Job -ScriptBlock { Link-ScrcpyToVirtualMic } | Out-Null
-
-    # Start scrcpy and get the process object
-    Start-Process "scrcpy" -ArgumentList $scrcpyArgs -Wait
-}
+    if ($global:os -eq 'linux'){
+    Start-Job -ScriptBlock {
 
 function Link-ScrcpyToVirtualMic {
     param(
@@ -133,7 +168,7 @@ function Link-ScrcpyToVirtualMic {
     do {
         $nodes = pw-cli ls Node
         $appExists = $nodes -match "node.name = `"$AppNodeName`""
-        $micExists = pw-link -l | Select-String $VirtualMicName
+        $micExists = pw-link -i | Select-String $VirtualMicName
 
         if (-not ($appExists -and $micExists)) {
             Start-Sleep -Seconds 1
@@ -141,12 +176,31 @@ function Link-ScrcpyToVirtualMic {
     } until ($appExists -and $micExists)
 
     # remove existing links from the app
-    $links = pw-link -l | Select-String "^${AppNodeName}:" | ForEach-Object { ($_ -split '\s+')[0] }
-    foreach ($link in $links) {
-        pw-link -d $link | Out-Null
+    $nodes = pw-cli ls Node
+    $appNodeId = $nodes | Select-String "node.name = `"$AppNodeName`"" | ForEach-Object {
+        if ($_.Line -match 'id (\d+),') { $matches[1] }
+    }
+    $links = pw-cli ls Link
+    $linkIdsToRemove = $links | ForEach-Object {
+        if ($_ -match 'id (\d+),') { $linkId = $matches[1] }
+        $outputNodeMatch = $_ -match 'link\.output\.node = "(\d+)"'
+        $inputNodeMatch = $_ -match 'link\.input\.node = "(\d+)"'
+        if ($outputNodeMatch -and $matches[1] -eq $appNodeId) { $linkId }
+        elseif ($inputNodeMatch -and $matches[2] -eq $appNodeId) { $linkId }
+    }
+    foreach ($linkId in $linkIdsToRemove | Where-Object { $_ }) {
+        pw-link -d $linkId | Out-Null
     }
 
     # create new links quietly
     pw-link "${AppNodeName}:output_FL" "${VirtualMicName}:input_FL" | Out-Null
     pw-link "${AppNodeName}:output_FR" "${VirtualMicName}:input_FR" | Out-Null
 }
+
+
+        Link-ScrcpyToVirtualMic }
+}
+    # Start scrcpy and get the process object
+    Start-Process "scrcpy" -ArgumentList $scrcpyArgs -Wait
+}
+

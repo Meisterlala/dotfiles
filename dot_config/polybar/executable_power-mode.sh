@@ -14,7 +14,7 @@ declare -A MODE_COLOR      # Polybar color
 MODE_VAR=( ["power"]="powersave|power" ["balanced"]="powersave|balance_power" ["performance"]="performance|performance" )
 
 # Polybar short names
-MODE_BAR=( ["power"]="P" ["balanced"]="B" ["performance"]="X" )
+MODE_BAR=( ["power"]="P" ["balanced"]="B" ["performance"]="X" ["unknown"]="?")
 
 # Dunst notification full names
 MODE_NOTIFY=( ["power"]="Power-Saving" ["balanced"]="Balanced" ["performance"]="Full-Performance" )
