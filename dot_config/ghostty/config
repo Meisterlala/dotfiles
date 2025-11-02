@@ -18,7 +18,7 @@ font-family = "Mono"
 command = pwsh -Login -NoLogo
 
 # Theme
-theme = catppuccin-mocha
+theme = Catppuccin Mocha
 
 background-opacity = 0.85
 background-blur = 20
