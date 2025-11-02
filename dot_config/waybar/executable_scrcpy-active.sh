@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -Eeuo pipefail
 
 # Check if scrcpy is running and output status for waybar
