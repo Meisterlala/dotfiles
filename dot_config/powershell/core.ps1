@@ -1,173 +1,269 @@
 # Core functions
-function Get-OperatingSystem {
-    if ($env:OS -eq "Windows_NT") {
+function Get-OperatingSystem
+{
+    if ($env:OS -eq "Windows_NT")
+    {
         return "windows"
-    }
-    else {
+    } else
+    {
         return "linux"
     }
 }
 $global:os = Get-OperatingSystem
 
-function Show-ProfileIssues {
+function Show-ProfileIssues
+{
     # Render all errors
-    foreach ($issue in $global:ProfileIssues) {
+    foreach ($issue in $global:ProfileIssues)
+    {
         Write-Warning (Get-ColorString $issue)
     }
 }
 
-function Show-ProfileHints {
+function Show-ProfileHints
+{
     param(
         [string[]] $hints = $Global:ProfileHints
     )
 
     # Render all errors
-    foreach ($issue in $hints) {
+    foreach ($issue in $hints)
+    {
         Write-Host (Get-ColorString $issue)
     }
 }
 
-function Show-ProfileAsync {
+function Show-ProfileAsync
+{
     # Render all errors
-    foreach ($issue in $global:ProfileLoadedAsync) {
+    foreach ($issue in $global:ProfileLoadedAsync)
+    {
         Write-Host (Get-ColorString $issue)
     }
 }
 
-function Save-ProfileHints {
-    try {
+function Save-ProfileHints
+{
+    try
+    {
         $configDir = Join-Path $HOME ".config/powershell"
-        if (-not (Test-Path $configDir)) {
+        if (-not (Test-Path $configDir))
+        {
             New-Item -ItemType Directory -Path $configDir -Force | Out-Null
         }
 
         $filePath = Join-Path $configDir "last_hints"
+
+
+
         $payload = @{ hints = @($global:ProfileHints) }
         $json = $payload | ConvertTo-Json -Depth 5
         Set-Content -Path $filePath -Value $json -Encoding utf8
-    }
-    catch {
+    } catch
+    {
         $global:ProfileIssues += "Failed to save profile hints: $($_.Exception.Message)"
     }
 }
 
-function Get-LastProfileHints {
-    try {
+function Get-LastProfileHints
+{
+    try
+    {
         $filePath = Join-Path $HOME ".config/powershell/last_hints"
-        if (-not (Test-Path $filePath)) {
+        if (-not (Test-Path $filePath))
+        {
             return @{ hints = @() }
         }
 
         $raw = Get-Content -Path $filePath -Raw -ErrorAction Stop
         $obj = $raw | ConvertFrom-Json -ErrorAction Stop
-        if ($null -eq $obj) {
+        if ($null -eq $obj)
+        {
             return @{ hints = @() }
         }
         return $obj
-    }
-    catch {
+    } catch
+    {
         $global:ProfileIssues += "Failed to load last profile hints: $($_.Exception.Message)"
         return @{ hints = @() }
     }
 }
 
-function Install-WithWinget {
+function Install-WithWinget
+{
     param (
         [Parameter(Mandatory)]
         [string] $name
     )
-    if ((Get-OperatingSystem) -ne "windows") {
+    if ((Get-OperatingSystem) -ne "windows")
+    {
         Write-Warning "You can only use winget on windows"
         return
     }
 
-    try {
+    try
+    {
         winget install --exact $name --accept-package-agreements 
-    }
-    catch {
+    } catch
+    {
         throw "Could not install $name with winget: $_"
     }
     pwsh -NoLogo -WorkingDirectory $pwd
 }
 
-function Install-WithYayPacman {
+function Install-WithYayPacman
+{
     param (
         [Parameter(Mandatory, ValueFromRemainingArguments = $true)]
         [string[]] $Name
     )
 
-    if ((Get-OperatingSystem) -ne "linux") {
+    if ((Get-OperatingSystem) -ne "linux")
+    {
         Write-Warning "You can use yay/pacman on linux"
         return
     }
 
     $useYay = $false
-    if (Get-Command -Name 'yay' -ErrorAction SilentlyContinue) {
+    if (Get-Command -Name 'yay' -ErrorAction SilentlyContinue)
+    {
         $useYay = $true
-    }
-    elseif (-not (Get-Command -Name 'pacman' -ErrorAction SilentlyContinue)) {
+    } elseif (-not (Get-Command -Name 'pacman' -ErrorAction SilentlyContinue))
+    {
         throw "Neither 'yay' nor 'pacman' is available on PATH."
     }
 
-    try {
+    try
+    {
         $packageArgs = @('-S', '--needed', '--noconfirm') + $Name
-        if ($useYay) {
+        if ($useYay)
+        {
             & yay @packageArgs
-        }
-        else {
+        } else
+        {
             & sudo pacman @packageArgs
         }
-    }
-    catch {
+    } catch
+    {
         throw "Could not install $([string]::Join(', ', $Name)) with $([bool]$useYay ? 'yay' : 'pacman'): $_"
     }
     pwsh -NoLogo -WorkingDirectory $pwd
 }
 
 
-function install-withapt {
+function install-withapt
+{
     param (
         [Parameter(Mandatory, ValueFromRemainingArguments = $true)]
         [string[]] $Name
     )
 
-    if ((Get-OperatingSystem) -ne "linux") {
+    if ((Get-OperatingSystem) -ne "linux")
+    {
         Write-Warning "You can use apt on linux"
         return
     }
 
     $aptGetCmd = Get-Command -Name 'apt-get' -ErrorAction SilentlyContinue
     $aptCmd = Get-Command -Name 'apt' -ErrorAction SilentlyContinue
-    if (-not $aptGetCmd -and -not $aptCmd) {
+    if (-not $aptGetCmd -and -not $aptCmd)
+    {
         throw "Neither 'apt-get' nor 'apt' is available on PATH."
     }
 
-    try {
+    try
+    {
         $packageArgs = @('install', '-y') + $Name
-        if ($aptGetCmd) {
+        if ($aptGetCmd)
+        {
             & sudo apt-get @packageArgs
-        }
-        else {
+        } else
+        {
             & sudo apt @packageArgs
         }
-    }
-    catch {
+    } catch
+    {
         throw "Could not install $([string]::Join(', ', $Name)) with apt: $_"
     }
     pwsh -NoLogo -WorkingDirectory $pwd
 }
 
-function Get-ColorString {
+function Get-ColorString
+{
     param (
         [Parameter(Mandatory)]
         [string] $in
     )
     $handler = Get-Command -Name 'Get-ColorStringCatppuccin' -CommandType Function -ErrorAction SilentlyContinue
-    if ($null -ne $handler) {
+    if ($null -ne $handler)
+    {
         return (Get-ColorStringCatppuccin -in $in)
     }
 
     # Fallback: strip tags if handler isn't loaded yet
     return [regex]::Replace($in, '<([A-Za-z0-9]+)>', '')
+}
+
+
+# Initialize cache for Find-Command
+$global:CommandCache = @{}
+
+function Initialize-CommandCache
+{
+    # Cache all available commands from PATH
+    $pathSep = if ($global:os -eq 'windows')
+    { ';' 
+    } else
+    { ':' 
+    }
+    $pathDirs = $env:PATH -split $pathSep | Where-Object { $_ -and (Test-Path $_) }
+    foreach ($dir in $pathDirs)
+    {
+        $files = Get-ChildItem -Path $dir -File -ErrorAction SilentlyContinue
+        foreach ($file in $files)
+        {
+            $name = if ($os -eq 'windows')
+            {
+                if ($file.Extension -in @('.exe', '.cmd', '.bat', '.com'))
+                {
+                    $file.BaseName
+                } else
+                { continue 
+                }
+
+            } else
+            {
+                $file.Name
+            }
+            $global:CommandCache[$name] = $true
+        }
+    }
+}
+
+# Command existence cache
+function Find-Command
+{
+    param (
+        [string] $commandName
+    )
+
+    # Check if cache is empty and initialize it
+    if ($global:CommandCache.Count -eq 0)
+    {
+        # Initialize-CommandCache
+    }
+
+    # Check cache first
+    if ($global:CommandCache.ContainsKey($commandName))
+    {
+        return $global:CommandCache[$commandName]
+    }
+
+    # Not cached, check and cache the result
+    $command = Get-Command -Name $commandName -ErrorAction SilentlyContinue
+    $exists = $null -ne $command
+    $global:CommandCache[$commandName] = $exists
+
+    return $exists
 }
 

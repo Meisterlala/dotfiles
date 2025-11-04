@@ -1,19 +1,22 @@
 # Check if PSProfiler is installed
-if (-not (Get-Module -ListAvailable -Name PSProfiler)) {
-    try {
+if (-not (Get-Module -ListAvailable -Name PSProfiler))
+{
+    try
+    {
         Write-Host (Get-ColorString "<Teal>Installing PSProfiler...<Clear>")
         Install-Module PSProfiler -Scope CurrentUser -Force -ErrorAction Stop
-    }
-    catch {
+    } catch
+    {
         Write-Warning (Get-ColorString "<Red>Failed to install PSProfiler<Clear>: $_")
     }
 }
 
 # Try to import the module
-try {
+try
+{
     Import-Module PSProfiler -ErrorAction Stop
-}
-catch {
+} catch
+{
     Write-Warning (Get-ColorString "<Peach>⚠ Could not load PSProfiler<Clear>: $_")
 }
 
