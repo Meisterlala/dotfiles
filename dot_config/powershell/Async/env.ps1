@@ -1,24 +1,30 @@
 # Set Enviorment Variables
 
 # pnpm
-if (Get-Command -Name "pnpm" -ErrorAction SilentlyContinue) {
-    $env:PNPM_HOME = Join-Path $HOME ".local/share/pnpm"
-    
-    if ($global:os -eq "windows") {
-        $env:PATH += ";$env:PNPM_HOME"
+$PNPM_HOME = Join-Path $HOME ".local/share/pnpm"
+if (Test-Path -Path $PNPM_HOME) {
+    if ($IsWindows) {
+        if (-not ($env:PATH -split ';' | Where-Object { $_ -eq $PNPM_HOME })) {
+            $env:PATH = "$env:PATH;$PNPM_HOME"
+        }
     } else {
-        $env:PATH += ":$env:PNPM_HOME"
+        if (-not ($env:PATH -split ':' | Where-Object { $_ -eq $PNPM_HOME })) {
+            $env:PATH = "${PNPM_HOME}:$env:PATH"
+        }
     }
 }
 
-
-# Test for cargo bin folder and add it (cross-platform)
+# cargo
 $CARGO_BIN = Join-Path $HOME ".cargo/bin"
 if (Test-Path -Path $CARGO_BIN) {
-    if ($global:os -eq "windows") {
-        $env:PATH += ";$CARGO_BIN"
+    if ($IsWindows) {
+        if (-not ($env:PATH -split ';' | Where-Object { $_ -eq $CARGO_BIN })) {
+            $env:PATH = "$env:PATH;$CARGO_BIN"
+        }
     } else {
-        $env:PATH += ":$CARGO_BIN"
+        if (-not ($env:PATH -split ':' | Where-Object { $_ -eq $CARGO_BIN })) {
+            $env:PATH = "${CARGO_BIN}:$env:PATH"
+        }
     }
 }
 
