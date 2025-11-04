@@ -1,43 +1,49 @@
 Import-Module Catppuccin
 $global:Flavor = $Catppuccin['Frappe']
 
-
-function Get-ColorStringCatppuccin {
+function Get-ColorStringCatppuccin
+{
 	param (
 		[Parameter(Mandatory)]
 		[string] $in
 	)
 	$tagPattern = '<([A-Za-z0-9]+)>'
 
-	if (-not $global:Flavor) {
+	if (-not $global:Flavor)
+	{
 		return [regex]::Replace($in, $tagPattern, '')
 	}
 
 	$tagMatches = [regex]::Matches($in, $tagPattern)
-	if ($tagMatches.Count -eq 0) {
+	if ($tagMatches.Count -eq 0)
+	{
 		return $in
 	}
 
 	$result = New-Object System.Text.StringBuilder
 	$lastIndex = 0
 
-	foreach ($m in $tagMatches) {
+	foreach ($m in $tagMatches)
+	{
 		[void]$result.Append($in.Substring($lastIndex, $m.Index - $lastIndex))
 		$name = $m.Groups[1].Value
-		if ($name -ieq 'Clear') {
+		if ($name -ieq 'Clear')
+		{
 			# Reset only the foreground color to terminal default
 			[void]$result.Append("$([char]27)[39m")
-		}
-		else {
+		} else
+		{
 			$colourObject = $global:Flavor.$name
-			if ($null -ne $colourObject) {
+			if ($null -ne $colourObject)
+			{
 				[void]$result.Append($colourObject.Foreground())
 			}
 		}
 		$lastIndex = $m.Index + $m.Length
 	}
 
-	if ($lastIndex -lt $in.Length) {
+	if ($lastIndex -lt $in.Length)
+	{
 		[void]$result.Append($in.Substring($lastIndex))
 	}
 

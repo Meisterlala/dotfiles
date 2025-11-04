@@ -1,19 +1,20 @@
 # Aliases
 
-
-
 ### Sudo
-function Invoke-LastCommandAsSudo {
+function Invoke-LastCommandAsSudo
+{
     $history = Get-History -Count 3
 
-    if ($history.Count -lt 1) {
+    if ($history.Count -lt 1)
+    {
         Write-Host (Get-ColorString "<Peach>No previous command found.<Clear>")
         return
     }
 
     $lastCommand = $history[-1].CommandLine
 
-    if ([string]::IsNullOrWhiteSpace($lastCommand)) {
+    if ([string]::IsNullOrWhiteSpace($lastCommand))
+    {
         Write-Host (Get-ColorString "<Peach>Last command was empty.<Clear>")
         return
     }
@@ -26,8 +27,10 @@ Set-Alias -Name 's!!' -Value Invoke-LastCommandAsSudo -Scope Global | Out-Null
 
 
 ### EZA
-if (Get-Command eza -ErrorAction SilentlyContinue) {
-    function Get-EzaWithColor {
+if (Get-Command eza -ErrorAction SilentlyContinue)
+{
+    function Get-EzaWithColor
+    {
         param (
             [Parameter(ValueFromRemainingArguments = $true)]
             [string[]]$Args
@@ -35,31 +38,38 @@ if (Get-Command eza -ErrorAction SilentlyContinue) {
         eza --icons=auto --color=always --color-scale=size -I lost+found -h @Args
     }
     Set-Alias -Name ls -Value Get-EzaWithColor -Scope Global | Out-Null
-}
-else {
+} else
+{
     $Global:ProfileHints += "<Teal>eza<Clear> not installed. Please Run <Mauve>Install-Eza"
 }
-function Install-Eza {
-    try {
-        if ((Get-OperatingSystem) -eq "windows") {
+
+function Install-Eza
+{
+    try
+    {
+        if ((Get-OperatingSystem) -eq "windows")
+        {
             Install-WithWinget "eza-community.eza"
-        } else {
+        } else
+        {
             Install-WithYayPacman "eza"
         }
-    }
-    catch {
+    } catch
+    {
         Write-Warning "Error during the install: $_"
     }
 }
 
 ### Measure in a new Terminal
-function Measure-ScriptInNewTerminal {
+function Measure-ScriptInNewTerminal
+{
     param(
         [Parameter(Mandatory)]
         [string]$ScriptPath
     )
 
-    if (-not (Test-Path $ScriptPath)) {
+    if (-not (Test-Path $ScriptPath))
+    {
         throw "Script file '$ScriptPath' does not exist."
     }
 
@@ -76,12 +86,14 @@ Measure-Script -Path '$ScriptPath'
 }
 
 ### Reload
-function Update-Profile {
+function Update-Profile
+{
     . $PROFILE.CurrentUserAllHosts
 }
 
 # yay no confirm alias
-function Invoke-YayNoConfirm {
+function Invoke-YayNoConfirm
+{
     param (
         [Parameter(ValueFromRemainingArguments = $true)]
         [string[]]$Args
@@ -91,19 +103,22 @@ function Invoke-YayNoConfirm {
 
 Set-Alias -Name yyay -Value Invoke-YayNoConfirm -Scope Global | Out-Null
 
-function Link-ScrcpyToVirtualMic {
+function Link-ScrcpyToVirtualMic
+{
     param(
         [string]$AppNodeName = "scrcpy",
         [string]$VirtualMicName = "scrcpySource"
     )
 
     # wait until both nodes exist
-    do {
+    do
+    {
         $nodes = pw-cli ls Node
         $appExists = $nodes -match "node.name = `"$AppNodeName`""
         $micExists = pw-link -i | Select-String $VirtualMicName
 
-        if (-not ($appExists -and $micExists)) {
+        if (-not ($appExists -and $micExists))
+        {
             Start-Sleep -Seconds 1
         }
     } until ($appExists -and $micExists)
@@ -111,17 +126,25 @@ function Link-ScrcpyToVirtualMic {
     # remove existing links from the app
     $nodes = pw-cli ls Node
     $appNodeId = $nodes | Select-String "node.name = `"$AppNodeName`"" | ForEach-Object {
-        if ($_.Line -match 'id (\d+),') { $matches[1] }
+        if ($_.Line -match 'id (\d+),')
+        { $matches[1] 
+        }
     }
     $links = pw-cli ls Link
     $linkIdsToRemove = $links | ForEach-Object {
-        if ($_ -match 'id (\d+),') { $linkId = $matches[1] }
+        if ($_ -match 'id (\d+),')
+        { $linkId = $matches[1] 
+        }
         $outputNodeMatch = $_ -match 'link\.output\.node = "(\d+)"'
         $inputNodeMatch = $_ -match 'link\.input\.node = "(\d+)"'
-        if ($outputNodeMatch -and $matches[1] -eq $appNodeId) { $linkId }
-        elseif ($inputNodeMatch -and $matches[2] -eq $appNodeId) { $linkId }
+        if ($outputNodeMatch -and $matches[1] -eq $appNodeId)
+        { $linkId 
+        } elseif ($inputNodeMatch -and $matches[2] -eq $appNodeId)
+        { $linkId 
+        }
     }
-    foreach ($linkId in $linkIdsToRemove | Where-Object { $_ }) {
+    foreach ($linkId in $linkIdsToRemove | Where-Object { $_ })
+    {
         pw-link -d $linkId | Out-Null
     }
 
@@ -130,7 +153,8 @@ function Link-ScrcpyToVirtualMic {
     pw-link "${AppNodeName}:output_FR" "${VirtualMicName}:input_FR" | Out-Null
 }
 
-function Start-Scrcpy {
+function Start-Scrcpy
+{
     param(
         # Use -Webcam to enable webcam mode
         [switch]$Webcam,
@@ -149,57 +173,70 @@ function Start-Scrcpy {
         "--max-fps=$MaxFps"
     )
 
-    if ($Webcam) {
+    if ($Webcam)
+    {
         $scrcpyArgs += "--v4l2-sink=$V4l2Device", "--video-source=camera", "--camera-id=$CameraId", "--no-video-playback", "--camera-size=1920x1080"
     }
 
 
     # Run Link-ScrcpyToVirtualMic in the background
-    if ($global:os -eq 'linux'){
-    Start-Job -ScriptBlock {
+    if ($global:os -eq 'linux')
+    {
+        Start-Job -ScriptBlock {
 
-function Link-ScrcpyToVirtualMic {
-    param(
-        [string]$AppNodeName = "scrcpy",
-        [string]$VirtualMicName = "scrcpySource"
-    )
+            function Link-ScrcpyToVirtualMic
+            {
+                param(
+                    [string]$AppNodeName = "scrcpy",
+                    [string]$VirtualMicName = "scrcpySource"
+                )
 
-    # wait until both nodes exist
-    do {
-        $nodes = pw-cli ls Node
-        $appExists = $nodes -match "node.name = `"$AppNodeName`""
-        $micExists = pw-link -i | Select-String $VirtualMicName
+                # wait until both nodes exist
+                do
+                {
+                    $nodes = pw-cli ls Node
+                    $appExists = $nodes -match "node.name = `"$AppNodeName`""
+                    $micExists = pw-link -i | Select-String $VirtualMicName
 
-        if (-not ($appExists -and $micExists)) {
-            Start-Sleep -Seconds 1
-        }
-    } until ($appExists -and $micExists)
+                    if (-not ($appExists -and $micExists))
+                    {
+                        Start-Sleep -Seconds 1
+                    }
+                } until ($appExists -and $micExists)
 
-    # remove existing links from the app
-    $nodes = pw-cli ls Node
-    $appNodeId = $nodes | Select-String "node.name = `"$AppNodeName`"" | ForEach-Object {
-        if ($_.Line -match 'id (\d+),') { $matches[1] }
+                # remove existing links from the app
+                $nodes = pw-cli ls Node
+                $appNodeId = $nodes | Select-String "node.name = `"$AppNodeName`"" | ForEach-Object {
+                    if ($_.Line -match 'id (\d+),')
+                    { $matches[1] 
+                    }
+                }
+                $links = pw-cli ls Link
+                $linkIdsToRemove = $links | ForEach-Object {
+                    if ($_ -match 'id (\d+),')
+                    { $linkId = $matches[1] 
+                    }
+                    $outputNodeMatch = $_ -match 'link\.output\.node = "(\d+)"'
+                    $inputNodeMatch = $_ -match 'link\.input\.node = "(\d+)"'
+                    if ($outputNodeMatch -and $matches[1] -eq $appNodeId)
+                    { $linkId 
+                    } elseif ($inputNodeMatch -and $matches[2] -eq $appNodeId)
+                    { $linkId 
+                    }
+                }
+                foreach ($linkId in $linkIdsToRemove | Where-Object { $_ })
+                {
+                    pw-link -d $linkId | Out-Null
+                }
+
+                # create new links quietly
+                pw-link "${AppNodeName}:output_FL" "${VirtualMicName}:input_FL" | Out-Null
+                pw-link "${AppNodeName}:output_FR" "${VirtualMicName}:input_FR" | Out-Null
+            }
+
+
+            Link-ScrcpyToVirtualMic }
     }
-    $links = pw-cli ls Link
-    $linkIdsToRemove = $links | ForEach-Object {
-        if ($_ -match 'id (\d+),') { $linkId = $matches[1] }
-        $outputNodeMatch = $_ -match 'link\.output\.node = "(\d+)"'
-        $inputNodeMatch = $_ -match 'link\.input\.node = "(\d+)"'
-        if ($outputNodeMatch -and $matches[1] -eq $appNodeId) { $linkId }
-        elseif ($inputNodeMatch -and $matches[2] -eq $appNodeId) { $linkId }
-    }
-    foreach ($linkId in $linkIdsToRemove | Where-Object { $_ }) {
-        pw-link -d $linkId | Out-Null
-    }
-
-    # create new links quietly
-    pw-link "${AppNodeName}:output_FL" "${VirtualMicName}:input_FL" | Out-Null
-    pw-link "${AppNodeName}:output_FR" "${VirtualMicName}:input_FR" | Out-Null
-}
-
-
-        Link-ScrcpyToVirtualMic }
-}
     # Start scrcpy and get the process object
     Start-Process "scrcpy" -ArgumentList $scrcpyArgs -Wait
 }
