@@ -108,7 +108,9 @@ function Start-Scrcpy
         # Specify the camera ID for webcam mode
         [int]$CameraId = 0,
         # Specify the maximum FPS
-        [int]$MaxFps = 30
+        [int]$MaxFps = 30,
+        # Resolution
+        [string]$Resolution = "1920x1080"
     )
 
     $scrcpyArgs = @(
@@ -123,7 +125,7 @@ function Start-Scrcpy
     # Configure webcam mode if specified
     if ($Webcam)
     {
-        $scrcpyArgs += "--video-source=camera", "--camera-id=$CameraId", "--no-video-playback", "--camera-size=1920x1080"
+        $scrcpyArgs += "--video-source=camera", "--camera-id=$CameraId", "--no-video-playback", "--camera-size=$Resolution"
 
         # Add V4L2 sink argument for Linux
         if ($global:os -eq 'linux')
