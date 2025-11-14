@@ -44,8 +44,54 @@ function Link-ScrcpyToVirtualMic
     }
 
     # create new links quietly
-    pw-link --save "${AppNodeName}:output_FL" "${VirtualMicName}:input_FL" | Out-Null
-    pw-link --save "${AppNodeName}:output_FR" "${VirtualMicName}:input_FR" | Out-Null
+    pw-link "${AppNodeName}:output_FL" "${VirtualMicName}:input_FL" | Out-Null
+    pw-link "${AppNodeName}:output_FR" "${VirtualMicName}:input_FR" | Out-Null
+}
+
+
+function Start-OBS
+{
+    param(
+        [string]$OBSPath = "obs",
+        [string]$Profile = "",
+        [string]$Scene = "",
+        [switch]$StartVirtualCam,
+        [switch]$StartRecording,
+        [switch]$MinimizeToTray
+    )
+
+    # Check if OBS is already running
+    if (Get-Process -Name "obs" -ErrorAction SilentlyContinue)
+    {
+        Write-Host "OBS is already running."
+        return
+    }
+
+    $args = @()
+
+    if ($StartVirtualCam)
+    { $args += "--startvirtualcam" 
+    }
+    if ($StartStreaming)
+    { $args += "--startstreaming" 
+    }
+    if ($StartRecording)
+    { $args += "--startrecording" 
+    }
+    if ($Profile)
+    { $args += "--profile `"$Profile`"" 
+    }
+    if ($Scene)
+    { $args += "--scene `"$Scene`"" 
+    }
+    if ($MinimizeToTray)
+    { $args += "--minimize-to-tray" 
+    }
+    # Build command string
+    $cmd = "$OBSPath $($args -join ' ') > /dev/null 2>&1 &"
+
+    # Start OBS completely detached
+    Start-Process -FilePath "bash" -ArgumentList "-c `"$cmd`"" -NoNewWindow
 }
 
 function Start-Scrcpy
@@ -55,12 +101,14 @@ function Start-Scrcpy
         [switch]$Webcam,
         # Use -Loop to enable looping mode
         [switch]$Loop,
+        # Start OBS aswell
+        [switch]$OBS,
         # Optionally specify the V4L2 device for webcam mode
         [string]$V4l2Device = "/dev/video0",
         # Specify the camera ID for webcam mode
-        [int]$CameraId = 0,
+        [int]$CameraId = 8,
         # Specify the maximum FPS
-        [int]$MaxFps = 60
+        [int]$MaxFps = 30
     )
 
     $scrcpyArgs = @(
@@ -72,14 +120,35 @@ function Start-Scrcpy
         "--max-fps=$MaxFps"
     )
 
+    # Configure webcam mode if specified
     if ($Webcam)
     {
-        $scrcpyArgs += "--v4l2-sink=$V4l2Device", "--video-source=camera", "--camera-id=$CameraId", "--no-video-playback", "--camera-size=1920x1080"
+        $scrcpyArgs += "--video-source=camera", "--camera-id=$CameraId", "--no-video-playback", "--camera-size=1920x1080"
+
+        # Add V4L2 sink argument for Linux
+        if ($global:os -eq 'linux')
+        {
+            $scrcpyArgs += "--v4l2-sink=$V4l2Device";
+        }
     }
 
-    # Start scrcpy and get the process object
-    do {
-        # Run Link-ScrcpyToVirtualMic in the background
+    # Start OBS if specified
+    if ($OBS)
+    {
+        # OBS integration is not supported on Windows
+        if ($global:os -eq 'windows')
+        {
+            Write-Error "OBS integration is not supported on Windows"
+            return
+        }
+
+        Start-OBS -StartVirtualCam -MinimizeToTray
+    }
+
+    # Start scrcpy in a loop, if specifed
+    do
+    {
+        # On Linux, link scrcpy audio to virtual mic in a background job
         if ($global:os -eq 'linux')
         {
             $func = ${function:Link-ScrcpyToVirtualMic}.ToString()
@@ -89,7 +158,12 @@ function Start-Scrcpy
                 Link-ScrcpyToVirtualMic
             } -ArgumentList $func
         }
+
+        # Launch scrcpy
         Start-Process "scrcpy" -ArgumentList $scrcpyArgs -Wait
     } while ($Loop)
 }
+
+
+
 
