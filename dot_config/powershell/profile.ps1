@@ -1,6 +1,6 @@
 # Linux Powershell
 
-$env:PATH += ":$HOME/.local/bin"
+$env:PATH = "$HOME/.local/bin:$env:PATH"
 
 
 # Load Main Data
