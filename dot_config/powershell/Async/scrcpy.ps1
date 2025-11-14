@@ -19,29 +19,30 @@ function Link-ScrcpyToVirtualMic
     } until ($appExists -and $micExists)
 
     # remove existing links from the app
-    $nodes = pw-cli ls Node
-    $appNodeId = $nodes | Select-String "node.name = `"$AppNodeName`"" | ForEach-Object {
-        if ($_.Line -match 'id (\d+),')
-        { $matches[1] 
-        }
-    }
-    $links = pw-cli ls Link
-    $linkIdsToRemove = $links | ForEach-Object {
-        if ($_ -match 'id (\d+),')
-        { $linkId = $matches[1] 
-        }
-        $outputNodeMatch = $_ -match 'link\.output\.node = "(\d+)"'
-        $inputNodeMatch = $_ -match 'link\.input\.node = "(\d+)"'
-        if ($outputNodeMatch -and $matches[1] -eq $appNodeId)
-        { $linkId 
-        } elseif ($inputNodeMatch -and $matches[2] -eq $appNodeId)
-        { $linkId 
-        }
-    }
-    foreach ($linkId in $linkIdsToRemove | Where-Object { $_ })
-    {
-        pw-link -d $linkId | Out-Null
-    }
+    # $nodes = pw-cli ls Node
+    # $appNodeId = $nodes | Select-String "node.name = `"$AppNodeName`"" | ForEach-Object {
+    #     if ($_.Line -match 'id (\d+),')
+    #     { $matches[1] 
+    #     }
+    # }
+    #
+    # $links = pw-cli ls Link
+    # $linkIdsToRemove = $links | ForEach-Object {
+    #     if ($_ -match 'id (\d+),')
+    #     { $linkId = $matches[1] 
+    #     }
+    #     $outputNodeMatch = $_ -match 'link\.output\.node = "(\d+)"'
+    #     $inputNodeMatch = $_ -match 'link\.input\.node = "(\d+)"'
+    #     if ($outputNodeMatch -and $matches[1] -eq $appNodeId)
+    #     { $linkId 
+    #     } elseif ($inputNodeMatch -and $matches[2] -eq $appNodeId)
+    #     { $linkId 
+    #     }
+    # }
+    # foreach ($linkId in $linkIdsToRemove | Where-Object { $_ })
+    # {
+    #     pw-link -d $linkId | Out-Null
+    # }
 
     # create new links quietly
     pw-link "${AppNodeName}:output_FL" "${VirtualMicName}:input_FL" | Out-Null
