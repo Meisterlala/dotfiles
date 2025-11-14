@@ -104,9 +104,9 @@ function Start-Scrcpy
         # Start OBS aswell
         [switch]$OBS,
         # Optionally specify the V4L2 device for webcam mode
-        [string]$V4l2Device = "/dev/video0",
+        [string]$V4l2Device = "/dev/video8",
         # Specify the camera ID for webcam mode
-        [int]$CameraId = 8,
+        [int]$CameraId = 0,
         # Specify the maximum FPS
         [int]$MaxFps = 30
     )
