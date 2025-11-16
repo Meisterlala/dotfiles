@@ -1,52 +1,63 @@
 function Link-ScrcpyToVirtualMic
 {
     param(
-        [string]$AppNodeName = "scrcpy",
-        [string]$VirtualMicName = "scrcpySource"
+        [string]$App = "scrcpy",
+        [string]$Sink = "scrcpy-sink"
     )
 
     # wait until both nodes exist
     do
     {
         $nodes = pw-cli ls Node
-        $appExists = $nodes -match "node.name = `"$AppNodeName`""
-        $micExists = pw-link -i | Select-String $VirtualMicName
+        $appExists = $nodes -match "node.name = `"$App`""
+        $sinkExists = $nodes -match "node.name = `"$Sink`""
 
-        if (-not ($appExists -and $micExists))
+        if (-not ($appExists -and $sinkExists))
         {
             Start-Sleep -Milliseconds 200
         }
-    } until ($appExists -and $micExists)
+    } until ($appExists -and $sinkExists)
 
-    # remove existing links from the app
-    # $nodes = pw-cli ls Node
-    # $appNodeId = $nodes | Select-String "node.name = `"$AppNodeName`"" | ForEach-Object {
-    #     if ($_.Line -match 'id (\d+),')
-    #     { $matches[1] 
-    #     }
-    # }
-    #
-    # $links = pw-cli ls Link
-    # $linkIdsToRemove = $links | ForEach-Object {
-    #     if ($_ -match 'id (\d+),')
-    #     { $linkId = $matches[1] 
-    #     }
-    #     $outputNodeMatch = $_ -match 'link\.output\.node = "(\d+)"'
-    #     $inputNodeMatch = $_ -match 'link\.input\.node = "(\d+)"'
-    #     if ($outputNodeMatch -and $matches[1] -eq $appNodeId)
-    #     { $linkId 
-    #     } elseif ($inputNodeMatch -and $matches[2] -eq $appNodeId)
-    #     { $linkId 
-    #     }
-    # }
-    # foreach ($linkId in $linkIdsToRemove | Where-Object { $_ })
-    # {
-    #     pw-link -d $linkId | Out-Null
-    # }
+# Get all nodes
+$Nodes = pw-cli ls Node
 
-    # create new links quietly
-    pw-link "${AppNodeName}:output_FL" "${VirtualMicName}:input_FL" | Out-Null
-    pw-link "${AppNodeName}:output_FR" "${VirtualMicName}:input_FR" | Out-Null
+# Function to extract node id by matching a line
+function Get-NodeId($Nodes, $MatchText) {
+    $NodeId = 0
+    $CurrentId = 0
+    foreach ($Line in $Nodes) {
+        if ($Line -match 'id (\d+),') {
+            $CurrentId = $matches[1]
+        }
+        if ($Line -match [regex]::Escape($MatchText)) {
+            $NodeId = $CurrentId
+            break
+        }
+    }
+    return $NodeId
+}
+
+
+# Get app node id
+$AppId = Get-NodeId $Nodes "application.name = `"$App`""
+
+# Get sink node id
+$SinkId = Get-NodeId $Nodes "node.name = `"$Sink`""
+
+    $linkList = pw-link -lI
+    foreach ($link in $linkList) {
+        if ($link -match "\b$AppId\b") {
+            # unlink the old link
+            if ($link -match '(\d+):') {
+                $linkId = $matches[1]
+                Write‑Host "Removing old link id $linkId"
+                pw‑link ‑d $linkId
+            }
+        }
+    }
+
+    pw-link -L $AppId $SinkId | Out-Null
+
 }
 
 
