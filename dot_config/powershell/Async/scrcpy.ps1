@@ -173,8 +173,19 @@ function Start-Scrcpy
             } -ArgumentList $func
         }
 
-        # Launch scrcpy
-        Start-Process "scrcpy" -ArgumentList $scrcpyArgs -Wait
+        # Launch scrcpy and capture process for exit code checking
+        $proc = Start-Process "scrcpy" -ArgumentList $scrcpyArgs -PassThru
+        $proc.WaitForExit()
+        $exit = $proc.ExitCode
+
+        # If scrcpy was killed by a command, break the loop; otherwise continue (e.g., on crash)
+        if ($global:os -eq 'linux') {
+            # Common Linux signal-derived exit codes: 130 (SIGINT), 143 (SIGTERM), 137 (SIGKILL)
+            if ($exit -in 130, 143, 137) { break }
+        } else {
+            # On Windows, a normal close typically returns 0, while crashes are non-zero
+            if ($exit -eq 0) { break }
+        }
     } while ($Loop)
 }
 
