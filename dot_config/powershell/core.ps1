@@ -120,32 +120,35 @@ function Install-WithYayPacman
 
     if ((Get-OperatingSystem) -ne "linux")
     {
-        Write-Warning "You can use yay/pacman on linux"
+        Write-Warning "You can use yay/paru/pacman on linux"
         return
     }
 
-    $useYay = $false
+    $aurHelper = $null
     if (Get-Command -Name 'yay' -ErrorAction SilentlyContinue)
     {
-        $useYay = $true
+        $aurHelper = 'yay'
+    } elseif (Get-Command -Name 'paru' -ErrorAction SilentlyContinue) {
+        $aurHelper = 'paru'
     } elseif (-not (Get-Command -Name 'pacman' -ErrorAction SilentlyContinue))
     {
-        throw "Neither 'yay' nor 'pacman' is available on PATH."
+        throw "None of 'yay', 'paru', or 'pacman' is available on PATH."
     }
 
     try
     {
         $packageArgs = @('-S', '--needed', '--noconfirm') + $Name
-        if ($useYay)
+        if ($aurHelper)
         {
-            & yay @packageArgs
+            & $aurHelper @packageArgs
         } else
         {
             & sudo pacman @packageArgs
         }
     } catch
     {
-        throw "Could not install $([string]::Join(', ', $Name)) with $([bool]$useYay ? 'yay' : 'pacman'): $_"
+        $usedHelper = if ($aurHelper) { $aurHelper } else { 'pacman' }
+        throw "Could not install $([string]::Join(', ', $Name)) with $usedHelper: $_"
     }
     pwsh -NoLogo -WorkingDirectory $pwd
 }
