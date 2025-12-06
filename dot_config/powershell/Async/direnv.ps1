@@ -19,3 +19,5 @@ function Install-Direnv
         Install-WithYayPacman "direnv"
     }
 }
+
+Enable-Direnv
