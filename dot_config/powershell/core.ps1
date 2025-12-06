@@ -148,7 +148,7 @@ function Install-WithYayPacman
     } catch
     {
         $usedHelper = if ($aurHelper) { $aurHelper } else { 'pacman' }
-        throw "Could not install $([string]::Join(', ', $Name)) with $usedHelper: $_"
+        throw "Could not install $([string]::Join(', ', $Name)) with ${usedHelper}: $_"
     }
     pwsh -NoLogo -WorkingDirectory $pwd
 }
