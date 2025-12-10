@@ -1,4 +1,4 @@
-wallpaper_directory = "~/wallpapers/"
+wallpaper_directory = "~/Nextcloud/Wallpapers/"
 interval = 400
 history_length = 25
 mode = "Random"
