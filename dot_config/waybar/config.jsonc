@@ -45,6 +45,7 @@
     },
 
     // Check with `hyprctl clients`
+    // hyprctl clients -j | jq -r '.[] | "\(.title) - (\(.class))"'
     // https://www.nerdfonts.com/cheat-sheet
     "hyprland/workspaces": {
       "format": "{windows}",
@@ -60,6 +61,7 @@
         "class<org.gnome.Nautilus>": "",
         "class<superProductivity>": "",
         "class<code>": "",
+        "class<steam>": "",
       },
     },
 
@@ -229,6 +231,7 @@
         "class<org.gnome.Nautilus>": "",
         "class<superProductivity>": "",
         "class<code>": "",
+        "class<steam>": "",
       },
     },
 
