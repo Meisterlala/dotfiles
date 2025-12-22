@@ -19,6 +19,7 @@
       "privacy",
       "tray",
       "systemd-failed-units",
+      "gamemode",
       "custom/scrcpy-active",
       "custom/updates",
       "wireplumber",
@@ -179,6 +180,18 @@
       "on-click": "~/.config/waybar/failed-units.sh",
       "on-click-right": "~/.config/waybar/restart-failed.sh",
     },
+    "gamemode": {
+      "format": "{glyph}",
+      "format-alt": "{glyph} {count}",
+      "glyph": "",
+      "hide-not-running": true,
+      "use-icon": true,
+      "icon-name": "input-gaming-symbolic",
+      "icon-spacing": 4,
+      "icon-size": 20,
+      "tooltip": true,
+      "tooltip-format": "Games running: {count}",
+    },
   },
   {
     // Secondary
@@ -195,7 +208,7 @@
       // "wlr/taskbar",
       "hyprland/window",
     ],
-    "modules-right": ["load", "custom/weather", "cpu", "memory", "clock"],
+    "modules-right": ["load", "custom/weather", "cpu", "memory", "custom/sleep", "clock" ],
 
     "wlr/taskbar": {
       "format": "{icon} {title:.45}",
@@ -235,6 +248,13 @@
         "class<steam>": "",
       },
     },
+    
+  "custom/sleep": {
+      "format": "  ",          // or "⏾", "󰤄", etc., depending on your font
+      "tooltip": "Suspend",
+      "on-click": "systemctl suspend",
+      "interval": 0
+  },
 
     "cpu": {
       "tooltip": true,

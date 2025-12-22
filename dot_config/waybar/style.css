@@ -96,9 +96,11 @@ box.#workspaces {
 #custom-weather,
 #custom-scrcpy-active,
 #systemd-failed-units,
+#custom-sleep,
 #tray,
 #wireplumber,
 #cpu,
+#gamemode,
 #memory,
 #clock {
   background-color: alpha(@surface0, 0.2);
@@ -110,8 +112,10 @@ box.#workspaces {
 
 #custom-weather:hover,
 #custom-updates:hover,
+#custom-sleep:hover,
 #custom-scrcpy-active:hover,
 #wireplumber:hover,
+#gamemode:hover,
 #cpu:hover,
 #memory:hover,
 #clock:hover {
