@@ -173,6 +173,7 @@
     "systemd-failed-units": {
       "hide-on-ok": true, // Do not hide if there is zero failed units.
       "format": " {nr_failed}",
+      "format-ok": "",
       "system": true, // Monitor failed systemwide units.
       "user": true, // Ignore failed user units.
       "on-click": "~/.config/waybar/failed-units.sh",
