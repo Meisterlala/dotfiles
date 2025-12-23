@@ -10,6 +10,10 @@ if [ -n "$pid" ]; then
     # Kill it!
     if [ "${1-}" = "--kill" ]; then
         kill "$pid"
+
+        $lock = "$env:TEMP\scrcpy.lock"
+        Remove-Item $lock -ErrorAction SilentlyContinue
+
         notify-send --icon=video-display "Killed scrcpy process" "Process ID $pid was terminated."
         echo ""
         exit 0

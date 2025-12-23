@@ -18,37 +18,44 @@ function Link-ScrcpyToVirtualMic
         }
     } until ($appExists -and $sinkExists)
 
-# Get all nodes
-$Nodes = pw-cli ls Node
+    # Get all nodes
+    $Nodes = pw-cli ls Node
 
-# Function to extract node id by matching a line
-function Get-NodeId($Nodes, $MatchText) {
-    $NodeId = 0
-    $CurrentId = 0
-    foreach ($Line in $Nodes) {
-        if ($Line -match 'id (\d+),') {
-            $CurrentId = $matches[1]
+    # Function to extract node id by matching a line
+    function Get-NodeId($Nodes, $MatchText)
+    {
+        $NodeId = 0
+        $CurrentId = 0
+        foreach ($Line in $Nodes)
+        {
+            if ($Line -match 'id (\d+),')
+            {
+                $CurrentId = $matches[1]
+            }
+            if ($Line -match [regex]::Escape($MatchText))
+            {
+                $NodeId = $CurrentId
+                break
+            }
         }
-        if ($Line -match [regex]::Escape($MatchText)) {
-            $NodeId = $CurrentId
-            break
-        }
+        return $NodeId
     }
-    return $NodeId
-}
 
 
-# Get app node id
-$AppId = Get-NodeId $Nodes "application.name = `"$App`""
+    # Get app node id
+    $AppId = Get-NodeId $Nodes "application.name = `"$App`""
 
-# Get sink node id
-$SinkId = Get-NodeId $Nodes "node.name = `"$Sink`""
+    # Get sink node id
+    $SinkId = Get-NodeId $Nodes "node.name = `"$Sink`""
 
     $linkList = pw-link -lI
-    foreach ($link in $linkList) {
-        if ($link -match "\b$AppId\b") {
+    foreach ($link in $linkList)
+    {
+        if ($link -match "\b$AppId\b")
+        {
             # unlink the old link
-            if ($link -match '(\d+):') {
+            if ($link -match '(\d+):')
+            {
                 $linkId = $matches[1]
                 Write‑Host "Removing old link id $linkId"
                 pw‑link ‑d $linkId
@@ -103,7 +110,7 @@ function Start-OBS
     $cmd = "$OBSPath $($args -join ' ') > /dev/null 2>&1 &"
 
     # Start OBS completely detached
-    Start-Process -FilePath "bash" -ArgumentList "-c `"$cmd`"" -NoNewWindow
+    Start-Process -FilePath "bash" -ArgumentList "-c `"$cmd`""
 }
 
 function Start-Scrcpy
@@ -124,6 +131,9 @@ function Start-Scrcpy
         # Resolution
         [string]$Resolution = "1920x1080"
     )
+
+    $lock = "$env:TEMP\scrcpy.lock"
+    Remove-Item $lock -ErrorAction SilentlyContinue
 
     $scrcpyArgs = @(
         "--video-codec=h264",
@@ -179,13 +189,26 @@ function Start-Scrcpy
         $exit = $proc.ExitCode
 
         # If scrcpy was killed by a command, break the loop; otherwise continue (e.g., on crash)
-        if ($global:os -eq 'linux') {
+        if ($global:os -eq 'linux')
+        {
             # Common Linux signal-derived exit codes: 130 (SIGINT), 143 (SIGTERM), 137 (SIGKILL)
-            if ($exit -in 130, 143, 137) { break }
-        } else {
+            if ($exit -in 130, 143, 137)
+            { break 
+            }
+        } else
+        {
             # On Windows, a normal close typically returns 0, while crashes are non-zero
-            if ($exit -eq 0) { break }
+            if ($exit -eq 0)
+            { break 
+            }
         }
+
+        # Check for lock file to determine whether to continue looping
+        if (-Not (Test-Path $lock))
+        {
+            break
+        }
+
     } while ($Loop)
 }
 
