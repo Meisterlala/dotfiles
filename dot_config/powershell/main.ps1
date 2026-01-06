@@ -32,6 +32,7 @@ $global:myAsync = [ordered]@{
     catppuccin = Join-Path $powershellAsync "catppuccin.ps1"
     scrcpy     = Join-Path $powershellAsync "scrcpy.ps1"
     direnv     = Join-Path $powershellAsync "direnv.ps1"
+    resolve    = Join-Path $powershellAsync "resolve.ps1"
 }
 
 # Load Core
@@ -105,6 +106,7 @@ $AsyncScriptblock = {
     . $global:myAsync.psprofiler
     . $global:myAsync.scrcpy
     . $global:myAsync.direnv
+    . $global:myAsync.resolve
 
     Save-ProfileHints
 }
