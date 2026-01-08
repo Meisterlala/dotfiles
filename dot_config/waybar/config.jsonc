@@ -53,16 +53,18 @@
       "format-window-separator": " ",
       "window-rewrite-default": "",
       "window-rewrite": {
-        "title<.*youtube.*>": "", // Windows whose titles contain "youtube"
-        "class<zen>": "", // Windows whose classes are "firefox"
+        "title<.*youtube.*>": "",
+        "class<zen>": "",
         "class<Alacritty>": "",
         "class<com.mitchellh.ghostty>": "",
         "class<Discord>": "",
         "class<Spotify>": "",
         "class<org.gnome.Nautilus>": "",
+        "class<org.kde.dolphin>": "",
         "class<superProductivity>": "",
         "class<code>": "",
         "class<steam>": "",
+        "class<com.obsproject.Studio>": "",
       },
     },
 
@@ -208,7 +210,14 @@
       // "wlr/taskbar",
       "hyprland/window",
     ],
-    "modules-right": ["load", "custom/weather", "cpu", "memory", "custom/sleep", "clock" ],
+    "modules-right": [
+      "load",
+      "custom/weather",
+      "cpu",
+      "memory",
+      "custom/sleep",
+      "clock",
+    ],
 
     "wlr/taskbar": {
       "format": "{icon} {title:.45}",
@@ -236,25 +245,27 @@
       "format-window-separator": " ",
       "window-rewrite-default": "",
       "window-rewrite": {
-        "title<.*youtube.*>": "", // Windows whose titles contain "youtube"
-        "class<zen>": "", // Windows whose classes are "firefox"
+        "title<.*youtube.*>": "",
+        "class<zen>": "",
         "class<Alacritty>": "",
         "class<com.mitchellh.ghostty>": "",
         "class<Discord>": "",
         "class<Spotify>": "",
         "class<org.gnome.Nautilus>": "",
+        "class<org.kde.dolphin>": "",
         "class<superProductivity>": "",
         "class<code>": "",
         "class<steam>": "",
+        "class<com.obsproject.Studio>": "",
       },
     },
-    
-  "custom/sleep": {
-      "format": "  ",          // or "⏾", "󰤄", etc., depending on your font
+
+    "custom/sleep": {
+      "format": "  ", // or "⏾", "󰤄", etc., depending on your font
       "tooltip": "Suspend",
       "on-click": "systemctl suspend",
-      "interval": 0
-  },
+      "interval": 0,
+    },
 
     "cpu": {
       "tooltip": true,
