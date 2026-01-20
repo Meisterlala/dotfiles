@@ -5,10 +5,37 @@
 # Only run this for interactive shells
 [[ $- != *i* ]] && return
 
-# Only run pwsh if we're NOT on a login TTY and not already in pwsh
-if [[ $(ps --no-header --pid=$PPID --format=comm) != "pwsh" ]] && [[ $TERM != "linux" ]]; then
-    # Check if BASH_EXECUTION_STRING is empty to avoid non-interactive execs
-    [[ -z $BASH_EXECUTION_STRING ]] && exec pwsh
+# Auto-start pwsh only in graphical / non-TTY sessions
+if [[ -z "$XDG_SESSION_TYPE" || "$XDG_SESSION_TYPE" == "tty" ]]; then
+    : # real TTY → do nothing
+else
+    if [[ $(ps --no-header --pid=$PPID --format=comm) != "pwsh" ]] \
+       && [[ -z $BASH_EXECUTION_STRING ]]; then
+        exec pwsh
+    fi
+fi
+
+if [ "$TERM" = "linux" ] || [ "$TERM" = "xterm-256color" ]; then
+    # Catppuccin Mocha TTY Palette
+    printf "\e]P01e1e2e" # 0: Black (Base)
+    printf "\e]P1f38ba8" # 1: Red (Red)
+    printf "\e]P2a6e3a1" # 2: Green (Green)
+    printf "\e]P3f9e2af" # 3: Yellow (Yellow)
+    printf "\e]P489b4fa" # 4: Blue (Blue)
+    printf "\e]P5cba6f7" # 5: Magenta (Mauve)
+    printf "\e]P694e2d5" # 6: Cyan (Teal)
+    printf "\e]P7cdd6f4" # 7: White (Text)
+    printf "\e]P8585b70" # 8: Bright Black (Surface2)
+    printf "\e]P9f38ba8" # 9: Bright Red (Red)
+    printf "\e]PAa6e3a1" # A: Bright Green (Green)
+    printf "\e]PBF9e2af" # B: Bright Yellow (Yellow)
+    printf "\e]PC89b4fa" # C: Bright Blue (Blue)
+    printf "\e]PDcba6f7" # D: Bright Magenta (Mauve)
+    printf "\e]PE94e2d5" # E: Bright Cyan (Teal)
+    printf "\e]PFf5e0dc" # F: Bright White (Rosewater)
+    
+    # Clear screen to paint the new background color
+    clear
 fi
 
 # Set a basic prompt
