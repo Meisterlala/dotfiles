@@ -1,0 +1,23 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "theme": "catppuccin",
+  "permission": {
+    "read": "allow",
+    "grep": "allow",
+    "list": "allow",
+    "edit": "allow",
+    "webfetch": "allow",
+    "bash": {
+      "*": "ask",
+
+      "sudo*": "deny",
+
+      "mkdir*": "allow",
+      "touch*": "allow",
+      "cd*": "allow",
+      "ls*": "allow",
+      "kubectl get *": "allow",
+      "grep*": "allow"
+    }
+  }
+}
