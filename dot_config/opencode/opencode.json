@@ -17,7 +17,10 @@
       "cd*": "allow",
       "ls*": "allow",
       "kubectl get *": "allow",
-      "grep*": "allow"
+      "grep*": "allow",
+      "git diff*": "allow",
+      "git status*": "allow",
+      "git log*": "allow"
     }
   }
 }
