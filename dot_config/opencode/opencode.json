@@ -1,6 +1,9 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "theme": "catppuccin",
+
+  "small_model": "opencode/x-ai/grok-4.1-fast",
+
   "permission": {
     "read": "allow",
     "grep": "allow",
