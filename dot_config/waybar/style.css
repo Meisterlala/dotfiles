@@ -92,6 +92,8 @@ box.#workspaces {
   box-shadow: inset 0px -4px @rosewater;
 }
 
+#custom-garage-longhorn,
+#custom-garage-velero,
 #custom-updates,
 #custom-weather,
 #custom-scrcpy-active,
@@ -112,6 +114,8 @@ box.#workspaces {
 
 #custom-weather:hover,
 #custom-updates:hover,
+#custom-garage-longhorn:hover,
+#custom-garage-velero:hover,
 #custom-sleep:hover,
 #custom-scrcpy-active:hover,
 #wireplumber:hover,

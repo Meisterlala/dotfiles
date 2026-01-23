@@ -21,6 +21,8 @@
       "systemd-failed-units",
       "gamemode",
       "custom/scrcpy-active",
+      "custom/garage-longhorn",
+      "custom/garage-velero",
       "custom/updates",
       "wireplumber",
       "clock",
@@ -83,8 +85,20 @@
     "custom/scrcpy-active": {
       "exec": "~/.config/waybar/scrcpy-active.sh",
       "on-click": "~/.config/waybar/scrcpy-active.sh --kill",
-      "hode-empty-text": true,
+      "hide-empty-text": true,
       "interval": 2,
+    },
+
+    "custom/garage-longhorn": {
+      "exec": "~/.config/waybar/garage-status.sh longhorn-backup L",
+      "interval": 10,
+      "hide-empty-text": true
+    },
+
+    "custom/garage-velero": {
+      "exec": "~/.config/waybar/garage-status.sh velero V",
+      "interval": 10,
+      "hide-empty-text": true
     },
 
     "tray": {
@@ -216,6 +230,8 @@
       "cpu",
       "memory",
       "custom/sleep",
+      "custom/garage-longhorn",
+      "custom/garage-velero",
       "clock",
     ],
 
@@ -265,6 +281,18 @@
       "tooltip": "Suspend",
       "on-click": "systemctl suspend",
       "interval": 0,
+    },
+
+    "custom/garage-longhorn": {
+      "exec": "~/.config/waybar/garage-status.sh longhorn-backup L",
+      "interval": 10,
+      "hide-empty-text": true
+    },
+
+    "custom/garage-velero": {
+      "exec": "~/.config/waybar/garage-status.sh velero V",
+      "interval": 10,
+      "hide-empty-text": true
     },
 
     "cpu": {
