@@ -92,12 +92,14 @@
     "custom/garage-longhorn": {
       "exec": "~/.config/waybar/garage-status.sh longhorn-backup L",
       "interval": 10,
+      "return-type": "json",
       "hide-empty-text": true
     },
 
     "custom/garage-velero": {
       "exec": "~/.config/waybar/garage-status.sh velero V",
       "interval": 10,
+      "return-type": "json",
       "hide-empty-text": true
     },
 
@@ -286,12 +288,14 @@
     "custom/garage-longhorn": {
       "exec": "~/.config/waybar/garage-status.sh longhorn-backup L",
       "interval": 10,
+      "return-type": "json",
       "hide-empty-text": true
     },
 
     "custom/garage-velero": {
       "exec": "~/.config/waybar/garage-status.sh velero V",
       "interval": 10,
+      "return-type": "json",
       "hide-empty-text": true
     },
 
