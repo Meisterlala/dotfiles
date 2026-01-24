@@ -3,7 +3,7 @@
 ### Sudo
 function Invoke-LastCommandAsSudo
 {
-    $history = Get-History -Count 3
+    $history = Get-History -Count 1
 
     if ($history.Count -lt 1)
     {
@@ -19,11 +19,11 @@ function Invoke-LastCommandAsSudo
         return
     }
 
-    Invoke-Expression "sudo $lastCommand"
+    Invoke-Expression ("sudo " + $lastCommand)
 }
 Set-Alias -Name 's!' -Value Invoke-LastCommandAsSudo -Scope Global | Out-Null
 Set-Alias -Name 's!!' -Value Invoke-LastCommandAsSudo -Scope Global | Out-Null
-
+Set-Alias -Name 'please' -Value Invoke-LastCommandAsSudo -Scope Global | Out-Null
 
 
 ### EZA
