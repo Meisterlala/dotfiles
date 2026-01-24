@@ -96,6 +96,7 @@ box.#workspaces {
 #custom-garage-velero,
 #custom-updates,
 #custom-weather,
+#custom-gpu,
 #custom-scrcpy-active,
 #systemd-failed-units,
 #custom-sleep,
@@ -116,6 +117,7 @@ box.#workspaces {
 #custom-updates:hover,
 #custom-garage-longhorn:hover,
 #custom-garage-velero:hover,
+#custom-gpu:hover,
 #custom-sleep:hover,
 #custom-scrcpy-active:hover,
 #wireplumber:hover,
@@ -133,6 +135,10 @@ box.#workspaces {
 
 #memory {
   color: @maroon;
+}
+
+#custom-gpu {
+  color: @green;
 }
 
 #systemd-failed-units {
