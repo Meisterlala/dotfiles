@@ -40,6 +40,7 @@
     "modules-right": [
       "load",
       "custom/weather",
+      "custom/hypridle",
       "custom/gpu",
       "cpu",
       "memory",
