@@ -199,6 +199,14 @@
   "custom/gpu": {
     "exec": "nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits",
     "format": "{:>2}% 󰢮",
-    "interval": 10,
+    "interval": 5,
+  },
+
+  "custom/hypridle": {
+    "format": "{:>2} 󰒲",
+    "hide-empty-text": true,
+    "return-type": "json",
+    "exec": "~/.config/hypr/idle_inhibit.py",
+    "interval": 5,
   },
 }
