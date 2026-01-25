@@ -132,13 +132,13 @@ box.#workspaces {
 /* Styling for the specific modules when they have the 'upload' class */
 #custom-garage-longhorn.upload,
 #custom-garage-velero.upload {
-  background-color: alpha(@green, 0.35);
+  background-color: alpha(@green, 0.5);
 }
 
 /* Styling for the specific modules when they have the 'delete' class */
 #custom-garage-longhorn.delete,
 #custom-garage-velero.delete {
-  background-color: alpha(@red, 0.35);
+  background-color: alpha(@red, 0.5);
 }
 
 #cpu {
