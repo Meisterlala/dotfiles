@@ -4,6 +4,25 @@
 
   "small_model": "opencode/x-ai/grok-4.1-fast",
 
+  "provider": {
+    "openrouter": {
+      "models": {
+        "xiaomi/mimo-v2-flash:free": {
+          "limit": {
+            "context": 262144,
+            "output": 65536
+          }
+        },
+        "@preset/flash-3": {
+          "limit": {
+            "context": 1048576,
+            "output": 262144
+          }
+        }
+      }
+    }
+  },
+
   "permission": {
     "read": "allow",
     "grep": "allow",
