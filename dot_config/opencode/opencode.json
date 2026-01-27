@@ -2,7 +2,7 @@
   "$schema": "https://opencode.ai/config.json",
   "theme": "catppuccin",
 
-  "small_model": "opencode/x-ai/grok-4.1-fast",
+  "small_model": "github-copilot-gpt4",
 
   "provider": {
     "openrouter": {
