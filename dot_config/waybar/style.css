@@ -92,6 +92,7 @@ box.#workspaces {
   box-shadow: inset 0px -4px @rosewater;
 }
 
+#custom-claude,
 #custom-garage-longhorn,
 #custom-garage-velero,
 #custom-updates,
@@ -165,6 +166,18 @@ box.#workspaces {
 
 #clock {
   color: @lavender;
+}
+
+#custom-claude {
+  color: @peach;
+}
+
+#custom-claude.warning {
+  color: @yellow;
+}
+
+#custom-claude.critical {
+  color: @red;
 }
 
 tooltip {
