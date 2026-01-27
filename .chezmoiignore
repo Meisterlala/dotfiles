@@ -2,7 +2,7 @@
 key.txt.age
 
 
-{{ if .chezmoi.os "windows" }}
+{{ if eq .chezmoi.os "windows" }}
 # Ignore .config folder, when not on linux or macOS
 .config/**/*
 {{ end }}
