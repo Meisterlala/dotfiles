@@ -14,6 +14,7 @@ FRIENDLY_NAMES = {
     "mpv": "mpv Player",
     "steam": "Steam",
     "webcord": "WebCord",
+    "jellyfin-desktop": "Jellyfin",
 }
 
 
