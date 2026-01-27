@@ -6,8 +6,8 @@ Fetch Claude (Anthropic) usage and print JSON for Waybar.
 import datetime
 import json
 import os
-import sys
 import urllib.request
+
 
 def load_token():
     paths = [
@@ -15,44 +15,56 @@ def load_token():
         "~/.claude/.credentials.json",
     ]
     for p in paths:
-        if not p: continue
+        if not p:
+            continue
         p = os.path.expanduser(p)
-        if not os.path.exists(p): continue
+        if not os.path.exists(p):
+            continue
         try:
             with open(p, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 # Specific check for Claude Code credentials format
                 token = data.get("claudeAiOauth", {}).get("accessToken")
-                if token: return token
+                if token:
+                    return token
                 # Fallback for generic formats
                 for k in ["accessToken", "access_token", "token"]:
-                    if k in data: return data[k]
+                    if k in data:
+                        return data[k]
         except Exception:
             continue
     return None
 
+
 def parse_dt(s):
-    if not s: return None
+    if not s:
+        return None
     try:
         return datetime.datetime.fromisoformat(s.replace("Z", "+00:00"))
     except Exception:
         return None
 
+
 def human_delta(dt, now):
-    if not dt: return ""
+    if not dt:
+        return ""
     delta = dt - now
     secs = int(delta.total_seconds())
-    if secs <= 0: return "now"
-    
+    if secs <= 0:
+        return "now"
+
     days, rem = divmod(secs, 86400)
     hours, rem = divmod(rem, 3600)
     mins, _ = divmod(rem, 60)
-    
+
     res = []
-    if days: res.append(f"{days}d")
-    if hours: res.append(f"{hours}h")
+    if days:
+        res.append(f"{days}d")
+    if hours:
+        res.append(f"{hours}h")
     res.append(f"{mins}m")
     return "".join(res)
+
 
 def get_pct(val):
     try:
@@ -61,10 +73,15 @@ def get_pct(val):
     except (ValueError, TypeError):
         return None
 
+
 def main():
     token = load_token()
     if not token:
-        print(json.dumps({"text": "Claude: n/a", "tooltip": "No token found", "class": "error"}))
+        print(
+            json.dumps(
+                {"text": "Claude: n/a", "tooltip": "No token found", "class": "error"}
+            )
+        )
         return
 
     req = urllib.request.Request(
@@ -73,7 +90,7 @@ def main():
             "Authorization": f"Bearer {token}",
             "anthropic-beta": "oauth-2025-04-20",
             "User-Agent": "claude-code/2.0.0",
-        }
+        },
     )
 
     try:
@@ -86,7 +103,7 @@ def main():
     now = datetime.datetime.now(datetime.timezone.utc)
     windows = {
         "5h": data.get("five_hour") or {},
-        "weekly": data.get("seven_day") or data.get("weekly") or {}
+        "weekly": data.get("seven_day") or data.get("weekly") or {},
     }
 
     five_pct = get_pct(windows["5h"].get("utilization") or data.get("utilization"))
@@ -95,12 +112,14 @@ def main():
     tooltip = []
     for label, win in windows.items():
         pct = get_pct(win.get("utilization"))
-        if pct is None and label == "5h": pct = five_pct
-        if pct is None: continue
+        if pct is None and label == "5h":
+            pct = five_pct
+        if pct is None:
+            continue
 
         tooltip.append(f"<span weight='bold' color='#b4befe'>{label} window</span>")
         tooltip.append(f"usage: <span color='#fab387'>{pct}%</span>")
-        
+
         resets_at = parse_dt(win.get("resets_at"))
         if resets_at:
             human = human_delta(resets_at, now)
@@ -112,14 +131,24 @@ def main():
 
     # Class logic
     max_pct = max(filter(None, [five_pct, weekly_pct]), default=0)
-    cls = "critical" if max_pct >= 90 else "warning" if max_pct >= 70 else "normal"
+    cls = "critical" if max_pct >= 90 else "warning" if max_pct >= 66 else "normal"
 
-    print(json.dumps({
-        "text": f"{five_pct}%" if five_pct else "",
-        "tooltip": f"<tt>{'\n'.join(tooltip).strip()}</tt>" if tooltip else "No usage data",
-        "class": cls,
-        "percentage": max_pct
-    }))
+    # Hide text only when usage is 100% (which incorrectly means full budget/0% used)
+    text = "" if five_pct == 100 else (f"{five_pct}%" if five_pct else "")
+
+    print(
+        json.dumps(
+            {
+                "text": text,
+                "tooltip": f"<tt>{'\n'.join(tooltip).strip()}</tt>"
+                if tooltip
+                else "No usage data",
+                "class": cls,
+                "percentage": max_pct,
+            }
+        )
+    )
+
 
 if __name__ == "__main__":
     main()

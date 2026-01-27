@@ -173,11 +173,13 @@ box.#workspaces {
 }
 
 #custom-claude.warning {
-  color: @yellow;
+  color: @crust;
+  background-color: @yellow;
 }
 
 #custom-claude.critical {
-  color: @red;
+  color: @crust;
+  background-color: @red;
 }
 
 tooltip {
