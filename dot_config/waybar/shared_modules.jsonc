@@ -209,4 +209,11 @@
     "exec": "~/.config/hypr/idle_inhibit.py",
     "interval": 5,
   },
+
+  "custom/claude": {
+    "format": "{} 󰭻",
+    "return-type": "json",
+    "interval": 300,
+    "exec": "~/.config/waybar/claud_usage.py",
+  },
 }
