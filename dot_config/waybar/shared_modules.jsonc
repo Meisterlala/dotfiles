@@ -215,5 +215,7 @@
     "return-type": "json",
     "interval": 300,
     "exec": "~/.config/waybar/claud_usage.py",
+    "on-click": "pkill -RTMIN+8 waybar",
+    "signal": 8,
   },
 }
