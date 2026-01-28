@@ -7,6 +7,7 @@ import datetime
 import json
 import os
 import urllib.request
+import urllib.error
 
 
 def load_token():
@@ -96,6 +97,13 @@ def main():
     try:
         with urllib.request.urlopen(req, timeout=10) as resp:
             data = json.load(resp)
+    except urllib.error.HTTPError as e:
+        # If this is an authentication error, hide the text (Waybar should show nothing)
+        if getattr(e, "code", None) == 401:
+            print(json.dumps({"text": "", "tooltip": "", "class": "error"}))
+            return
+        print(json.dumps({"text": "Claude: err", "tooltip": str(e), "class": "error"}))
+        return
     except Exception as e:
         print(json.dumps({"text": "Claude: err", "tooltip": str(e), "class": "error"}))
         return
