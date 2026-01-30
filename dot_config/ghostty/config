@@ -29,7 +29,7 @@ alpha-blending = linear-corrected
 
 # Performance
 # 100 MB
-scrollback-limit = 100000000
+scrollback-limit = 10000000
 quit-after-last-window-closed = false
 linux-cgroup = single-instance
 gtk-single-instance = true
