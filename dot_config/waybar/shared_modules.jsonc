@@ -206,7 +206,7 @@
     "format": "{:>2} 󰒲",
     "hide-empty-text": true,
     "return-type": "json",
-    "exec": "~/.config/hypr/idle_inhibit.py",
+    "exec": "~/.config/waybar/idle_inhibit.py",
     "interval": 5,
   },
 
