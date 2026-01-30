@@ -34,26 +34,30 @@
 
       "sudo*": "deny",
 
-      "mkdir*": "allow",
-      "touch*": "allow",
-      "cd*": "allow",
-      "ls*": "allow",
+      "mkdir *": "allow",
+      "touch *": "allow",
+      "cd *": "allow",
+      "ls *": "allow",
       "kubectl get *": "allow",
       "kubectl describe *": "allow",
       "kubectl logs *": "allow",
-      "helm list*": "allow",
-      "helm get*": "allow",
-      "helm status*": "allow",
-      "helm show*": "allow",
-      "helm repo*": "allow",
-      "helm link*": "allow",
-      "grep*": "allow",
-      "tail*": "allow",
-      "head*": "allow",
-      "git diff*": "allow",
-      "git status*": "allow",
-      "git log*": "allow",
-      "pwsh -NoProfile ./scripts/validate.ps1": "allow"
+      "helm list *": "allow",
+      "helm get *": "allow",
+      "helm status *": "allow",
+      "helm show *": "allow",
+      "helm repo *": "allow",
+      "helm link *": "allow",
+      "flux get *": "allow",
+      "grep *": "allow",
+      "tail *": "allow",
+      "head *": "allow",
+      "git diff *": "allow",
+      "git status *": "allow",
+      "git log *": "allow",
+      "pwsh -NoProfile ./scripts/validate.ps1": "allow",
+
+      "yq *": "allow",
+      "jq *": "allow"
     }
   }
 }
