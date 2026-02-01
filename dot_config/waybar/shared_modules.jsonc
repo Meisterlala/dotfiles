@@ -215,7 +215,7 @@
     "return-type": "json",
     "interval": 300,
     "hide-empty-text": true,
-    "exec": "~/.config/waybar/claud_usage.py",
+    "exec": "~/.config/waybar/claude_usage.py",
     "on-click": "pkill -RTMIN+8 waybar",
     "signal": 8,
   },
