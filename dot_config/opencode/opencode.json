@@ -55,6 +55,8 @@
       "git status *": "allow",
       "git log *": "allow",
       "pwsh -NoProfile ./scripts/validate.ps1": "allow",
+      "tree *": "allow",
+      "xargs *": "allow",
 
       "yq *": "allow",
       "jq *": "allow"
