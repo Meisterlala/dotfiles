@@ -25,19 +25,18 @@ background-blur = 20
 
 window-decoration = none
 
-alpha-blending = linear-corrected
 
 # Performance
 # 100 MB
-scrollback-limit = 1000000
+scrollback-limit = 50000
 quit-after-last-window-closed = false
 linux-cgroup = single-instance
 gtk-single-instance = true
 
 # Behavior
 mouse-hide-while-typing = true
-window-inherit-working-directory = true
-resize-overlay-duration = 2s
+window-inherit-working-directory = false
+resize-overlay-duration = 3s
 confirm-close-surface = false
 
 # Clipboard
