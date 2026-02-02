@@ -15,7 +15,7 @@ font-family = "Noto Color Emoji"
 font-family = "Mono"
 
 # Set powershell
-command = pwsh -Login -NoLogo
+command = fish -l
 
 # Theme
 theme = Catppuccin Mocha
