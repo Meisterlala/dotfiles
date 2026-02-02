@@ -2,8 +2,6 @@
 # ~/.bashrc
 #
 
-
-
 # Only run this for interactive shells
 [[ $- != *i* ]] && return
 
@@ -13,7 +11,8 @@ if [[ -z "$XDG_SESSION_TYPE" || "$XDG_SESSION_TYPE" == "tty" ]]; then
 else
     if [[ $(ps --no-header --pid=$PPID --format=comm) != "pwsh" ]] \
        && [[ -z $BASH_EXECUTION_STRING ]]; then
-        exec pwsh
+        # exec pwsh
+        exec fish -l
     fi
 fi
 
