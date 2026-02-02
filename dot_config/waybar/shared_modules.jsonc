@@ -154,6 +154,10 @@
         "type": "audio-in",
         "name": "discord_capture",
       },
+      {
+        "type": "audio-in",
+        "name": "ALSA plug-in [python3.14]",
+      },
     ],
   },
 
