@@ -2,6 +2,11 @@ if status is-interactive
     # Commands to run in interactive sessions can go here
 end
 
+# General abbr
+abbr -a .. 'cd ..'
+abbr -a cc "claude"
+abbr -a v "nvim"
+
 # Initialize zoxide if installed
 if command -q zoxide
     zoxide init fish --cmd cd | source
