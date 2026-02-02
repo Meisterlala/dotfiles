@@ -61,3 +61,4 @@ set -g ct_base 303446
 set -g ct_mantle 292c3c
 set -g ct_crust 232634
 
+fish_config theme choose "Catppuccin Frappe"
