@@ -6,6 +6,7 @@ end
 abbr -a .. 'cd ..'
 abbr -a cc "claude"
 abbr -a v "nvim"
+abbr -a watch "watch -c -n 1 -d"
 
 # Initialize zoxide if installed
 if command -q zoxide
