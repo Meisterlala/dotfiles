@@ -5,6 +5,7 @@ end
 # General abbr
 abbr -a .. 'cd ..'
 abbr -a cc "claude"
+abbr -a oc "opencode"
 abbr -a v "nvim"
 abbr -a watch "watch -c -n 1 -d"
 
