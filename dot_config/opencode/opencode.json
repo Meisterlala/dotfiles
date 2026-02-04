@@ -1,28 +1,24 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "theme": "catppuccin",
-
   "small_model": "github-copilot-gpt4",
-
-  "provider": {
-    "openrouter": {
-      "models": {
-        "xiaomi/mimo-v2-flash:free": {
-          "limit": {
-            "context": 262144,
-            "output": 65536
-          }
-        },
-        "@preset/flash-3": {
-          "limit": {
-            "context": 1048576,
-            "output": 262144
-          }
-        }
+  "agent": {
+    "commit-review": {
+      "description": "Review the current staged git changes. Provide feedback on code quality, style, and potential issues.",
+      "prompt": "You are a senior software engineer reviewing the following git changes. Provide constructive feedback on code quality, style, and potential issues. Suggest improvements where necessary.",
+      "permission": {
+        "write": "ask",
+        "edit": "ask",
       }
-    }
+    },
   },
-
+  "watcher": {
+    "ignore": [
+      "node_modules/**",
+      "dist/**",
+      ".git/**"
+    ]
+  },
   "permission": {
     "read": "allow",
     "grep": "allow",
@@ -31,9 +27,7 @@
     "webfetch": "allow",
     "bash": {
       "*": "ask",
-
       "sudo*": "deny",
-
       "mkdir *": "allow",
       "touch *": "allow",
       "cd *": "allow",
@@ -57,7 +51,6 @@
       "pwsh -NoProfile ./scripts/validate.ps1": "allow",
       "tree *": "allow",
       "xargs *": "allow",
-
       "yq *": "allow",
       "jq *": "allow"
     }
