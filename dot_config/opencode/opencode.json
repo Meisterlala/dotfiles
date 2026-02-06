@@ -8,16 +8,39 @@
       "prompt": "You are a senior software engineer reviewing the following git changes. Provide constructive feedback on code quality, style, and potential issues. Suggest improvements where necessary.",
       "permission": {
         "write": "ask",
-        "edit": "ask",
+        "edit": "ask"
       }
-    },
+    }
   },
+  "provider": {
+    "cerebro": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Cerebro Arbeit",
+      "options": {
+        "baseURL": "https://chat.cerebroai.de/api"
+      },
+      "models": {
+        "gpt-5.2": {
+          "name": "gpt-5.2",
+          "limit": {
+            "context": 400000,
+            "output": 100000
+          },
+          "cost": {
+            "cache_read": 0.175,
+            "input": 1.75,
+            "output": 14
+          },
+          "reasoning": true,
+          "family": "gpt",
+          "tool_call": true
+        }
+      }
+    }
+  },
+
   "watcher": {
-    "ignore": [
-      "node_modules/**",
-      "dist/**",
-      ".git/**"
-    ]
+    "ignore": ["node_modules/**", "dist/**", ".git/**"]
   },
   "permission": {
     "read": "allow",
