@@ -92,6 +92,13 @@ box.#workspaces {
   box-shadow: inset 0px -4px @rosewater;
 }
 
+#custom-notification {
+  color: @text;
+  padding: 0px 8px;
+  margin: 2px 4px;
+  border-radius: 8px;
+}
+
 #custom-claude,
 #custom-codex,
 #custom-garage-longhorn,
