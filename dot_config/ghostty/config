@@ -39,6 +39,9 @@ window-inherit-working-directory = false
 resize-overlay-duration = 3s
 confirm-close-surface = false
 
+# Bell - blink border and show in taskbar
+bell-features = attention,border,title
+
 # Clipboard
 clipboard-read = allow
 clipboard-write = allow

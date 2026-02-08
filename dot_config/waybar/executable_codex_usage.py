@@ -174,10 +174,12 @@ def main():
         if bal is not None:
             tooltip.append(f"balance: <span color='#a6adc8'>{bal}</span>")
 
+    text = f"{primary_pct}%" if max_pct > 0 else ""
+
     print(
         json.dumps(
             {
-                "text": f"{primary_pct}%",
+                "text": text,
                 "tooltip": f"<tt>{'\n'.join(tooltip).strip()}</tt>"
                 if tooltip
                 else "No usage data",
