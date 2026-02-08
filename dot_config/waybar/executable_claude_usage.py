@@ -75,6 +75,14 @@ def get_pct(val):
         return None
 
 
+def fmt_num(val):
+    try:
+        n = float(val)
+    except (ValueError, TypeError):
+        return None
+    return str(int(n)) if n.is_integer() else f"{n:.2f}".rstrip("0").rstrip(".")
+
+
 def main():
     token = load_token()
     if not token:
@@ -116,6 +124,11 @@ def main():
 
     five_pct = get_pct(windows["5h"].get("utilization") or data.get("utilization"))
     weekly_pct = get_pct(windows["weekly"].get("utilization"))
+    extra = data.get("extra_usage") or {}
+    extra_enabled = bool(extra.get("is_enabled"))
+    extra_util_pct = get_pct(extra.get("utilization"))
+    extra_used = fmt_num(extra.get("used_credits"))
+    extra_limit = fmt_num(extra.get("monthly_limit"))
 
     tooltip = []
     for label, win in windows.items():
@@ -137,12 +150,22 @@ def main():
             tooltip.append(f"reset at: <span color='#a6adc8'>{tstr}</span>")
         tooltip.append("")
 
+    if extra_enabled:
+        tooltip.append("<span weight='bold' color='#b4befe'>extra usage</span>")
+        if extra_util_pct is not None:
+            tooltip.append(
+                f"used: <span color='#fab387'>{extra_util_pct}%</span> of monthly limit"
+            )
+        if extra_used is not None:
+            tooltip.append(f"credits used: <span color='#fab387'>{extra_used}</span>")
+        if extra_limit is not None:
+            tooltip.append(f"monthly limit: <span color='#a6adc8'>{extra_limit}</span>")
+
     # Class logic
     max_pct = max(filter(None, [five_pct, weekly_pct]), default=0)
     cls = "critical" if max_pct >= 90 else "warning" if max_pct >= 66 else "normal"
 
-    # Hide text only when usage is 100% (which incorrectly means full budget/0% used)
-    text = "" if five_pct == 100 else (f"{five_pct}%" if five_pct else "")
+    text = f"{five_pct}%" if five_pct is not None else ""
 
     print(
         json.dumps(
