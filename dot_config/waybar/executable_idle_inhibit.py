@@ -20,6 +20,27 @@ FRIENDLY_NAMES = {
 FRIENDLY_NAMES = {k.lower(): v for k, v in FRIENDLY_NAMES.items()}
 
 
+def get_systemd_inhibitors():
+    """Get systemd inhibit locks"""
+    try:
+        cmd = ["systemd-inhibit", "--list", "--mode=block"]
+        output = subprocess.check_output(cmd, text=True)
+        inhibitors = []
+
+        for line in output.splitlines()[1:]:  # Skip header
+            if not line.strip() or "inhibitors listed" in line:
+                continue
+            parts = line.split()
+            if len(parts) >= 6 and "idle" in parts[5]:
+                who = parts[0]
+                why = " ".join(parts[6:-1]) if len(parts) > 6 else "Unknown"
+                inhibitors.append((who, why))
+
+        return inhibitors
+    except Exception:
+        return []
+
+
 def get_hypridle_state():
     try:
         cmd = ["journalctl", "--user", "-u", "hypridle", "-n", "300", "--no-pager"]
@@ -53,6 +74,11 @@ def get_hypridle_state():
             if match:
                 owner_id = match.group(1)
                 active_locks.pop(owner_id, None)
+
+    # Check for systemd inhibitors
+    systemd_inhibitors = get_systemd_inhibitors()
+    for who, why in systemd_inhibitors:
+        active_locks[f"systemd-{who}"] = f"<b>{who}</b>: {why}"
 
     parsed_count = len(active_locks)
 
