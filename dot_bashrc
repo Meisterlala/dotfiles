@@ -2,21 +2,11 @@
 # ~/.bashrc
 #
 
-# Only run this for interactive shells
+# If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-# Auto-start pwsh only in graphical / non-TTY sessions
-if [[ -z "$XDG_SESSION_TYPE" || "$XDG_SESSION_TYPE" == "tty" ]]; then
-    : # real TTY → do nothing
-else
-    if [[ $(ps --no-header --pid=$PPID --format=comm) != "pwsh" ]] \
-       && [[ -z $BASH_EXECUTION_STRING ]]; then
-        # exec pwsh
-        exec fish -l
-    fi
-fi
-
-if [ "$TERM" = "linux" ] || [ "$TERM" = "xterm-256color" ]; then
+# TTY Color Palette
+if [ "$TERM" = "linux" ]; then
     # Catppuccin Mocha TTY Palette
     printf "\e]P01e1e2e" # 0: Black (Base)
     printf "\e]P1f38ba8" # 1: Red (Red)
@@ -33,22 +23,22 @@ if [ "$TERM" = "linux" ] || [ "$TERM" = "xterm-256color" ]; then
     printf "\e]PC89b4fa" # C: Bright Blue (Blue)
     printf "\e]PDcba6f7" # D: Bright Magenta (Mauve)
     printf "\e]PE94e2d5" # E: Bright Cyan (Teal)
-    printf "\e]PFf5e0dc" # F: Bright White (Rosewater)
-    
-    # Clear screen to paint the new background color
+
+    # Clear screen so the background color takes effect immediately
     clear
 fi
 
-# Start light-dm
-if [[ "$TERM" = "linux" && "$(tty)" == "/dev/tty1" ]]; then
-	exec ly-dm
+# Launch Fish
+if [[ -x "$(command -v fish)" && "$TERM" != "linux" && -z "$BASH_EXECUTION_STRING" ]]; then
+    # PREVENT INFINITE LOOPS:
+    PARENT_COMM=$(ps -o comm= -p $PPID)
+
+    if [[ "$PARENT_COMM" != "fish" ]]; then
+        exec fish -l
+    fi
 fi
 
-
-# Set a basic prompt
+# Enable bash completion
 PS1='[\u@\h \W]\$ '
-
-# Use bash-completion, if available
 [[ $PS1 && -f /usr/share/bash-completion/bash_completion ]] && \
     . /usr/share/bash-completion/bash_completion
-
