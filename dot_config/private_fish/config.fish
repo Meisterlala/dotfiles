@@ -6,6 +6,7 @@ end
 abbr -a .. 'cd ..'
 abbr -a cc "claude"
 abbr -a oc "opencode"
+abbr -a co "codex"
 abbr -a v "nvim"
 abbr -a watch "watch -c -n 1 -d"
 
@@ -38,7 +39,7 @@ set -g fish_greeting ''
 set -g fzf_history_opts --with-nth=4..
 
 # Set up tide prompt
-set -g tide_right_prompt_items status cmd_duration context jobs direnv bun node python rustc java php pulumi ruby go gcloud distrobox toolbox terraform aws nix_shell crystal elixir zig
+set -g tide_right_prompt_items status cmd_duration context jobs direnv bun node python rustc java php pulumi ruby go gcloud distrobox toolbox terraform aws nix_shell crystal elixir zig shlvl
 
 # Catppuccin Frappé Palette
 set -g ct_rosewater f2d5cf
