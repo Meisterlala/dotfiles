@@ -93,6 +93,7 @@ box.#workspaces {
 }
 
 #custom-claude,
+#custom-codex,
 #custom-garage-longhorn,
 #custom-garage-velero,
 #custom-updates,
@@ -172,12 +173,26 @@ box.#workspaces {
   color: @peach;
 }
 
+#custom-codex {
+  color: @teal;
+}
+
 #custom-claude.warning {
   color: @crust;
   background-color: @yellow;
 }
 
 #custom-claude.critical {
+  color: @crust;
+  background-color: @red;
+}
+
+#custom-codex.warning {
+  color: @crust;
+  background-color: @yellow;
+}
+
+#custom-codex.critical {
   color: @crust;
   background-color: @red;
 }

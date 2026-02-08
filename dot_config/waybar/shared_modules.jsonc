@@ -223,4 +223,14 @@
     "on-click": "pkill -RTMIN+8 waybar",
     "signal": 8,
   },
+
+  "custom/codex": {
+    "format": "{} 󱙺",
+    "return-type": "json",
+    "interval": 300,
+    "hide-empty-text": true,
+    "exec": "~/.config/waybar/codex_usage.py",
+    "on-click": "pkill -RTMIN+9 waybar",
+    "signal": 9,
+  },
 }
