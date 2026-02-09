@@ -41,6 +41,8 @@
     }
   },
 
+  "plugin": ["cc-safety-net"],
+
   "watcher": {
     "ignore": ["node_modules/**", "dist/**", ".git/**"]
   },
@@ -102,6 +104,26 @@
       "kubectl get *": "allow",
       "kubectl logs *": "allow",
       "kubectl top *": "allow",
+      "kubectl -n * api-resources *": "allow",
+      "kubectl -n * auth can-i *": "allow",
+      "kubectl -n * debug *": "allow",
+      "kubectl -n * describe *": "allow",
+      "kubectl -n * diff *": "allow",
+      "kubectl -n * events *": "allow",
+      "kubectl -n * explain *": "allow",
+      "kubectl -n * get *": "allow",
+      "kubectl -n * logs *": "allow",
+      "kubectl -n * top *": "allow",
+      "kubectl --namespace * api-resources *": "allow",
+      "kubectl --namespace * auth can-i *": "allow",
+      "kubectl --namespace * debug *": "allow",
+      "kubectl --namespace * describe *": "allow",
+      "kubectl --namespace * diff *": "allow",
+      "kubectl --namespace * events *": "allow",
+      "kubectl --namespace * explain *": "allow",
+      "kubectl --namespace * get *": "allow",
+      "kubectl --namespace * logs *": "allow",
+      "kubectl --namespace * top *": "allow",
       "kustomize build *": "allow",
       "ls *": "allow",
       "mkdir *": "allow",
