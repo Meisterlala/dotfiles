@@ -41,7 +41,7 @@
     }
   },
 
-  "plugin": ["cc-safety-net"],
+  "plugin": ["cc-safety-net", "@mohak34/opencode-notifier@latest"],
 
   "watcher": {
     "ignore": ["node_modules/**", "dist/**", ".git/**"]
@@ -52,6 +52,11 @@
     "list": "allow",
     "edit": "allow",
     "webfetch": "allow",
+    "external_directory": {
+      "*": "ask",
+      "~/.config/nvim/tmp/**": "allow"
+    },
+
     "bash": {
       "*": "ask",
       "sudo*": "deny",

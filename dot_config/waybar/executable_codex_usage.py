@@ -174,11 +174,8 @@ def main():
         if bal is not None:
             tooltip.append(f"balance: <span color='#a6adc8'>{bal}</span>")
 
-    # If usage is 0%, don't output anything so waybar hides the module
-    if max_pct == 0:
-        return
-
-    text = f"{primary_pct}%"
+    # If usage is 0%, set text to empty string so waybar hides the module
+    text = f"{primary_pct}%" if primary_pct > 0 else ""
 
     print(
         json.dumps(
