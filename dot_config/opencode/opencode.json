@@ -28,11 +28,6 @@
             "context": 400000,
             "output": 100000
           },
-          "cost": {
-            "cache_read": 0.175,
-            "input": 1.75,
-            "output": 14
-          },
           "reasoning": true,
           "family": "gpt",
           "tool_call": true
