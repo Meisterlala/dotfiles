@@ -209,7 +209,7 @@
     "format": "  ",
     "tooltip": "Suspend",
     "on-click": "systemctl suspend",
-    "interval": 0,
+    "interval": 100,
   },
 
   "custom/weather": {
