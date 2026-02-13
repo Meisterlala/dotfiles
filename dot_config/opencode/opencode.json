@@ -36,7 +36,7 @@
     }
   },
 
-  "plugin": ["cc-safety-net", "@mohak34/opencode-notifier@latest"],
+  "plugin": ["cc-safety-net"],
 
   "watcher": {
     "ignore": ["node_modules/**", "dist/**", ".git/**"]
