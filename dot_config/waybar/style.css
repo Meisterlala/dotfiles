@@ -109,6 +109,7 @@ box.#workspaces {
 #custom-scrcpy-active,
 #custom-systemd-failed-units,
 #custom-hypridle,
+#custom-weight,
 #custom-sleep,
 #tray,
 #wireplumber,
@@ -131,6 +132,7 @@ box.#workspaces {
 #custom-sleep:hover,
 #custom-scrcpy-active:hover,
 #custom-hypridle:hover,
+#custom-weight:hover,
 #wireplumber:hover,
 #gamemode:hover,
 #cpu:hover,
@@ -170,6 +172,18 @@ box.#workspaces {
 
 #custom-systemd-failed-units:hover {
   box-shadow: inset 0px -4px @rosewater;
+}
+
+#custom-weight {
+  color: @mauve;
+}
+
+#custom-weight.hidden {
+  color: @overlay1;
+}
+
+#custom-weight.met {
+  color: @green;
 }
 
 #clock {

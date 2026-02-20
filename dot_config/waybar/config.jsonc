@@ -47,6 +47,7 @@
       "custom/gpu",
       "cpu",
       "memory",
+      "custom/weight",
       "custom/sleep",
       "custom/garage-longhorn",
       "custom/garage-velero",

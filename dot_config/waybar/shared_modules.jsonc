@@ -234,6 +234,14 @@
     "interval": 5,
   },
 
+  "custom/weight": {
+    "return-type": "json",
+    "exec": "/home/misti/opencode/weight-unlock/show_weight_waybar.py",
+    "on-click": "/home/misti/opencode/weight-unlock/show_weight_waybar.py --toggle; pkill -RTMIN+11 waybar",
+    "interval": 300,
+    "signal": 11,
+  },
+
   "custom/claude": {
     "format": "{} 󰭻",
     "return-type": "json",
