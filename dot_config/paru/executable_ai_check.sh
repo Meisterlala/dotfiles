@@ -4,12 +4,21 @@ set -euo pipefail
 tmp_file="$(mktemp /tmp/paru-pkgbuild-diff.XXXXXX)"
 trap 'rm -f "$tmp_file"' EXIT
 
-ai_model="${OPENCODE_MODEL:-github-copilot/gpt-5.2}"
+ai_model="${OPENCODE_MODEL:-github-copilot/gemini-3-flash-preview}"
 
 if [ "$#" -gt 0 ]; then
   cat "$@" > "$tmp_file"
 else
   cat > "$tmp_file"
+fi
+
+# 1. LOCAL FAST PATH (Instant skip for routine version bumps)
+if grep '^[+]' "$tmp_file" | grep -vE '^\+\+\+ ' | grep -vE '^\+(pkgver|pkgrel|.*sums| )' | grep -q '^[+]'; then
+    # Non-trivial changes found, continue to AI check
+    :
+else
+    printf 'AI CHECK: SKIP (Local) - routine version/checksum bump.\n' >&2
+    exit 0
 fi
 
 forced_warn_reason=""
@@ -73,7 +82,9 @@ Decision bias:
 - If uncertain, choose WARN.
 EOF
 
-if ! ai_output="$(opencode run --model "$ai_model" --file "$tmp_file" -- "$ai_prompt" 2>&1)"; then
+if ! ai_output="$(opencode run --model "$ai_model" -- "$ai_prompt
+--- BEGIN DIFF ---
+$(cat "$tmp_file")" 2>&1)"; then
   printf 'WARNING: AI check failed (offline/API/command error). Showing PKGBUILD diff.\n\n' >&2
   printf '%s\n\n' "$ai_output" >&2
   show_diff
