@@ -30,22 +30,7 @@ def human_delta(dt, now):
 
 
 def call_rate_limits():
-    req_init = {
-        "jsonrpc": "2.0",
-        "id": "1",
-        "method": "initialize",
-        "params": {
-            "clientInfo": {"name": "waybar-codex-usage", "version": "1.0"},
-            "capabilities": {"experimentalApi": True},
-        },
-    }
-    req_limits = {
-        "jsonrpc": "2.0",
-        "id": "2",
-        "method": "account/rateLimits/read",
-        "params": {},
-    }
-    req_initialized = {"jsonrpc": "2.0", "method": "initialized", "params": {}}
+    import time
 
     proc = subprocess.Popen(
         ["codex", "app-server"],
@@ -55,29 +40,48 @@ def call_rate_limits():
         text=True,
     )
 
-    assert proc.stdin is not None
-    proc.stdin.write(json.dumps(req_init) + "\n")
-    proc.stdin.write(json.dumps(req_initialized) + "\n")
-    proc.stdin.write(json.dumps(req_limits) + "\n")
-    proc.stdin.close()
+    def send(msg):
+        assert proc.stdin is not None
+        proc.stdin.write(json.dumps(msg) + "\n")
+        proc.stdin.flush()
 
     try:
-        lines = []
-        for _ in range(20):
-            line = proc.stdout.readline() if proc.stdout else ""
+        send({
+            "jsonrpc": "2.0",
+            "id": "1",
+            "method": "initialize",
+            "params": {
+                "clientInfo": {"name": "waybar-codex-usage", "version": "1.0"},
+                "capabilities": {"experimentalApi": True},
+            },
+        })
+
+        deadline = time.time() + 15
+        initialized_sent = False
+        while time.time() < deadline:
+            assert proc.stdout is not None
+            line = proc.stdout.readline()
             if not line:
                 break
-            lines.append(line.strip())
             try:
                 msg = json.loads(line)
             except json.JSONDecodeError:
                 continue
-            if str(msg.get("id")) == "2":
+            if str(msg.get("id")) == "1" and not initialized_sent:
+                initialized_sent = True
+                send({"jsonrpc": "2.0", "method": "initialized", "params": {}})
+                send({"jsonrpc": "2.0", "id": "2", "method": "account/rateLimits/read", "params": {}})
+            elif str(msg.get("id")) == "2":
                 res = msg.get("result") or {}
                 return (res.get("rateLimits") or {}), None
+
         err = (proc.stderr.read() if proc.stderr else "").strip()
         return None, err or "No account/rateLimits/read response from codex app-server"
     finally:
+        try:
+            proc.stdin.close()
+        except Exception:
+            pass
         try:
             proc.terminate()
             proc.wait(timeout=1)
@@ -92,15 +96,7 @@ def main():
     try:
         limits, err = call_rate_limits()
     except FileNotFoundError:
-        print(
-            json.dumps(
-                {
-                    "text": "Codex: n/a",
-                    "tooltip": "codex CLI not found",
-                    "class": "error",
-                }
-            )
-        )
+        print(json.dumps({"text": "", "tooltip": "codex CLI not found", "class": "error"}))
         return
     except Exception as e:
         print(
@@ -111,15 +107,7 @@ def main():
         return
 
     if not limits:
-        print(
-            json.dumps(
-                {
-                    "text": "Codex: n/a",
-                    "tooltip": err or "No usage data (run `codex login`)",
-                    "class": "error",
-                }
-            )
-        )
+        print(json.dumps({"text": "", "tooltip": err or "No usage data (run `codex login`)", "class": "error"}))
         return
 
     now = datetime.datetime.now(datetime.timezone.utc)
