@@ -107,7 +107,7 @@ box.#workspaces {
 #custom-weather,
 #custom-gpu,
 #custom-scrcpy-active,
-#systemd-failed-units,
+#custom-systemd-failed-units,
 #custom-hypridle,
 #custom-sleep,
 #tray,
@@ -164,11 +164,11 @@ box.#workspaces {
   color: @green;
 }
 
-#systemd-failed-units {
+#custom-systemd-failed-units {
   background-color: shade(@red, 0.6);
 }
 
-#systemd-failed-units:hover {
+#custom-systemd-failed-units:hover {
   box-shadow: inset 0px -4px @rosewater;
 }
 

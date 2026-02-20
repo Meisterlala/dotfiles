@@ -161,14 +161,13 @@
     ],
   },
 
-  "systemd-failed-units": {
-    "hide-on-ok": true,
-    "format": " {nr_failed}",
-    "format-ok": "",
-    "system": true,
-    "user": true,
-    "on-click": "~/.config/waybar/failed-units.sh",
-    "on-click-right": "~/.config/waybar/restart-failed.sh",
+  "custom/systemd-failed-units": {
+    "return-type": "json",
+    "exec": "~/.config/waybar/failed-units.sh",
+    "interval": 10,
+    "signal": 10,
+    "hide-empty-text": true,
+    "on-click": "~/.config/waybar/restart-failed.sh",
   },
 
   "custom/notification": {
