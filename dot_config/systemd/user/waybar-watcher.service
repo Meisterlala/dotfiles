@@ -4,11 +4,11 @@ StartLimitIntervalSec=0
 StartLimitBurst=0
 PartOf=graphical-session.target
 After=waybar.service
-Requisite=graphical-session.targe
+Requisite=graphical-session.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/systemctl --user restart waybar.service
+ExecStart=/usr/bin/systemctl --user reload waybar.service
 
 [Install]
 WantedBy=graphical-session.target

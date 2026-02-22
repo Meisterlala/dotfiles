@@ -9,8 +9,9 @@ StartLimitBurst=10
 
 [Service]
 ExecStart=/usr/bin/waybar
-ExecReload=kill -SIGUSR2 $MAINPID
-Restart=on-failure
+ExecReload=/usr/bin/kill -SIGTERM $MAINPID
+Restart=always
+RestartSec=300ms
 
 [Install]
 WantedBy=graphical-session.target
