@@ -39,6 +39,10 @@
   "plugin": ["cc-safety-net"],
 
   "mcp": {
+    "browsermcp": {
+      "type": "local",
+      "command": ["npx", "@browsermcp/mcp@latest"]
+    },
     "livekit-docs": {
       "type": "remote",
       "url": "https://docs.livekit.io/mcp"
