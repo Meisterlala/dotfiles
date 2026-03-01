@@ -5,6 +5,7 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
+
 # TTY Color Palette
 if [ "$TERM" = "linux" ]; then
     # Catppuccin Mocha TTY Palette

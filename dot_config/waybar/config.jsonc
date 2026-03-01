@@ -21,7 +21,7 @@
       "gamemode",
       "custom/scrcpy-active",
       "custom/updates",
-      "custom/claude",
+      //"custom/claude",
       "custom/codex",
       "wireplumber",
       "clock",

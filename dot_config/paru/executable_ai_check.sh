@@ -13,7 +13,44 @@ else
 fi
 
 # 1. LOCAL FAST PATH (Instant skip for routine version bumps)
-if grep '^[+]' "$tmp_file" | grep -vE '^\+\+\+ ' | grep -vE '^\+(pkgver|pkgrel|.*sums| )' | grep -q '^[+]'; then
+# We only skip if the only changes are pkgver, pkgrel, or checksums, AND it's an update (not a new file).
+is_new_file() {
+  # A new file usually has '--- /dev/null' or just '+++' without a matching '---'
+  # BUT in many diff tools, it just shows as all '+' lines.
+  # Let's check if there are ANY '-' lines that aren't the diff header.
+  ! grep '^[-]' "$tmp_file" | grep -vE '^--- ' | grep -q '^[-]'
+}
+
+is_routine_update() {
+  # 1. Must NOT be a new file
+  if is_new_file; then return 1; fi
+
+  # 2. Check for potential prompt injection BEFORE skipping
+  if grep -Ei '(ignore.*(all|previous).*instructions|system.*prompt|developer.*message|assistant.*message|jailbreak|do.*not.*analyze|override.*your.*rules)' "$tmp_file"; then
+    return 1
+  fi
+
+  # 3. Must only have changes (both + and -) that are in the allowed list
+  # Any modified line that is NOT the diff header AND is NOT a routine field
+  # will trigger the AI check.
+  # Routine fields: pkgver, pkgrel, and any checksum field ending in "sums".
+  # We use [+-][[:space:]]* to allow for leading whitespace after the +/- marker.
+  if grep '^[+-]' "$tmp_file" | \
+     grep -vE '^--- |^\+\+\+ ' | \
+     grep -vE '^[+-][[:space:]]*(pkgver|pkgrel|.*sums)' | \
+     grep -q '^[+-]'; then
+    return 1
+  fi
+  
+  # Ensure there is at least one modified line (actual change)
+  if ! grep '^[+-]' "$tmp_file" | grep -vE '^--- |^\+\+\+ ' | grep -q '^[+-]'; then
+    return 1 # If there are NO + or - lines, we send it to AI just to be safe (usually indicates a malformed or unexpected diff format)
+  fi
+
+  return 0
+}
+
+if ! is_routine_update; then
     # Non-trivial changes found, continue to AI check
     :
 else
@@ -65,6 +102,7 @@ Medium-risk signals (usually WARN):
 - New network sources, moving tags/branches, unpinned VCS refs
 - New post-install behavior, telemetry, persistence-like behavior
 - Large refactors in install() / package() requiring manual read-through
+- Introduction of ANY new, custom, or unexplained variables (e.g., 'my_custom_var', 'debug_flag', etc.)
 
 Low-risk signals (can be GOOD):
 - Version bumps, checksum refreshes, URL mirror swaps, packaging path fixes, dependency updates with no risky script behavior
@@ -91,9 +129,13 @@ $(cat "$tmp_file")" 2>&1)"; then
   exit 0
 fi
 
+# Export result for potential testing/integration
+export AI_CHECK_RESULT="$(printf '%s\n' "$ai_output" | sed -E 's/\x1B\[[0-9;]*[[:alpha:]]//g' | sed -n 's/.*RESULT:[[:space:]]*//p' | head -n 1 | tr '[:lower:]' '[:upper:]')"
+export AI_CHECK_REASON="$(printf '%s\n' "$ai_output" | sed -n 's/.*REASON:[[:space:]]*//p' | head -n 1)"
+
 clean_output="$(printf '%s\n' "$ai_output" | sed -E 's/\x1B\[[0-9;]*[[:alpha:]]//g')"
-result="$(printf '%s\n' "$clean_output" | sed -n 's/.*RESULT:[[:space:]]*//p' | head -n 1 | tr '[:lower:]' '[:upper:]')"
-reason="$(printf '%s\n' "$clean_output" | sed -n 's/.*REASON:[[:space:]]*//p' | head -n 1)"
+result="$AI_CHECK_RESULT"
+reason="$AI_CHECK_REASON"
 
 case "$result" in
   GOOD)
