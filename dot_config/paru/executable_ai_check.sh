@@ -102,7 +102,7 @@ Medium-risk signals (usually WARN):
 - New network sources, moving tags/branches, unpinned VCS refs
 - New post-install behavior, telemetry, persistence-like behavior
 - Large refactors in install() / package() requiring manual read-through
-- Introduction of ANY new, custom, or unexplained variables (e.g., 'my_custom_var', 'debug_flag', etc.)
+- Introduction of new, custom, or unexplained variables, that maybe shouldnt be there
 
 Low-risk signals (can be GOOD):
 - Version bumps, checksum refreshes, URL mirror swaps, packaging path fixes, dependency updates with no risky script behavior
