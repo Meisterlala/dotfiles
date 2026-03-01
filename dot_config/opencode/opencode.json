@@ -38,6 +38,13 @@
 
   "plugin": ["cc-safety-net"],
 
+  "mcp": {
+    "livekit-docs": {
+      "type": "remote",
+      "url": "https://docs.livekit.io/mcp"
+    }
+  },
+
   "watcher": {
     "ignore": ["node_modules/**", "dist/**", ".git/**"]
   },
