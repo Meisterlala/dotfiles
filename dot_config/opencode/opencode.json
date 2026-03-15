@@ -46,6 +46,10 @@
     "livekit-docs": {
       "type": "remote",
       "url": "https://docs.livekit.io/mcp"
+    },
+    "kubernetes": {
+      "type": "local",
+      "command": ["npx", "-y", "kubernetes-mcp-server@latest"]
     }
   },
 

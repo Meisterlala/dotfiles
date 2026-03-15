@@ -5,6 +5,11 @@ tmp_file="$(mktemp /tmp/paru-pkgbuild-diff.XXXXXX)"
 trap 'rm -f "$tmp_file"' EXIT
 
 ai_model="${OPENCODE_MODEL:-github-copilot/gemini-3-flash-preview}"
+ai_timeout_seconds="${OPENCODE_TIMEOUT_SECONDS:-20}"
+
+if ! [[ "$ai_timeout_seconds" =~ ^[0-9]+$ ]] || [ "$ai_timeout_seconds" -lt 1 ]; then
+  ai_timeout_seconds=20
+fi
 
 if [ "$#" -gt 0 ]; then
   cat "$@" > "$tmp_file"
@@ -26,7 +31,7 @@ is_routine_update() {
   if is_new_file; then return 1; fi
 
   # 2. Check for potential prompt injection BEFORE skipping
-  if grep -Ei '(ignore.*(all|previous).*instructions|system.*prompt|developer.*message|assistant.*message|jailbreak|do.*not.*analyze|override.*your.*rules)' "$tmp_file"; then
+  if grep -Eiq '(ignore.*(all|previous).*instructions|system.*prompt|developer.*message|assistant.*message|jailbreak|do.*not.*analyze|override.*your.*rules)' "$tmp_file"; then
     return 1
   fi
 
@@ -37,7 +42,7 @@ is_routine_update() {
   # We use [+-][[:space:]]* to allow for leading whitespace after the +/- marker.
   if grep '^[+-]' "$tmp_file" | \
      grep -vE '^--- |^\+\+\+ ' | \
-     grep -vE '^[+-][[:space:]]*(pkgver|pkgrel|.*sums)' | \
+     grep -vE '^[+-][[:space:]]*(pkgver|pkgrel|epoch|_pkgver|_pkgrel|_tag|_commit|_rev|source(_[[:alnum:]_]+)?|.*sums)([[:space:]=]|$)' | \
      grep -q '^[+-]'; then
     return 1
   fi
@@ -120,10 +125,23 @@ Decision bias:
 - If uncertain, choose WARN.
 EOF
 
-if ! ai_output="$(opencode run --model "$ai_model" -- "$ai_prompt
+ai_exit=0
+if command -v timeout >/dev/null 2>&1; then
+  ai_output="$(timeout --kill-after=3s "${ai_timeout_seconds}s" opencode run --model "$ai_model" -- "$ai_prompt
 --- BEGIN DIFF ---
-$(cat "$tmp_file")" 2>&1)"; then
-  printf 'WARNING: AI check failed (offline/API/command error). Showing PKGBUILD diff.\n\n' >&2
+$(cat "$tmp_file")" 2>&1)" || ai_exit=$?
+else
+  ai_output="$(opencode run --model "$ai_model" -- "$ai_prompt
+--- BEGIN DIFF ---
+$(cat "$tmp_file")" 2>&1)" || ai_exit=$?
+fi
+
+if [ "$ai_exit" -ne 0 ]; then
+  if [ "$ai_exit" -eq 124 ] || [ "$ai_exit" -eq 137 ]; then
+    printf 'WARNING: AI check timed out after %ss. Showing PKGBUILD diff.\n\n' "$ai_timeout_seconds" >&2
+  else
+    printf 'WARNING: AI check failed (offline/API/command error). Showing PKGBUILD diff.\n\n' >&2
+  fi
   printf '%s\n\n' "$ai_output" >&2
   show_diff
   exit 0
