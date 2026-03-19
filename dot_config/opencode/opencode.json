@@ -157,7 +157,9 @@
       "unzip *": "allow",
       "wc *": "allow",
       "xargs *": "allow",
-      "yq *": "allow"
+      "yq *": "allow",
+      "nslookup *": "allow",
+      "getent *": "allow"
     }
   }
 }
