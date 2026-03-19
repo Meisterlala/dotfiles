@@ -28,8 +28,19 @@
             "context": 400000,
             "output": 100000
           },
+          "options": {
+            "reasoningSummary": false
+          },
+          "reasoning": false,
+          "tool_call": true
+        },
+        "gemini-2.5-flash": {
+          "name": "gemini-2.5-flash",
+          "limit": {
+            "context": 400000,
+            "output": 100000
+          },
           "reasoning": true,
-          "family": "gpt",
           "tool_call": true
         }
       }
