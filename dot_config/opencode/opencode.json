@@ -51,10 +51,12 @@
 
   "mcp": {
     "browsermcp": {
+      "enabled": false,
       "type": "local",
       "command": ["npx", "@browsermcp/mcp@latest"]
     },
     "livekit-docs": {
+      "enabled": false,
       "type": "remote",
       "url": "https://docs.livekit.io/mcp"
     },

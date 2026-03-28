@@ -5,6 +5,7 @@ tmp_file="$(mktemp /tmp/paru-pkgbuild-diff.XXXXXX)"
 trap 'rm -f "$tmp_file"' EXIT
 
 ai_model="${OPENCODE_MODEL:-github-copilot/gemini-3-flash-preview}"
+ai_fallback_models_csv="${OPENCODE_FALLBACK_MODELS:-github-copilot/gpt-4.1,github-copilot/gpt-5-mini,openai/gpt-5.3-codex,openrouter/free,openrouter/openai/oss-80b:free,openrouter/meta-llama/llama-3.3-70b-instruct:free,openrouter/google/gemma-3-12b-it:free}"
 ai_timeout_seconds="${OPENCODE_TIMEOUT_SECONDS:-20}"
 
 if ! [[ "$ai_timeout_seconds" =~ ^[0-9]+$ ]] || [ "$ai_timeout_seconds" -lt 1 ]; then
@@ -81,7 +82,27 @@ if ! command -v opencode >/dev/null 2>&1; then
   exit 0
 fi
 
-printf 'Running AI check on PKGBUILD changes (model: %s)\n' "$ai_model" >&2
+models=("$ai_model")
+IFS=',' read -r -a parsed_fallback_models <<< "$ai_fallback_models_csv"
+for candidate in "${parsed_fallback_models[@]}"; do
+  candidate="${candidate#${candidate%%[![:space:]]*}}"
+  candidate="${candidate%${candidate##*[![:space:]]}}"
+  [ -z "$candidate" ] && continue
+
+  already_added=0
+  for existing in "${models[@]}"; do
+    if [ "$existing" = "$candidate" ]; then
+      already_added=1
+      break
+    fi
+  done
+
+  if [ "$already_added" -eq 0 ]; then
+    models+=("$candidate")
+  fi
+done
+
+printf 'Running AI check on PKGBUILD changes (model chain: %s)\n' "$(IFS=', '; printf '%s' "${models[*]}")" >&2
 
 read -r -d '' ai_prompt <<'EOF' || true
 You are a strict security auditor for Arch Linux AUR PKGBUILD diffs.
@@ -125,27 +146,77 @@ Decision bias:
 - If uncertain, choose WARN.
 EOF
 
-ai_exit=0
-if command -v timeout >/dev/null 2>&1; then
-  ai_output="$(timeout --kill-after=3s "${ai_timeout_seconds}s" opencode run --model "$ai_model" -- "$ai_prompt
+run_ai_for_model() {
+  local model="$1"
+  local parsed_result
+  ai_exit=0
+  if command -v timeout >/dev/null 2>&1; then
+    ai_output="$(timeout --kill-after=3s "${ai_timeout_seconds}s" opencode run --model "$model" -- "$ai_prompt
 --- BEGIN DIFF ---
 $(cat "$tmp_file")" 2>&1)" || ai_exit=$?
-else
-  ai_output="$(opencode run --model "$ai_model" -- "$ai_prompt
---- BEGIN DIFF ---
-$(cat "$tmp_file")" 2>&1)" || ai_exit=$?
-fi
-
-if [ "$ai_exit" -ne 0 ]; then
-  if [ "$ai_exit" -eq 124 ] || [ "$ai_exit" -eq 137 ]; then
-    printf 'WARNING: AI check timed out after %ss. Showing PKGBUILD diff.\n\n' "$ai_timeout_seconds" >&2
   else
-    printf 'WARNING: AI check failed (offline/API/command error). Showing PKGBUILD diff.\n\n' >&2
+    ai_output="$(opencode run --model "$model" -- "$ai_prompt
+--- BEGIN DIFF ---
+$(cat "$tmp_file")" 2>&1)" || ai_exit=$?
   fi
+
+  if [ "$ai_exit" -eq 0 ]; then
+    parsed_result="$(printf '%s\n' "$ai_output" | sed -E 's/\x1B\[[0-9;]*[[:alpha:]]//g' | sed -n 's/.*RESULT:[[:space:]]*//p' | head -n 1 | tr '[:lower:]' '[:upper:]')"
+    if [ -z "$parsed_result" ]; then
+      ai_exit=86
+    fi
+  fi
+}
+
+should_fallback() {
+  [ "$ai_exit" -eq 124 ] || [ "$ai_exit" -eq 137 ] && return 0
+
+  if printf '%s\n' "$ai_output" | grep -Eiq '(rate limit|quota|resource exhausted|too many requests|429|insufficient.*credit|billing|model.*not found|not available|access denied|forbidden)'; then
+    return 0
+  fi
+
+  return 1
+}
+
+ai_selected_model=""
+ai_last_exit=0
+ai_last_output=""
+
+for model in "${models[@]}"; do
+  printf 'AI check attempt with model: %s (timeout: %ss)\n' "$model" "$ai_timeout_seconds" >&2
+  run_ai_for_model "$model"
+
+  if [ "$ai_exit" -eq 0 ]; then
+    ai_selected_model="$model"
+    break
+  fi
+
+  ai_last_exit="$ai_exit"
+  ai_last_output="$ai_output"
+
+  if should_fallback; then
+    printf 'WARNING: AI model failed (%s). Trying fallback model.\n' "$model" >&2
+    continue
+  fi
+
+  printf 'WARNING: AI check failed (offline/API/command error) on %s. Showing PKGBUILD diff.\n\n' "$model" >&2
   printf '%s\n\n' "$ai_output" >&2
   show_diff
   exit 0
+done
+
+if [ -z "$ai_selected_model" ]; then
+  if [ "$ai_last_exit" -eq 124 ] || [ "$ai_last_exit" -eq 137 ]; then
+    printf 'WARNING: AI check timed out after %ss across all models. Showing PKGBUILD diff.\n\n' "$ai_timeout_seconds" >&2
+  else
+    printf 'WARNING: AI check failed for all models. Showing PKGBUILD diff.\n\n' >&2
+  fi
+  printf '%s\n\n' "$ai_last_output" >&2
+  show_diff
+  exit 0
 fi
+
+printf 'AI check completed with model: %s\n' "$ai_selected_model" >&2
 
 # Export result for potential testing/integration
 export AI_CHECK_RESULT="$(printf '%s\n' "$ai_output" | sed -E 's/\x1B\[[0-9;]*[[:alpha:]]//g' | sed -n 's/.*RESULT:[[:space:]]*//p' | head -n 1 | tr '[:lower:]' '[:upper:]')"
