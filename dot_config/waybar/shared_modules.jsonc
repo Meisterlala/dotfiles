@@ -170,6 +170,13 @@
     "on-click": "~/.config/waybar/restart-failed.sh",
   },
 
+  "custom/k8s-alerts": {
+    "return-type": "json",
+    "exec": "~/.config/waybar/k8s-alerts.sh",
+    "interval": 60,
+    "tooltip": true,
+  },
+
   "custom/notification": {
     "tooltip": true,
     "format": "<span size='16pt'>{icon}</span>",
