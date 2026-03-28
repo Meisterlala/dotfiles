@@ -205,6 +205,16 @@ box.#workspaces {
 
 #custom-codex {
   color: @teal;
+  background-color: alpha(@surface0, 0.2);
+  background-image: linear-gradient(
+    to right,
+    alpha(@teal, 0.35) 0%,
+    alpha(@teal, 0.35) 0%,
+    transparent 0%,
+    transparent 100%
+  );
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
 }
 
 #custom-claude.warning {
@@ -217,14 +227,67 @@ box.#workspaces {
   background-color: @red;
 }
 
-#custom-codex.warning {
-  color: @crust;
-  background-color: @yellow;
+#custom-codex.usage-0 {
+  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 0%, transparent 0%, transparent 100%);
 }
 
+#custom-codex.usage-1 {
+  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 10%, transparent 10%, transparent 100%);
+}
+
+#custom-codex.usage-2 {
+  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 20%, transparent 20%, transparent 100%);
+}
+
+#custom-codex.usage-3 {
+  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 30%, transparent 30%, transparent 100%);
+}
+
+#custom-codex.usage-4 {
+  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 40%, transparent 40%, transparent 100%);
+}
+
+#custom-codex.usage-5 {
+  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 50%, transparent 50%, transparent 100%);
+}
+
+#custom-codex.usage-6 {
+  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 60%, transparent 60%, transparent 100%);
+}
+
+#custom-codex.usage-7 {
+  background-image: linear-gradient(to right, alpha(@yellow, 0.45) 0%, alpha(@yellow, 0.45) 70%, transparent 70%, transparent 100%);
+}
+
+#custom-codex.usage-8 {
+  background-image: linear-gradient(to right, alpha(@yellow, 0.45) 0%, alpha(@yellow, 0.45) 80%, transparent 80%, transparent 100%);
+}
+
+#custom-codex.usage-9 {
+  background-image: linear-gradient(to right, alpha(@red, 0.45) 0%, alpha(@red, 0.45) 90%, transparent 90%, transparent 100%);
+}
+
+#custom-codex.usage-10 {
+  background-image: linear-gradient(to right, alpha(@red, 0.5) 0%, alpha(@red, 0.5) 100%, transparent 100%, transparent 100%);
+}
+
+@keyframes codexpulse {
+  to {
+    box-shadow: inset 0px -4px @rosewater;
+  }
+}
+
+#custom-codex.warning,
 #custom-codex.critical {
-  color: @crust;
-  background-color: @red;
+  animation-name: codexpulse;
+  animation-duration: 0.8s;
+  animation-timing-function: steps(8);
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+#custom-codex:hover {
+  box-shadow: inset 0px -4px @rosewater;
 }
 
 tooltip {

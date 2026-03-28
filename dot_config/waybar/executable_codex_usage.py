@@ -79,7 +79,8 @@ def call_rate_limits():
         return None, err or "No account/rateLimits/read response from codex app-server"
     finally:
         try:
-            proc.stdin.close()
+            if proc.stdin is not None:
+                proc.stdin.close()
         except Exception:
             pass
         try:
@@ -119,7 +120,9 @@ def main():
     secondary_pct = int(round(float(secondary.get("usedPercent", 0))))
     max_pct = max(primary_pct, secondary_pct)
 
-    cls = "critical" if max_pct >= 90 else "warning" if max_pct >= 66 else "normal"
+    state_cls = "critical" if max_pct >= 90 else "warning" if max_pct >= 66 else "normal"
+    usage_bucket = min(10, max(0, (max_pct + 9) // 10))
+    usage_cls = f"usage-{usage_bucket}"
 
     tooltip = []
     windows = [
@@ -165,7 +168,7 @@ def main():
     # Determine display text and handle "100%" case
     if max_pct >= 99:
         text = "100%"
-        cls = "critical"
+        state_cls = "critical"
     else:
         # Only show the 5h window (primary) unless it's 0%
         text = f"{primary_pct}%" if primary_pct > 0 else ""
@@ -177,7 +180,7 @@ def main():
                 "tooltip": f"<tt>{'\n'.join(tooltip).strip()}</tt>"
                 if tooltip
                 else "No usage data",
-                "class": cls,
+                "class": ["codex-usage", state_cls, usage_cls],
                 "percentage": max_pct,
             }
         )
