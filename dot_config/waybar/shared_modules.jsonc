@@ -172,9 +172,13 @@
 
   "custom/k8s-alerts": {
     "return-type": "json",
-    "exec": "~/.config/waybar/k8s-alerts.sh",
+    "exec": "~/.config/waybar/k8s-alerts.py",
     "interval": 60,
     "tooltip": true,
+    "escape": false,
+    "hide-empty-text": true,
+    "signal": 12,
+    "on-click": "pkill -RTMIN+12 waybar",
   },
 
   "custom/notification": {

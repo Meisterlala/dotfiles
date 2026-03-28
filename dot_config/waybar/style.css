@@ -108,6 +108,7 @@ box.#workspaces {
 #custom-gpu,
 #custom-scrcpy-active,
 #custom-systemd-failed-units,
+#custom-k8s-alerts,
 #custom-hypridle,
 #custom-weight,
 #custom-sleep,
@@ -172,6 +173,14 @@ box.#workspaces {
 
 #custom-systemd-failed-units:hover {
   box-shadow: inset 0px -4px @rosewater;
+}
+
+#custom-k8s-alerts.warning {
+  background-color: @yellow;
+}
+
+#custom-k8s-alerts.critical {
+  background-color: shade(@red, 0.6);
 }
 
 #custom-weight {
