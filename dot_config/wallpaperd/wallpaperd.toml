@@ -2,4 +2,4 @@ wallpaper_directory = "~/Nextcloud/Wallpapers/"
 interval = 400
 history_length = 25
 mode = "Random"
-wallpaper_change_command = "swww img --transition-type fade --transition-duration 3 --transition-step 1 --transition-fps 120 %wallpaper%"
+wallpaper_change_command = "awww img --transition-type fade --transition-duration 3 --transition-step 1 --transition-fps 120 %wallpaper%"
