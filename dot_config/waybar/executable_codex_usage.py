@@ -121,7 +121,8 @@ def main():
     max_pct = max(primary_pct, secondary_pct)
 
     state_cls = "critical" if max_pct >= 90 else "warning" if max_pct >= 66 else "normal"
-    usage_bucket = min(10, max(0, (max_pct + 9) // 10))
+    # Fill background by weekly usage so long-window trend is visible.
+    usage_bucket = min(20, max(0, (secondary_pct + 4) // 5))
     usage_cls = f"usage-{usage_bucket}"
 
     tooltip = []
@@ -165,13 +166,10 @@ def main():
         if bal is not None:
             tooltip.append(f"balance: <span color='#a6adc8'>{bal}</span>")
 
-    # Determine display text and handle "100%" case
+    # Keep text focused on the 5h (primary) window.
+    text = f"{primary_pct}%"
     if max_pct >= 99:
-        text = "100%"
         state_cls = "critical"
-    else:
-        # Only show the 5h window (primary) unless it's 0%
-        text = f"{primary_pct}%" if primary_pct > 0 else ""
 
     print(
         json.dumps(
