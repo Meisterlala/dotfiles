@@ -39,15 +39,22 @@
   },
 
   "custom/updates": {
-    "format": "{} {icon} ",
+    "format": "{} {icon}",
     "return-type": "json",
     "format-icons": {
-      "has-updates": "󱍷",
+      "updates": "󱍷",
+      "warning": "󱍷",
+      "critical": "󱍷",
       "updated": "󰒘",
+      "error": "",
     },
-    "exec-if": "which waybar-module-pacman-updates",
-    "exec": "waybar-module-pacman-updates --interval-seconds 5 --network-interval-seconds 300 --tooltip-align-columns --color-semver-updates eba0ac,cba6f7,cdd6f4,cdd6f4,cdd6f4,cdd6f4,cdd6f4,cdd6f4,cdd6f4 --no-zero-output",
+    "exec": "~/.config/waybar/arch_updates.py",
+    "interval": 900,
+    "signal": 13,
+    "escape": false,
+    "hide-empty-text": true,
     "on-click": "ghostty -e paru -Syu",
+    "on-click-right": "pkill -RTMIN+13 waybar",
   },
 
   "custom/scrcpy-active": {
