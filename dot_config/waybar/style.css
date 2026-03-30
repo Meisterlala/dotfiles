@@ -228,102 +228,219 @@ box.#workspaces {
 }
 
 #custom-codex.usage-0 {
-  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 0%, transparent 0%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@teal, 0.35) 0%,
+    alpha(@teal, 0.35) 0%,
+    transparent 0%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-1 {
-  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 5%, transparent 5%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@teal, 0.35) 0%,
+    alpha(@teal, 0.35) 5%,
+    transparent 5%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-2 {
-  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 10%, transparent 10%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@teal, 0.35) 0%,
+    alpha(@teal, 0.35) 10%,
+    transparent 10%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-3 {
-  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 15%, transparent 15%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@teal, 0.35) 0%,
+    alpha(@teal, 0.35) 15%,
+    transparent 15%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-4 {
-  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 20%, transparent 20%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@teal, 0.35) 0%,
+    alpha(@teal, 0.35) 20%,
+    transparent 20%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-5 {
-  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 25%, transparent 25%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@teal, 0.35) 0%,
+    alpha(@teal, 0.35) 25%,
+    transparent 25%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-6 {
-  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 30%, transparent 30%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@teal, 0.35) 0%,
+    alpha(@teal, 0.35) 30%,
+    transparent 30%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-7 {
-  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 35%, transparent 35%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@teal, 0.35) 0%,
+    alpha(@teal, 0.35) 35%,
+    transparent 35%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-8 {
-  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 40%, transparent 40%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@teal, 0.35) 0%,
+    alpha(@teal, 0.35) 40%,
+    transparent 40%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-9 {
-  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 45%, transparent 45%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@teal, 0.35) 0%,
+    alpha(@teal, 0.35) 45%,
+    transparent 45%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-10 {
-  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 50%, transparent 50%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@teal, 0.35) 0%,
+    alpha(@teal, 0.35) 50%,
+    transparent 50%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-11 {
-  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 55%, transparent 55%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@teal, 0.35) 0%,
+    alpha(@teal, 0.35) 55%,
+    transparent 55%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-12 {
-  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 60%, transparent 60%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@teal, 0.35) 0%,
+    alpha(@teal, 0.35) 60%,
+    transparent 60%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-13 {
-  background-image: linear-gradient(to right, alpha(@teal, 0.35) 0%, alpha(@teal, 0.35) 65%, transparent 65%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@teal, 0.35) 0%,
+    alpha(@teal, 0.35) 65%,
+    transparent 65%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-14 {
-  background-image: linear-gradient(to right, alpha(@yellow, 0.45) 0%, alpha(@yellow, 0.45) 70%, transparent 70%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@yellow, 0.45) 0%,
+    alpha(@yellow, 0.45) 70%,
+    transparent 70%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-15 {
-  background-image: linear-gradient(to right, alpha(@yellow, 0.45) 0%, alpha(@yellow, 0.45) 75%, transparent 75%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@yellow, 0.45) 0%,
+    alpha(@yellow, 0.45) 75%,
+    transparent 75%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-16 {
-  background-image: linear-gradient(to right, alpha(@yellow, 0.45) 0%, alpha(@yellow, 0.45) 80%, transparent 80%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@yellow, 0.45) 0%,
+    alpha(@yellow, 0.45) 80%,
+    transparent 80%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-17 {
-  background-image: linear-gradient(to right, alpha(@yellow, 0.45) 0%, alpha(@yellow, 0.45) 85%, transparent 85%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@yellow, 0.45) 0%,
+    alpha(@yellow, 0.45) 85%,
+    transparent 85%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-18 {
-  background-image: linear-gradient(to right, alpha(@red, 0.45) 0%, alpha(@red, 0.45) 90%, transparent 90%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@red, 0.45) 0%,
+    alpha(@red, 0.45) 90%,
+    transparent 90%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-19 {
-  background-image: linear-gradient(to right, alpha(@red, 0.45) 0%, alpha(@red, 0.45) 95%, transparent 95%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@red, 0.45) 0%,
+    alpha(@red, 0.45) 95%,
+    transparent 95%,
+    transparent 100%
+  );
 }
 
 #custom-codex.usage-20 {
-  background-image: linear-gradient(to right, alpha(@red, 0.5) 0%, alpha(@red, 0.5) 100%, transparent 100%, transparent 100%);
+  background-image: linear-gradient(
+    to right,
+    alpha(@red, 0.5) 0%,
+    alpha(@red, 0.5) 100%,
+    transparent 100%,
+    transparent 100%
+  );
 }
 
 @keyframes codexpulse {
   to {
     box-shadow: inset 0px -4px @rosewater;
   }
-}
-
-#custom-codex.warning,
-#custom-codex.critical {
-  animation-name: codexpulse;
-  animation-duration: 0.8s;
-  animation-timing-function: steps(8);
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
 }
 
 #custom-codex:hover {

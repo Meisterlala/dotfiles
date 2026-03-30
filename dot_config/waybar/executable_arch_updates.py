@@ -130,25 +130,32 @@ def save_state(path: Path, state: dict) -> None:
     path.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def last_upgrade_epoch() -> int:
+def last_completed_upgrade_epoch() -> int:
     log_path = Path("/var/log/pacman.log")
     if not log_path.exists():
         return 0
     latest = 0
+    pending_full_upgrade = 0
     marker = "starting full system upgrade"
+    completed_marker = "[ALPM] transaction completed"
     try:
         with log_path.open("r", encoding="utf-8", errors="ignore") as fh:
             for line in fh:
-                if marker not in line or not line.startswith("[") or len(line) < 20:
+                if not line.startswith("[") or len(line) < 20:
                     continue
                 stamp = line[1:20]
                 try:
-                    ts = int(
-                        dt.datetime.strptime(stamp, "%Y-%m-%dT%H:%M:%S").timestamp()
-                    )
-                    latest = max(latest, ts)
+                    ts = int(dt.datetime.strptime(stamp, "%Y-%m-%dT%H:%M:%S").timestamp())
                 except Exception:
                     continue
+
+                if marker in line:
+                    pending_full_upgrade = ts
+                    continue
+
+                if pending_full_upgrade and completed_marker in line:
+                    latest = max(latest, pending_full_upgrade)
+                    pending_full_upgrade = 0
     except Exception:
         return 0
     return latest
@@ -221,7 +228,7 @@ def main() -> None:
     now = dt.datetime.now()
 
     # Keep a tiny state: last seen full-upgrade timestamp + snooze-until.
-    latest_upgrade = last_upgrade_epoch()
+    latest_upgrade = last_completed_upgrade_epoch()
     prev_upgrade = int(state.get("last_upgrade_epoch", 0) or 0)
     if latest_upgrade and latest_upgrade != prev_upgrade:
         state["last_upgrade_epoch"] = latest_upgrade

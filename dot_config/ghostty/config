@@ -27,7 +27,7 @@ window-decoration = none
 
 
 # Performance
-scrollback-limit = 1000000
+scrollback-limit = 5000000
 quit-after-last-window-closed = false
 linux-cgroup = single-instance
 gtk-single-instance = true

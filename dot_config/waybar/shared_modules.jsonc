@@ -53,7 +53,7 @@
     "signal": 13,
     "escape": false,
     "hide-empty-text": true,
-    "on-click": "ghostty -e paru -Syu",
+    "on-click": "ghostty -e bash -lc 'paru -Syu; echo; read -rp \"Press Enter to close...\"'",
     "on-click-right": "pkill -RTMIN+13 waybar",
   },
 
