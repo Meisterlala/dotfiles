@@ -43,6 +43,7 @@
     "return-type": "json",
     "format-icons": {
       "updates": "󱍷",
+      "normal": "󱍷",
       "warning": "󱍷",
       "critical": "󱍷",
       "updated": "󰒘",
@@ -111,8 +112,8 @@
 
   "clock": {
     "locale": "de_DE.UTF-8",
-    "format": "{:%H:%M}  ",
-    "format-alt": "{:%A %d.%m.%Y  %H:%M}  ",
+    "format": "{:%H:%M} ",
+    "format-alt": "{:%A %d.%m.%Y  %H:%M} ",
     "tooltip-format": "<tt><small>{calendar}</small></tt>",
     "calendar": {
       "mode": "year",
@@ -223,14 +224,14 @@
   },
 
   "custom/sleep": {
-    "format": "  ",
+    "format": "",
     "tooltip": "Suspend",
     "on-click": "systemctl suspend",
     "interval": 100,
   },
 
   "custom/weather": {
-    "format": " {}",
+    "format": "{}",
     "tooltip": true,
     "interval": 3600,
     "exec-if": "which wttrbar",
