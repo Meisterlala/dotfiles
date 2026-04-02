@@ -1,5 +1,9 @@
 [Unit]
 Description=Auto-generate Waybar window rewrite icons
+Wants=hyprland-session.target
+Requires=waybar.service
+After=waybar.service
+After=hyprland-session.target
 After=graphical-session.target
 
 [Service]

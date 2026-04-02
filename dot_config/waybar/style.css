@@ -112,7 +112,7 @@ box.#workspaces {
   background-color: alpha(@surface0, 0.2);
   border: 1px solid alpha(@text, 0.1);
   color: @text;
-  padding: 0px 8px;
+  padding: 0px 12px 0px 8px;
   margin: 2px 4px;
   border-radius: 8px;
 }
@@ -124,6 +124,7 @@ box.#workspaces {
 #custom-gpu:hover,
 #custom-sleep:hover,
 #custom-scrcpy-active:hover,
+#custom-k8s-alerts:hover,
 #custom-hypridle:hover,
 #custom-weight:hover,
 #wireplumber:hover,
@@ -135,15 +136,21 @@ box.#workspaces {
   box-shadow: inset 0px -4px @rosewater;
 }
 
-/* Adjust padding for specific modules to accommodate icons or text */
-#clock,
-#wireplumber,
-#custom-claude,
-#custom-updates,
-#custom-hypridle,
-#custom-codex {
-  padding: 0px 12px 0px 8px;
+#custom-weight,
+#custom-sleep {
+  padding: 0px 8px;
 }
+
+/* Adjust padding for specific modules to accommodate icons or text */
+/* #clock, */
+/* #wireplumber, */
+/* #custom-claude, */
+/* #custom-updates, */
+/* #custom-hypridle, */
+/* #custom-k8s-alerts, */
+/* #custom-codex { */
+/*   padding: 0px 12px 0px 8px; */
+/* } */
 
 #load {
   padding: 0px 8px 0px 0px;

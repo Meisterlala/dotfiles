@@ -20,7 +20,8 @@
       "class<steam>": "",
       "class<fluffychat>": "",
       "class<Element>": "󰘨",
-      "class<com.obsproject.Studio>": ""
+      "class<com.obsproject.Studio>": "",
+      "class<chromium>": ""
     }
   }
 }

@@ -1,9 +1,9 @@
 [Unit]
-Description=Run Waybar window rewrite icon autogen every 10 minutes
+Description=Run Waybar window rewrite icon autogen periodically
 
 [Timer]
 OnBootSec=3m
-OnUnitActiveSec=10m
+OnUnitActiveSec=5m
 Persistent=true
 Unit=waybar-window-rewrite-autogen.service
 
