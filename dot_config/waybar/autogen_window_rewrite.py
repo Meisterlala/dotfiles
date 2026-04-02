@@ -206,6 +206,46 @@ def extract_unknown_classes(
     return unknown
 
 
+def is_missing_icon_value(value) -> bool:
+    if value is None:
+        return True
+    if isinstance(value, str) and value.strip() == "":
+        return True
+    return False
+
+
+def extract_missing_rule_targets(
+    existing_rules: dict[str, str], windows: list[dict[str, str]]
+) -> dict[str, dict]:
+    missing: dict[str, dict] = {}
+    for rule_key, icon_value in existing_rules.items():
+        if not is_missing_icon_value(icon_value):
+            continue
+
+        class_pat, title_pat = parse_rule_key(rule_key)
+        matches: list[dict[str, str]] = []
+        for w in windows:
+            cls = w.get("class", "")
+            title = w.get("title", "")
+            if rule_matches(rule_key, cls, title):
+                matches.append(w)
+
+        missing[rule_key] = {
+            "rule": rule_key,
+            "classPattern": class_pat,
+            "titlePattern": title_pat,
+            "sampleMatches": [
+                {
+                    "class": m.get("class", ""),
+                    "title": m.get("title", ""),
+                    "workspace": m.get("workspace", ""),
+                }
+                for m in matches[:6]
+            ],
+        }
+    return missing
+
+
 def load_icon_catalog(path: Path | None) -> str:
     if not path or not path.exists():
         return ""
@@ -503,6 +543,7 @@ def call_ai(
 def build_prompt(
     existing_rules: dict[str, str],
     unknown: dict[str, dict],
+    missing_rules: dict[str, dict],
     icon_catalog_line_count: int,
     icon_catalog_attached: bool,
 ) -> str:
@@ -523,6 +564,11 @@ def build_prompt(
             }
         )
     unknown_json = json.dumps(unknown_payload, ensure_ascii=False, indent=2)
+    missing_json = json.dumps(
+        [missing_rules[k] for k in sorted(missing_rules.keys())],
+        ensure_ascii=False,
+        indent=2,
+    )
 
     catalog_header = (
         f"Attached Nerd Font icon catalog has {icon_catalog_line_count} non-empty lines. Prefer icons from the attached file."
@@ -536,11 +582,11 @@ def build_prompt(
         "",
         "Output format (strict)",
         "- Return only a JSON object, no markdown, no prose.",
-        "- Key format: `class<APP_CLASS>`",
+        "- Key format: `class<APP_CLASS>` for new classes OR exact missing rule key (eg `title<OpenCode>`).",
         "- Value format: icon name from attached catalog (prefer `nf-...` css class, e.g. `nf-md-phone_sync`).",
         "",
         "Constraints",
-        '- Add entries only for classes listed in "Unknown classes".',
+        '- Add entries only for keys listed in "Unknown classes" or "Rules with missing icons".',
         "- Do not modify, rename, or remove existing rules.",
         "- Keep style consistent with existing mappings (Nerd Font style).",
         "- Prefer app-specific icons over generic placeholders.",
@@ -560,6 +606,9 @@ def build_prompt(
             "",
             "New, unknown window(s)",
             unknown_json,
+            "",
+            "Rules with missing icons",
+            missing_json,
             "",
         ]
     )
@@ -623,7 +672,9 @@ def configure_logging(level_name: str) -> None:
     root.setLevel(level)
     root.handlers.clear()
 
-    if JournalHandler is not None:
+    in_systemd = bool(os.environ.get("INVOCATION_ID") or os.environ.get("JOURNAL_STREAM"))
+
+    if JournalHandler is not None and in_systemd:
         # Native journald logging with proper PRIORITY mapping.
         handler = JournalHandler(SYSLOG_IDENTIFIER="waybar-window-rewrite-autogen")
         handler.setLevel(logging.DEBUG)
@@ -709,8 +760,10 @@ def main() -> int:
     windows = get_open_windows()
     logging.info("Detected %d open windows", len(windows))
     unknown = extract_unknown_classes(rewrite, windows)
-    if not unknown:
-        logging.info("No unknown windows found")
+    missing_rules = extract_missing_rule_targets(rewrite, windows)
+
+    if not unknown and not missing_rules:
+        logging.info("No unknown windows or missing icon rules found")
         return 0
 
     logging.info("Found %d unknown classes", len(unknown))
@@ -726,6 +779,17 @@ def main() -> int:
             item["xwayland"],
             item["mapped"],
             item["addresses"],
+        )
+
+    logging.info("Found %d rules with missing icons", len(missing_rules))
+    for rule_key in sorted(missing_rules.keys()):
+        item = missing_rules[rule_key]
+        logging.info(
+            "Missing icon rule=%s classPattern=%s titlePattern=%s sampleMatches=%s",
+            rule_key,
+            item["classPattern"],
+            item["titlePattern"],
+            item["sampleMatches"],
         )
 
     icon_catalog_path = NERDFONT_ICON_CATALOG_PATH
@@ -756,6 +820,7 @@ def main() -> int:
     prompt = build_prompt(
         rewrite,
         unknown,
+        missing_rules,
         icon_catalog_line_count=icon_catalog_line_count,
         icon_catalog_attached=icon_catalog_attached,
     )
@@ -791,8 +856,16 @@ def main() -> int:
     for css_name, glyph in icon_by_css.items():
         if glyph not in css_by_glyph:
             css_by_glyph[glyph] = css_name
-    for cls in sorted(unknown.keys()):
-        key = f"class<{cls}>"
+    target_keys = [f"class<{cls}>" for cls in sorted(unknown.keys())] + [
+        key for key in sorted(missing_rules.keys())
+    ]
+
+    for key in target_keys:
+        cls = key
+        class_pat, title_pat = parse_rule_key(key)
+        if class_pat is not None and title_pat is None:
+            cls = class_pat
+
         icon_candidate = ai_map.get(key, "").strip()
         if not icon_candidate:
             continue
@@ -806,21 +879,22 @@ def main() -> int:
         if icon is None:
             logging.warning("Skipping mapping %s: %s", key, icon_err)
             continue
-        if has_equivalent_class_rule(rewrite, cls):
+        if class_pat is not None and title_pat is None and key not in rewrite and has_equivalent_class_rule(rewrite, cls):
             logging.info("Skipping mapping for class-equivalent existing rule: %s", key)
             continue
-        if key not in rewrite:
-            rewrite[key] = icon
-            added += 1
-            resolved_css_name = (
-                icon_candidate
-                if icon_candidate.startswith("nf-")
-                else css_by_glyph.get(icon, "?")
-            )
-            added_mappings.append((cls, icon, resolved_css_name))
-            logging.info(
-                "Adding mapping: %s -> %s (from '%s')", key, icon, icon_candidate
-            )
+        old_value = rewrite.get(key)
+        if key in rewrite and not is_missing_icon_value(old_value):
+            continue
+
+        rewrite[key] = icon
+        added += 1
+        resolved_css_name = (
+            icon_candidate if icon_candidate.startswith("nf-") else css_by_glyph.get(icon, "?")
+        )
+        added_mappings.append((cls, icon, resolved_css_name))
+        logging.info(
+            "Setting mapping: %s -> %s (from '%s')", key, icon, icon_candidate
+        )
 
     if added == 0:
         logging.warning("AI returned no valid new mappings")

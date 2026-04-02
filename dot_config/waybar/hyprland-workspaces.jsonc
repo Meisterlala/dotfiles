@@ -5,6 +5,9 @@
     "window-rewrite-default": "",
     "window-rewrite": {
       "title<.*youtube.*>": "",
+      "title<OpenCode>": "",
+      "title<OC \\|.*>": "",
+      "title<nvim .*>": "",
       "class<zen>": "",
       "class<Alacritty>": "",
       "class<com.mitchellh.ghostty>": "",
@@ -16,7 +19,7 @@
       "class<code>": "",
       "class<steam>": "",
       "class<fluffychat>": "",
-      "class<Element>": "󰘨"
-    }
-  }
+      "class<Element>": "󰘨",
+    },
+  },
 }
