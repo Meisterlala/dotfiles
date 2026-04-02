@@ -5,7 +5,6 @@ After=graphical-session.target
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/python3 %h/.config/waybar/autogen_window_rewrite.py
-Environment=OPENCODE_AI_CMD=opencode run
 Environment=OPENCODE_MODEL=
 Environment=WAYBAR_REWRITE_AUTOGEN_LOG_LEVEL=INFO
 Environment=PYTHONUNBUFFERED=1
