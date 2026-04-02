@@ -14,7 +14,7 @@
 
 window#waybar {
   color: @text;
-  background-color: alpha(@base, 0.2);
+  background-color: alpha(@base, 0.4);
   transition-duration: 0.1s;
 }
 
@@ -140,10 +140,14 @@ box.#workspaces {
 #wireplumber,
 #custom-claude,
 #custom-updates,
+#custom-hypridle,
 #custom-codex {
   padding: 0px 12px 0px 8px;
 }
 
+#load {
+  padding: 0px 8px 0px 0px;
+}
 /* Styling for the specific modules when they have the 'upload' class */
 #custom-garage-longhorn.upload,
 #custom-garage-velero.upload {

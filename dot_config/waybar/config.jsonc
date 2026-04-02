@@ -2,7 +2,10 @@
 [
   {
     // Main
-    "include": ["~/.config/waybar/shared_modules.jsonc"],
+    "include": [
+      "~/.config/waybar/shared_modules.jsonc",
+      "~/.config/waybar/hyprland-workspaces.jsonc"
+    ],
     "height": 38,
     "spacing": 4,
     "fixed-center": true,
@@ -29,7 +32,10 @@
   },
   {
     // Secondary
-    "include": ["~/.config/waybar/shared_modules.jsonc"],
+    "include": [
+      "~/.config/waybar/shared_modules.jsonc",
+      "~/.config/waybar/hyprland-workspaces.jsonc"
+    ],
     "height": 38,
     "spacing": 4,
     "fixed-center": true,
@@ -42,7 +48,6 @@
     "modules-center": ["hyprland/window"],
     "modules-right": [
       "load",
-      "custom/weather",
       "custom/hypridle",
       "custom/gpu",
       "cpu",

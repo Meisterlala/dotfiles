@@ -13,29 +13,9 @@
     "icon": false,
     "rewrite": {
       "(.*) — Zen Browser": "$1",
-      "class<com.mitchellh.ghostty>": "sdf",
+      "class<com.mitchellh.ghostty>": " Ghostty",
     },
     "separate-outputs": true,
-  },
-
-  "hyprland/workspaces": {
-    "format": "{windows}",
-    "format-window-separator": " ",
-    "window-rewrite-default": "",
-    "window-rewrite": {
-      "title<.*youtube.*>": "",
-      "class<zen>": "",
-      "class<Alacritty>": "",
-      "class<com.mitchellh.ghostty>": "",
-      "class<Discord>": "",
-      "class<Spotify>": "",
-      "class<org.gnome.Nautilus>": "",
-      "class<org.kde.dolphin>": "",
-      "class<superProductivity>": "",
-      "class<code>": "",
-      "class<steam>": "",
-      "class<com.obsproject.Studio>": "",
-    },
   },
 
   "custom/updates": {
@@ -246,7 +226,7 @@
   },
 
   "custom/hypridle": {
-    "format": "{:>2} 󰒲",
+    "format": "{} 󰒲",
     "hide-empty-text": true,
     "return-type": "json",
     "exec": "~/.config/waybar/idle_inhibit.py",
