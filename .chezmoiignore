@@ -21,4 +21,5 @@ Documents
 !.config/oh-my-posh.yaml
 
 # pycache
-**/__pycache__**
+__pycache__/
+*.pyc

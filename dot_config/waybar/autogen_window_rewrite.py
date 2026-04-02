@@ -13,6 +13,11 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+try:
+    from systemd.journal import JournalHandler
+except Exception:
+    JournalHandler = None
+
 NERDFONT_GLYPHS_URL = (
     "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/glyphnames.json"
 )
@@ -603,6 +608,43 @@ def send_success_notification(added_mappings: list[tuple[str, str, str]]) -> Non
     )
 
 
+class MaxLevelFilter(logging.Filter):
+    def __init__(self, max_level: int):
+        super().__init__()
+        self.max_level = max_level
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return record.levelno <= self.max_level
+
+
+def configure_logging(level_name: str) -> None:
+    level = getattr(logging, level_name.upper(), logging.INFO)
+    root = logging.getLogger()
+    root.setLevel(level)
+    root.handlers.clear()
+
+    if JournalHandler is not None:
+        # Native journald logging with proper PRIORITY mapping.
+        handler = JournalHandler(SYSLOG_IDENTIFIER="waybar-window-rewrite-autogen")
+        handler.setLevel(logging.DEBUG)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+        root.addHandler(handler)
+    else:
+        formatter = logging.Formatter("%(levelname)s %(message)s")
+
+        stdout_handler = logging.StreamHandler(sys.stdout)
+        stdout_handler.setLevel(logging.DEBUG)
+        stdout_handler.addFilter(MaxLevelFilter(logging.INFO))
+        stdout_handler.setFormatter(formatter)
+
+        stderr_handler = logging.StreamHandler(sys.stderr)
+        stderr_handler.setLevel(logging.WARNING)
+        stderr_handler.setFormatter(formatter)
+
+        root.addHandler(stdout_handler)
+        root.addHandler(stderr_handler)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Auto-generate waybar window-rewrite icons"
@@ -649,10 +691,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=getattr(logging, args.log_level.upper(), logging.INFO),
-        format="%(asctime)s %(levelname)s %(message)s",
-    )
+    configure_logging(args.log_level)
 
     config_target_path = Path(args.config).expanduser()
     config_path, chezmoi_apply_path = resolve_config_path_for_chezmoi(
