@@ -19,3 +19,6 @@ Documents
 
 # Oh-my-posh theme
 !.config/oh-my-posh.yaml
+
+# pycache
+**/__pycache__**
