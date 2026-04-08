@@ -187,12 +187,19 @@ box.#workspaces {
   box-shadow: inset 0px -4px @rosewater;
 }
 
-#custom-k8s-alerts.warning {
-  color: shade(@yellow, 0.6);
+#custom-k8s-alerts.critical {
+  color: @red;
+  animation: k8s-critical-pulse 1s steps(2, start) infinite;
 }
 
-#custom-k8s-alerts.critical {
-  background-color: alpha(shade(@red, 0.6), 0.8);
+#custom-k8s-alerts.error {
+  color: shade(@red, 0.7);
+}
+
+@keyframes k8s-critical-pulse {
+  50% {
+    opacity: 0.35;
+  }
 }
 
 #custom-weight {

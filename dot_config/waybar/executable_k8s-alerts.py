@@ -245,9 +245,12 @@ def main() -> None:
         if a.get("labels", {}).get("alertname", "") not in ("Watchdog", "InfoInhibitor")
     ]
 
+    severities = {str(a.get("labels", {}).get("severity", "")).lower() for a in visible}
     alert_class = "warning"
-    if any(str(a.get("labels", {}).get("severity", "")).lower() in ("critical", "error") for a in visible):
+    if "critical" in severities:
         alert_class = "critical"
+    elif "error" in severities:
+        alert_class = "error"
 
     visible_sorted = sorted(
         visible,
@@ -266,7 +269,10 @@ def main() -> None:
         return
 
     if visible:
-        emit(f"{ICON_ALERT} {len(visible)}", tooltip, alert_class)
+        icon = ICON_ALERT
+        if alert_class == "critical":
+            icon = ICON_ERROR
+        emit(f"{icon} {len(visible)}", tooltip, alert_class)
         return
 
     emit("", "", "ok")
