@@ -14,7 +14,69 @@
       }
     }
   },
+
   "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama",
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "models": {
+        "gemma4:e2b": {
+          "name": "Gemma 4 E2B",
+          "tool_call": true,
+          "reasoning": false,
+          "limit": {
+            "context": 128000,
+            "output": 8192
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        },
+        "gemma4:e4b": {
+          "name": "Gemma 4 E4B",
+          "tool_call": true,
+          "reasoning": false,
+          "limit": {
+            "context": 128000,
+            "output": 8192
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        },
+        "gemma4:26b": {
+          "name": "Gemma 4 26B",
+          "tool_call": true,
+          "reasoning": false,
+          "limit": {
+            "context": 256000,
+            "output": 8192
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        },
+        "gemma4:31b": {
+          "name": "Gemma 4 31B",
+          "tool_call": true,
+          "reasoning": false,
+          "limit": {
+            "context": 256000,
+            "output": 8192
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        }
+      }
+    },
     "cerebro": {
       "npm": "@ai-sdk/openai-compatible",
       "name": "Cerebro Arbeit",

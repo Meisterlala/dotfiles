@@ -31,7 +31,11 @@
       "class<steam_app_686060>": "",
       "class<org.mozilla.Thunderbird>": "",
       "class<xdg-desktop-portal-gtk>": "",
-      "class<localsend>": ""
+      "class<localsend>": "",
+      "class<org.kde.keepsecret>": "",
+      "class<com.gabm.satty>": "",
+      "class<com.saivert.pwvucontrol>": "",
+      "class<org.pipewire.Helvum>": ""
     }
   }
 }
