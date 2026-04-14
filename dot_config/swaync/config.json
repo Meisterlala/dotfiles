@@ -60,18 +60,18 @@
     "buttons-grid": {
       "actions": [
         {
-          "label": "󰒲 Inhibit Sleep",
+          "label": "󰒲  Inhibit Sleep",
           "type": "toggle",
           "active": false,
-          "command": "sh -c '[[ $SWAYNC_TOGGLE_STATE == true ]] && ~/.config/swaync/toggle-hypridle-inhibit.sh on || ~/.config/swaync/toggle-hypridle-inhibit.sh off'",
-          "update-command": "sh -c '[[ -f /tmp/hypridle-inhibit.lock ]] && echo true || echo false'"
+          "command": "~/.config/swaync/toggle-hypridle-inhibit.sh swaync",
+          "update-command": "~/.config/swaync/toggle-hypridle-inhibit.sh swaync-state"
         },
         {
-          "label": "󰍹 2nd Monitor Off",
+          "label": "󰍹  Disable 2nd Monitor",
           "type": "toggle",
           "active": false,
-          "command": "sh -c '[[ $SWAYNC_TOGGLE_STATE == true ]] && ~/.config/swaync/toggle-second-monitor.sh disable || ~/.config/swaync/toggle-second-monitor.sh enable'",
-          "update-command": "sh -c '[[ \"$(~/.config/swaync/toggle-second-monitor.sh status)\" == disabled ]] && echo true || echo false'"
+          "command": "~/.config/swaync/toggle-second-monitor.sh swaync",
+          "update-command": "~/.config/swaync/toggle-second-monitor.sh swaync-state"
         }
       ]
     }
