@@ -231,7 +231,13 @@
       "xargs *": "allow",
       "yq *": "allow",
       "nslookup *": "allow",
-      "getent *": "allow"
+      "getent *": "allow",
+
+      "gofmt *": "allow",
+      "go test *": "allow",
+      "go mod tidy": "allow",
+
+      "pnpm *": "allow"
     }
   }
 }

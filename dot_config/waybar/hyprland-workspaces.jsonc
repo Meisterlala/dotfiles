@@ -35,7 +35,13 @@
       "class<org.kde.keepsecret>": "",
       "class<com.gabm.satty>": "",
       "class<com.saivert.pwvucontrol>": "",
-      "class<org.pipewire.Helvum>": ""
+      "class<org.pipewire.Helvum>": "",
+      "class<wev>": "",
+      "class<ffxiv_dx11.exe>": "",
+      "class<org.gnome.seahorse.Application>": "",
+      "class<local.dailyplan.window>": "",
+      "class<zenity>": "",
+      "class<habits-desktop>": ""
     }
   }
 }

@@ -4,7 +4,7 @@
     // Main
     "include": [
       "~/.config/waybar/shared_modules.jsonc",
-      "~/.config/waybar/hyprland-workspaces.jsonc"
+      "~/.config/waybar/hyprland-workspaces.jsonc",
     ],
     "height": 38,
     "spacing": 4,
@@ -26,7 +26,9 @@
       "custom/updates",
       //"custom/claude",
       "custom/codex",
+      "custom/habits",
       "wireplumber",
+      "custom/daily-plan",
       "clock",
     ],
   },
@@ -34,7 +36,7 @@
     // Secondary
     "include": [
       "~/.config/waybar/shared_modules.jsonc",
-      "~/.config/waybar/hyprland-workspaces.jsonc"
+      "~/.config/waybar/hyprland-workspaces.jsonc",
     ],
     "height": 38,
     "spacing": 4,

@@ -101,8 +101,10 @@ box.#workspaces {
 #custom-systemd-failed-units,
 #custom-k8s-alerts,
 #custom-hypridle,
+#custom-habits,
 #custom-weight,
 #custom-sleep,
+#custom-daily-plan,
 #tray,
 #wireplumber,
 #cpu,
@@ -123,9 +125,11 @@ box.#workspaces {
 #custom-garage-velero:hover,
 #custom-gpu:hover,
 #custom-sleep:hover,
+#custom-daily-plan:hover,
 #custom-scrcpy-active:hover,
 #custom-k8s-alerts:hover,
 #custom-hypridle:hover,
+#custom-habits:hover,
 #custom-weight:hover,
 #wireplumber:hover,
 #gamemode:hover,
@@ -212,6 +216,21 @@ box.#workspaces {
 
 #custom-weight.met {
   color: @green;
+}
+
+#custom-weight.trend-down {
+  background-color: alpha(@green, 0.14);
+  border-color: alpha(@green, 0.35);
+}
+
+#custom-weight.trend-up {
+  background-color: alpha(@red, 0.14);
+  border-color: alpha(@red, 0.35);
+}
+
+#custom-weight.trend-flat {
+  background-color: alpha(@yellow, 0.12);
+  border-color: alpha(@yellow, 0.3);
 }
 
 #clock {
@@ -470,4 +489,48 @@ tooltip {
   background-color: @surface1;
   border: 3px solid @rosewater;
   border-radius: 8px;
+}
+
+#custom-daily-plan {
+  padding: 0 10px;
+}
+
+#custom-habits {
+  padding: 0 10px;
+}
+
+#custom-habits.pending {
+  background-color: shade(alpha(@red, 0.5), 0.4);
+}
+
+#custom-habits.active {
+  background-color: shade(alpha(@teal, 0.5), 0.7);
+}
+
+#custom-habits.done {
+  background-color: shade(alpha(@green, 0.5), 0.6);
+}
+
+#custom-habits.empty {
+  background-color: shade(alpha(@surface0, 0.5), 0.5);
+}
+
+#custom-habits.error {
+  background-color: shade(alpha(@red, 0.5), 0.5);
+}
+
+#custom-daily-plan.pending {
+  background-color: shade(alpha(@red, 0.5), 0.4);
+}
+#custom-daily-plan.active {
+  background-color: shade(alpha(@teal, 0.5), 0.7);
+}
+#custom-daily-plan.done {
+  background-color: shade(alpha(@green, 0.5), 0.6);
+}
+#custom-daily-plan.empty {
+  background-color: shade(alpha(@surface0, 0.5), 0.5);
+}
+#custom-daily-plan.error {
+  background-color: shade(alpha(@red, 0.5), 0.5);
 }
