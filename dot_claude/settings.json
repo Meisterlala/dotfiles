@@ -117,15 +117,12 @@
       "Bash(nslookup *)",
       "Bash(getent *)"
     ],
-    "deny": [
-      "Bash(sudo*)"
-    ],
-    "ask": [
-      "Bash(flux reconcile *)"
-    ]
+    "deny": ["Bash(sudo*)"],
+    "ask": ["Bash(flux reconcile *)"]
   },
   "spinnerTipsEnabled": false,
   "autoConnectToIde": true,
   "effortLevel": "medium",
-  "cleanupPeriodDays": 999999999
+  "cleanupPeriodDays": 999999999,
+  "autoconnectToIde": true
 }
