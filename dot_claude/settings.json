@@ -145,7 +145,25 @@
       "Bash(ssh baldr *)",
       "Bash(ssh odin *)",
       "Bash(ssh raspberry-pi *)",
-      "Bash(ssh raspberrypi *)"
+      "Bash(ssh raspberrypi *)",
+      "Bash(ping *)",
+      "Bash(ss *)",
+      "Bash(ip *)",
+      "Bash(ps *)",
+      "Bash(top *)",
+      "Bash(htop)",
+      "Bash(stat *)",
+      "Bash(file *)",
+      "Bash(realpath *)",
+      "Bash(kubectl port-forward *)",
+      "Bash(kubectl -n * port-forward *)",
+      "Bash(kubectl --namespace * port-forward *)",
+      "Bash(gzip *)",
+      "Bash(gunzip *)",
+      "Bash(zstd *)",
+      "Bash(unzstd *)",
+      "Bash(cut *)",
+      "Bash(tr *)"
     ],
     "deny": [
       "Bash(sudo*)"
