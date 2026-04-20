@@ -136,10 +136,23 @@
       "Bash(echo *)",
       "Bash(./scripts/*)",
       "Bash(nslookup *)",
-      "Bash(getent *)"
+      "Bash(getent *)",
+      "Bash(gofmt *)",
+      "Bash(go test *)",
+      "Bash(go mod tidy)",
+      "Bash(pnpm *)",
+      "Bash(ssh ran *)",
+      "Bash(ssh baldr *)",
+      "Bash(ssh odin *)",
+      "Bash(ssh raspberry-pi *)",
+      "Bash(ssh raspberrypi *)"
     ],
-    "deny": ["Bash(sudo*)"],
-    "ask": ["Bash(flux reconcile *)"]
+    "deny": [
+      "Bash(sudo*)"
+    ],
+    "ask": [
+      "Bash(flux reconcile *)"
+    ]
   },
   "spinnerTipsEnabled": false,
   "autoConnectToIde": true,
