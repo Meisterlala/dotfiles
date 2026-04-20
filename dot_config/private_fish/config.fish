@@ -8,7 +8,7 @@ abbr -a cc "claude"
 abbr -a oc "jai -j opencode opencode"
 abbr -a co "codex"
 abbr -a v "nvim"
-abbr -a watch "watch -c -n 1"
+abbr -a watch "watch -c -n 1 --"
 
 # Initialize zoxide if installed
 if command -q zoxide
