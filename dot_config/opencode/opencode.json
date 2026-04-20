@@ -159,6 +159,7 @@
       "awk *": "allow",
       "cat *": "allow",
       "cd *": "allow",
+      "command -v *": "allow",
       "cut *": "allow",
       "curl *": "allow",
       "date *": "allow",
@@ -196,7 +197,9 @@
       "hubble *": "allow",
 
       "ip *": "allow",
+      "iostat *": "allow",
       "jq *": "allow",
+      "journalctl *": "allow",
 
       "kubectl -n * api-resources *": "allow",
       "kubectl -n * auth can-i *": "allow",
@@ -235,13 +238,26 @@
       "kustomize build *": "allow",
 
       "ls *": "allow",
+      "lsblk *": "allow",
+      "lsof *": "allow",
       "mkdir *": "allow",
 
       "nslookup *": "allow",
+      "pacman -Q *": "allow",
+      "pacman -Qi *": "allow",
+      "pacman -Ql *": "allow",
       "ping *": "allow",
+      "pgrep *": "allow",
+      "pstree *": "allow",
       "pwsh -NoProfile ./scripts/validate.ps1": "allow",
 
       "pnpm *": "allow",
+      "podman images *": "allow",
+      "podman info *": "allow",
+      "podman inspect *": "allow",
+      "podman logs *": "allow",
+      "podman ps *": "allow",
+      "podman stats --no-stream *": "allow",
       "ps *": "allow",
 
       "realpath *": "allow",
@@ -251,6 +267,17 @@
       "sort *": "allow",
       "ss *": "allow",
       "stat *": "allow",
+      "systemctl --user list-sockets *": "allow",
+      "systemctl --user list-timers *": "allow",
+      "systemctl --user list-units *": "allow",
+      "systemctl --user show *": "allow",
+      "systemctl --user status *": "allow",
+      "systemctl list-sockets *": "allow",
+      "systemctl list-timers *": "allow",
+      "systemctl list-units *": "allow",
+      "systemctl show *": "allow",
+      "systemctl status *": "allow",
+      "systemd-analyze *": "allow",
       "ssh baldr *": "allow",
       "ssh odin *": "allow",
       "ssh ran *": "allow",
@@ -263,16 +290,35 @@
       "touch *": "allow",
       "tr *": "allow",
       "tree *": "allow",
+      "type *": "allow",
 
       "uniq *": "allow",
+      "uname *": "allow",
       "unzip *": "allow",
       "unzstd *": "allow",
 
       "wc *": "allow",
+      "whereis *": "allow",
+      "which *": "allow",
 
       "xargs *": "allow",
 
       "yq *": "allow",
+
+      "blkid *": "allow",
+      "btop": "allow",
+      "df *": "allow",
+      "docker images *": "allow",
+      "docker info *": "allow",
+      "docker inspect *": "allow",
+      "docker logs *": "allow",
+      "docker ps *": "allow",
+      "docker stats --no-stream *": "allow",
+      "flatpak info *": "allow",
+      "flatpak list *": "allow",
+      "free *": "allow",
+      "host *": "allow",
+      "vmstat *": "allow",
 
       "zstd *": "allow"
     }
