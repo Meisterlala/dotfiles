@@ -237,7 +237,12 @@
       "go test *": "allow",
       "go mod tidy": "allow",
 
-      "pnpm *": "allow"
+      "pnpm *": "allow",
+      "ssh ran *": "allow",
+      "ssh baldr *": "allow",
+      "ssh odin *": "allow",
+      "ssh raspberry-pi *": "allow",
+      "ssh raspberrypi *": "allow"
     }
   }
 }
