@@ -41,7 +41,11 @@
       "class<org.gnome.seahorse.Application>": "",
       "class<local.dailyplan.window>": "",
       "class<zenity>": "",
-      "class<habits-desktop>": ""
+      "class<habits-desktop>": "",
+      "class<google-chrome>": "",
+      "class<org.kde.konsole>": "",
+      "class<electron>": "",
+      "class<org.coolercontrol.CoolerControl>": "󰈐"
     }
   }
 }

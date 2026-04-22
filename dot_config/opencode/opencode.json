@@ -117,16 +117,28 @@
       "type": "local",
       "command": ["npx", "@browsermcp/mcp@latest"]
     },
+    "chrome-devtools": {
+      "enabled": false,
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "chrome-devtools-mcp@latest",
+        "--no-usage-statistics"
+      ]
+    },
     "livekit-docs": {
       "enabled": false,
       "type": "remote",
       "url": "https://docs.livekit.io/mcp"
     },
     "kubernetes": {
+      "enabled": false,
       "type": "local",
       "command": ["npx", "-y", "kubernetes-mcp-server@latest"]
     },
     "github": {
+      "enabled": true,
       "type": "remote",
       "url": "https://api.githubcopilot.com/mcp/",
       "oauth": false,
@@ -150,9 +162,14 @@
       "~/.config/nvim/tmp/**": "allow"
     },
 
+    "skill": {
+      "*": "allow"
+    },
+
     "bash": {
       "*": "ask",
       "sudo*": "deny",
+      "./*": "allow",
 
       "./scripts/*": "allow",
 
@@ -250,6 +267,7 @@
       "pgrep *": "allow",
       "pstree *": "allow",
       "pwsh -NoProfile ./scripts/validate.ps1": "allow",
+      "python3 /home/misti/.config/habits-server/check_config_schema.py": "allow",
 
       "pnpm *": "allow",
       "podman images *": "allow",

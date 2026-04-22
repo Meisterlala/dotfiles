@@ -229,7 +229,11 @@
       "Bash(flatpak list *)",
       "Bash(free *)",
       "Bash(host *)",
-      "Bash(vmstat *)"
+      "Bash(vmstat *)",
+      "Bash(systemctl --user *)",
+      "Bash(docker *)",
+      "Bash(python3 /home/misti/.config/habits-server/check_config_schema.py)",
+      "Bash(./*)"
     ],
     "deny": [
       "Bash(sudo*)"
