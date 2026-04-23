@@ -46,7 +46,8 @@
       "class<org.kde.konsole>": "",
       "class<electron>": "",
       "class<org.coolercontrol.CoolerControl>": "󰈐",
-      "class<habits>": ""
+      "class<habits>": "",
+      "class<Emulator>": ""
     }
   }
 }
