@@ -45,7 +45,8 @@
       "class<google-chrome>": "",
       "class<org.kde.konsole>": "",
       "class<electron>": "",
-      "class<org.coolercontrol.CoolerControl>": "󰈐"
+      "class<org.coolercontrol.CoolerControl>": "󰈐",
+      "class<habits>": ""
     }
   }
 }
