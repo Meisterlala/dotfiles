@@ -45,6 +45,16 @@
     "interval": 2,
   },
 
+  "custom/fritz-traffic": {
+    "return-type": "json",
+    "exec": "~/.config/waybar/fritz_traffic.py",
+    "interval": 10,
+    "tooltip": true,
+    "hide-empty-text": true,
+    "signal": 14,
+    "on-click": "pkill -RTMIN+14 waybar",
+  },
+
   "custom/garage-longhorn": {
     "exec": "~/.config/waybar/garage-status.sh longhorn-backup L",
     "interval": 10,
@@ -203,11 +213,11 @@
 
   "custom/habits": {
     "return-type": "json",
-    "exec": "/home/misti/source/habits/waybar/habits_summary.py",
+    "exec": "/home/misti/.local/bin/habits-waybar",
     "format": "{text}",
     "interval": 30,
     "tooltip": true,
-    "on-click": "/home/misti/source/habits/waybar/habits_summary.py --toggle",
+    "on-click": "/home/misti/.local/bin/habits-waybar --toggle",
     "escape": false,
   },
 

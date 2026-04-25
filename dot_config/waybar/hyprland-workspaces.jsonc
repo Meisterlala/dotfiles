@@ -47,7 +47,10 @@
       "class<electron>": "",
       "class<org.coolercontrol.CoolerControl>": "󰈐",
       "class<habits>": "",
-      "class<Emulator>": ""
+      "class<Emulator>": "",
+      "class<jetbrains-studio>": "",
+      "class<btrfs-assistant>": "",
+      "class<scrcpy>": ""
     }
   }
 }

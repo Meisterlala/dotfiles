@@ -98,6 +98,7 @@ box.#workspaces {
 #custom-weather,
 #custom-gpu,
 #custom-scrcpy-active,
+#custom-fritz-traffic,
 #custom-systemd-failed-units,
 #custom-k8s-alerts,
 #custom-hypridle,
@@ -127,6 +128,7 @@ box.#workspaces {
 #custom-sleep:hover,
 #custom-daily-plan:hover,
 #custom-scrcpy-active:hover,
+#custom-fritz-traffic:hover,
 #custom-k8s-alerts:hover,
 #custom-hypridle:hover,
 #custom-habits:hover,
@@ -189,6 +191,21 @@ box.#workspaces {
 
 #custom-systemd-failed-units:hover {
   box-shadow: inset 0px -4px @rosewater;
+}
+
+#custom-fritz-traffic.warning {
+  color: @yellow;
+}
+
+#custom-fritz-traffic.critical,
+#custom-fritz-traffic.error {
+  color: @crust;
+  background-color: @red;
+}
+
+#custom-fritz-traffic.error {
+  background-color: alpha(@surface0, 0.2);
+  color: @overlay1;
 }
 
 #custom-k8s-alerts.critical {

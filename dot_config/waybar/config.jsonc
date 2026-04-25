@@ -20,6 +20,7 @@
       "custom/notification",
       "privacy",
       "tray",
+      "custom/fritz-traffic",
       "custom/systemd-failed-units",
       "gamemode",
       "custom/scrcpy-active",
