@@ -212,12 +212,12 @@ def format_rate(mbit: float) -> str:
 
 
 def tooltip(config: Config, traffic: Traffic) -> str:
-    down_ratio = traffic.down_ratio(config) * 100
-    up_ratio = traffic.up_ratio(config) * 100
     return (
-        "FRITZ!Box traffic\n"
-        f"Down: {traffic.down_mbit:.1f} / {config.down_limit_mbit:.0f} Mbit/s ({down_ratio:.0f}%)\n"
-        f"Up:   {traffic.up_mbit:.1f} / {config.up_limit_mbit:.0f} Mbit/s ({up_ratio:.0f}%)"
+        "<span foreground='#89b4fa'><b>FRITZ!Box traffic</b></span>\n"
+        "<tt>"
+        f"<span foreground='#74c7ec'>Down</span> {traffic.down_mbit:6.1f} / {config.down_limit_mbit:3.0f} Mbit/s\n"
+        f"<span foreground='#f9e2af'>Up</span>   {traffic.up_mbit:6.1f} / {config.up_limit_mbit:3.0f} Mbit/s"
+        "</tt>"
     )
 
 

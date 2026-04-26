@@ -199,12 +199,10 @@ box.#workspaces {
 
 #custom-fritz-traffic.critical,
 #custom-fritz-traffic.error {
-  color: @crust;
-  background-color: @red;
+  color: @red;
 }
 
 #custom-fritz-traffic.error {
-  background-color: alpha(@surface0, 0.2);
   color: @overlay1;
 }
 

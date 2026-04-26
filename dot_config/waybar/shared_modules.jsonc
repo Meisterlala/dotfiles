@@ -200,16 +200,16 @@
     "escape": true,
   },
 
-  "custom/daily-plan": {
-    "return-type": "json",
-    "exec": "/home/misti/opencode/4week/waybar_daily_plan.py",
-    "interval": 30,
-    "signal": 12,
-    "format": "{text}",
-    "tooltip": true,
-    "on-click": "/home/misti/opencode/4week/daily_plan_window.py",
-    "escape": false,
-  },
+  // "custom/daily-plan": {
+  //   "return-type": "json",
+  //   "exec": "/home/misti/opencode/4week/waybar_daily_plan.py",
+  //   "interval": 30,
+  //   "signal": 12,
+  //   "format": "{text}",
+  //   "tooltip": true,
+  //   "on-click": "/home/misti/opencode/4week/daily_plan_window.py",
+  //   "escape": false,
+  // },
 
   "custom/habits": {
     "return-type": "json",
