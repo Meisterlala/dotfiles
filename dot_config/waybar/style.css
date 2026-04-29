@@ -92,6 +92,7 @@ box.#workspaces {
 
 #custom-claude,
 #custom-codex,
+#custom-garage-kopia,
 #custom-garage-longhorn,
 #custom-garage-velero,
 #custom-updates,
@@ -122,6 +123,7 @@ box.#workspaces {
 
 #custom-weather:hover,
 #custom-updates:hover,
+#custom-garage-kopia:hover,
 #custom-garage-longhorn:hover,
 #custom-garage-velero:hover,
 #custom-gpu:hover,
@@ -162,12 +164,14 @@ box.#workspaces {
   padding: 0px 8px 0px 0px;
 }
 /* Styling for the specific modules when they have the 'upload' class */
+#custom-garage-kopia.upload,
 #custom-garage-longhorn.upload,
 #custom-garage-velero.upload {
   background-color: alpha(@green, 0.5);
 }
 
 /* Styling for the specific modules when they have the 'delete' class */
+#custom-garage-kopia.delete,
 #custom-garage-longhorn.delete,
 #custom-garage-velero.delete {
   background-color: alpha(@red, 0.5);

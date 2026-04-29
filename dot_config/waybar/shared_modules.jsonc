@@ -69,6 +69,13 @@
     "hide-empty-text": true,
   },
 
+  "custom/garage-kopia": {
+    "exec": "~/.config/waybar/garage-status.sh kopia K",
+    "interval": 10,
+    "return-type": "json",
+    "hide-empty-text": true,
+  },
+
   "tray": {
     "icon-size": 20,
     "spacing": 10,

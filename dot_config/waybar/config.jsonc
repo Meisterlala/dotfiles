@@ -60,6 +60,7 @@
       "custom/sleep",
       "custom/garage-longhorn",
       "custom/garage-velero",
+      "custom/garage-kopia",
       "clock",
     ],
   },

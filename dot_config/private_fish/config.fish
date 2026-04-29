@@ -37,6 +37,8 @@ set -g fish_greeting ''
 
 # Set up fzf
 set -g fzf_history_opts --with-nth=4..
+# And load its key bindings
+fzf_key_bindings
 
 # Set up tide prompt
 set -g tide_right_prompt_items status cmd_duration context jobs direnv bun node python rustc java php pulumi ruby go gcloud distrobox toolbox terraform aws nix_shell crystal elixir zig shlvl

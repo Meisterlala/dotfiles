@@ -1,61 +1,83 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-BUCKET=$1
-ICON=$2
-STATE_FILE="/tmp/garage_bucket_${BUCKET}.count"
+BUCKET=${1:?bucket required}
+ICON=${2:?icon required}
+STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/waybar-garage"
+STATE_FILE="$STATE_DIR/${BUCKET}.count"
 
-# 1. Fetch bucket info
+json_escape() {
+    local value=${1//\\/\\\\}
+    value=${value//"/\\"}
+    value=${value//$'\n'/\\n}
+    value=${value//$'\r'/\\r}
+    value=${value//$'\t'/\\t}
+    printf '%s' "$value"
+}
+
+trim_leading() {
+    local value=$1
+    value=${value#"${value%%[![:space:]]*}"}
+    printf '%s' "$value"
+}
+
+mkdir -p "$STATE_DIR"
+
 INFO=$(garage bucket info "$BUCKET" 2>/dev/null || true)
-
-if [ -z "$INFO" ]; then
-    echo '{"text": "", "tooltip": "Bucket not found"}'
+if [[ -z "$INFO" ]]; then
+    printf '{"text":"","tooltip":"Bucket not found"}\n'
     exit 0
 fi
 
-# 2. Extract Object count and Size
-OBJECTS=$(echo "$INFO" | grep "Objects:" | awk '{print $2}')
-SIZE=$(echo "$INFO" | grep "Size:" | sed -E 's/^Size:[[:space:]]*//')
+OBJECTS=""
+SIZE=""
+while IFS= read -r line; do
+    case "$line" in
+        Objects:*)
+            OBJECTS=${line#Objects:}
+            OBJECTS=$(trim_leading "$OBJECTS")
+            ;;
+        Size:*)
+            SIZE=${line#Size:}
+            SIZE=$(trim_leading "$SIZE")
+            ;;
+    esac
+done <<< "$INFO"
 
-# 3. Handle State (Previous Count)
-if [ -f "$STATE_FILE" ]; then
-    PREV_OBJECTS=$(cat "$STATE_FILE")
-else
-    # First run: set to current to avoid a massive initial spike/delta
-    PREV_OBJECTS=$OBJECTS
+if [[ ! "$OBJECTS" =~ ^[0-9]+$ ]]; then
+    printf '{"text":"","tooltip":"Failed to parse bucket stats"}\n'
+    exit 0
 fi
 
-# Save current count immediately for the next run
-echo "$OBJECTS" > "$STATE_FILE"
+# First run uses the current count so the widget doesn't flash a bogus delta.
+PREV_OBJECTS=$OBJECTS
+if [[ -f "$STATE_FILE" ]]; then
+    read -r PREV_OBJECTS < "$STATE_FILE" || PREV_OBJECTS=$OBJECTS
+    [[ "$PREV_OBJECTS" =~ ^[0-9]+$ ]] || PREV_OBJECTS=$OBJECTS
+fi
 
-# 4. Calculate Delta
+printf '%s\n' "$OBJECTS" > "$STATE_FILE"
 DELTA=$((OBJECTS - PREV_OBJECTS))
 
-# 5. Display Logic
-# Show if objects have changed (Positive OR Negative)
-if [[ "$DELTA" -ne 0 ]]; then
-
-    # Determine formatting based on direction
-    if [[ "$DELTA" -gt 0 ]]; then
-        CHANGE_TEXT="+$DELTA"
-        ACTIVITY="Uploading"
-        CLASS="upload"
-    else
-        CHANGE_TEXT="$DELTA" # Delta already contains the "-" sign
-        ACTIVITY="Deleting"
-        CLASS="delete"
-    fi
-    
-    # Construct Tooltip
-    TOOLTIP="Bucket: $BUCKET\nActivity: $ACTIVITY\nChange: $CHANGE_TEXT objects\nTotal Objects: $OBJECTS\nSize: $SIZE"
-    
-    # Escape newlines and quotes for JSON
-    TOOLTIP_ESCAPED=$(echo -e "$TOOLTIP" | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g')
-    
-    # Output JSON with "class" for styling (upload vs delete)
-    echo "{\"text\": \"$ICON\", \"tooltip\": \"$TOOLTIP_ESCAPED\", \"class\": \"$CLASS\"}"
-
-else
-    # Return empty JSON to hide the module when inactive
-    echo '{"text": "", "tooltip": ""}'
+if (( DELTA == 0 )); then
+    printf '{"text":"","tooltip":""}\n'
+    exit 0
 fi
+
+if (( DELTA > 0 )); then
+    CHANGE_TEXT="+$DELTA"
+    ACTIVITY="Uploading"
+    CLASS="upload"
+else
+    CHANGE_TEXT="$DELTA"
+    ACTIVITY="Deleting"
+    CLASS="delete"
+fi
+
+TOOLTIP=$(printf 'Bucket: %s\nActivity: %s\nChange: %s objects\nTotal Objects: %s\nSize: %s' \
+    "$BUCKET" "$ACTIVITY" "$CHANGE_TEXT" "$OBJECTS" "$SIZE")
+
+printf '{"text":"%s","tooltip":"%s","class":"%s"}\n' \
+    "$(json_escape "$ICON")" \
+    "$(json_escape "$TOOLTIP")" \
+    "$(json_escape "$CLASS")"
