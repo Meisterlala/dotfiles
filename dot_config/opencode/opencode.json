@@ -4,6 +4,8 @@
 
   "small_model": "github-copilot/gpt-4o",
 
+  "lsp": true,
+
   "agent": {
     "commit-review": {
       "description": "Review the current staged git changes. Provide feedback on code quality, style, and potential issues.",

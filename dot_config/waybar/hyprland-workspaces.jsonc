@@ -50,7 +50,8 @@
       "class<Emulator>": "",
       "class<jetbrains-studio>": "",
       "class<btrfs-assistant>": "",
-      "class<scrcpy>": ""
+      "class<scrcpy>": "",
+      "class<com.misti.NvidiaDriverRestart>": "󱄌"
     }
   }
 }

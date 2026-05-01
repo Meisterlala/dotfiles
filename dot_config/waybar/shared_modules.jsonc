@@ -38,6 +38,15 @@
     "on-click-right": "pkill -RTMIN+13 waybar",
   },
 
+  "custom/nvidia-driver": {
+    "return-type": "json",
+    "exec": "~/.config/waybar/nvidia-driver.py",
+    "interval": 60,
+    "tooltip": true,
+    "escape": false,
+    "hide-empty-text": true,
+  },
+
   "custom/scrcpy-active": {
     "exec": "~/.config/waybar/scrcpy-active.sh",
     "on-click": "~/.config/waybar/scrcpy-active.sh --kill",

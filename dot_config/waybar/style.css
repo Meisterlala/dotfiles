@@ -95,6 +95,7 @@ box.#workspaces {
 #custom-garage-kopia,
 #custom-garage-longhorn,
 #custom-garage-velero,
+#custom-nvidia-driver,
 #custom-updates,
 #custom-weather,
 #custom-gpu,
@@ -126,6 +127,7 @@ box.#workspaces {
 #custom-garage-kopia:hover,
 #custom-garage-longhorn:hover,
 #custom-garage-velero:hover,
+#custom-nvidia-driver:hover,
 #custom-gpu:hover,
 #custom-sleep:hover,
 #custom-daily-plan:hover,
@@ -187,6 +189,14 @@ box.#workspaces {
 
 #custom-gpu {
   color: @green;
+}
+
+#custom-nvidia-driver.critical {
+  background-color: shade(@red, 0.6);
+}
+
+#custom-nvidia-driver.users {
+  color: @red;
 }
 
 #custom-systemd-failed-units {

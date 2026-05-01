@@ -21,6 +21,7 @@
       "privacy",
       "tray",
       "custom/fritz-traffic",
+      "custom/nvidia-driver",
       "custom/systemd-failed-units",
       "gamemode",
       "custom/scrcpy-active",
