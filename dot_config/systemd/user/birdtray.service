@@ -6,11 +6,10 @@ PartOf=graphical-session.target
 
 [Service]
 Type=simple
-ExecStartPre=/usr/bin/sleep 30
 ExecStartPre=/usr/sbin/nm-online -q --timeout=60
 ExecStart=/usr/sbin/birdtray
 Restart=on-failure
 RestartSec=10
 
 [Install]
-WantedBy=xdg-desktop-autostart.target
+WantedBy=default.target
