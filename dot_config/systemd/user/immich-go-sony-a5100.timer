@@ -1,0 +1,10 @@
+[Unit]
+Description=Upload Sony a5100 photos to Immich every 6 hours
+
+[Timer]
+OnCalendar=*-*-* 00/6:00:00
+Persistent=true
+Unit=immich-go-sony-a5100.service
+
+[Install]
+WantedBy=timers.target
