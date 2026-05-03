@@ -3,38 +3,12 @@ import datetime as dt
 import json
 import os
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
 PARU_TIMEOUT = int(os.environ.get("WAYBAR_UPDATES_TIMEOUT", "120"))
 MAX_LIST = int(os.environ.get("WAYBAR_UPDATES_MAX_LIST", "120"))
-
-
-def parse_duration(value: str, default_seconds: int) -> dt.timedelta:
-    value = (value or "").strip().lower()
-    if not value:
-        return dt.timedelta(seconds=default_seconds)
-
-    total = 0
-    for amount, unit in re.findall(r"(\d+)\s*([smhd])", value):
-        n = int(amount)
-        if unit == "s":
-            total += n
-        elif unit == "m":
-            total += n * 60
-        elif unit == "h":
-            total += n * 3600
-        elif unit == "d":
-            total += n * 86400
-
-    if total <= 0:
-        return dt.timedelta(seconds=default_seconds)
-    return dt.timedelta(seconds=total)
-
-
-REMIND_INTERVAL = parse_duration(
-    os.environ.get("WAYBAR_UPDATES_REMIND_INTERVAL", "12h"), 12 * 3600
-)
 
 LINE_RE = re.compile(
     r"^(?P<pkg>\S+)\s+(?P<old>\S+)\s+->\s+(?P<new>\S+)(?:\s+\[(?P<flag>[^\]]+)\])?$"
@@ -47,6 +21,12 @@ def run_cmd(args: list[str], timeout: int = PARU_TIMEOUT) -> tuple[int, str, str
         return proc.returncode, proc.stdout, proc.stderr
     except Exception as exc:
         return 1, "", str(exc)
+
+
+def query_repo_updates() -> tuple[int, str, str]:
+    if shutil.which("checkupdates"):
+        return run_cmd(["checkupdates"])
+    return run_cmd(["paru", "-Qu", "--repo", "--color", "never"])
 
 
 def parse_upgrade_lines(raw: str) -> list[dict]:
@@ -225,41 +205,16 @@ def build_tooltip(items: list[dict]) -> str:
 def main() -> None:
     state_path = state_file()
     state = load_state(state_path)
-    now = dt.datetime.now()
 
-    # Keep a tiny state: last seen full-upgrade timestamp + snooze-until.
+    # Keep the last seen full-upgrade timestamp for the cache file, but always
+    # query first so a newly available update is never hidden by the reminder.
     latest_upgrade = last_completed_upgrade_epoch()
     prev_upgrade = int(state.get("last_upgrade_epoch", 0) or 0)
     if latest_upgrade and latest_upgrade != prev_upgrade:
         state["last_upgrade_epoch"] = latest_upgrade
-        state["snooze_until"] = (
-            dt.datetime.fromtimestamp(latest_upgrade) + REMIND_INTERVAL
-        ).isoformat(timespec="seconds")
         save_state(state_path, state)
 
-    snooze_until_raw = str(state.get("snooze_until", "")).strip()
-    if snooze_until_raw:
-        try:
-            snooze_until = dt.datetime.fromisoformat(snooze_until_raw)
-            if now < snooze_until:
-                print(
-                    json.dumps(
-                        {
-                            "text": "",
-                            "tooltip": "",
-                            "class": "updated",
-                            "alt": "updated",
-                            "percentage": 0,
-                        }
-                    )
-                )
-                return
-        except Exception:
-            pass
-
-    repo_code, repo_out, repo_err = run_cmd(
-        ["paru", "-Qu", "--repo", "--color", "never"]
-    )
+    repo_code, repo_out, repo_err = query_repo_updates()
     aur_code, aur_out, aur_err = run_cmd(
         ["paru", "-Qua", "--devel", "--color", "never"]
     )
