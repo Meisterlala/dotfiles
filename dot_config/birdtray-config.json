@@ -110,7 +110,7 @@
     "common/hidewhenstarted": true,
     "common/ignoreShowUnreadCount": false,
     "common/ignoreStartUnreadCount": false,
-    "common/launchthunderbird": true,
+    "common/launchthunderbird": false,
     "common/launchthunderbirddelay": 5,
     "common/monitorthunderbirdwindow": true,
     "common/newemailEnabled": false,

@@ -1,16 +1,12 @@
 [Unit]
-Description=Birdtray Thunderbird tray service
+Description=Thunderbird for Birdtray under XWayland
 Documentation=man:systemd.service(5)
 After=graphical-session.target xdg-desktop-autostart.target
-After=thunderbird-xwayland.service
-Wants=thunderbird-xwayland.service
 PartOf=graphical-session.target
 
 [Service]
 Type=simple
-Environment=QT_QPA_PLATFORM=xcb
-ExecStartPre=/usr/sbin/nm-online -q --timeout=60
-ExecStart=/usr/sbin/birdtray
+ExecStart=/home/misti/.local/bin/thunderbird-xwayland
 Restart=on-failure
 RestartSec=10
 
