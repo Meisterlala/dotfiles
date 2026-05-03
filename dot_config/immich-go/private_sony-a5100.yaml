@@ -1,0 +1,31 @@
+concurrent-tasks: 8
+dry-run: false
+log-file: /home/misti/.config/immich-go/sony-a5100.log
+log-level: INFO
+log-type: text
+on-errors: continue
+save-config: false
+upload:
+  server: https://immich.meisterlala.dev
+  device-uuid: sony-a5100-arch-amd
+  client-timeout: 20m
+  dry-run: false
+  manage-raw-jpeg: StackCoverJPG
+  manage-heic-jpeg: NoStack
+  manage-burst: NoStack
+  no-ui: true
+  overwrite: false
+  pause-immich-jobs: true
+  session-tag: true
+  skip-verify-ssl: false
+  tag:
+    - camera/sony-a5100
+  from-folder:
+    recursive: true
+    into-album: Sony a5100
+    date-from-name: false
+    folder-as-album: NONE
+    folder-as-tags: false
+    ignore-sidecar-files: false
+    exclude-extensions: []
+    ban-file: {}
