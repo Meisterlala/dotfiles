@@ -51,7 +51,12 @@
       "class<jetbrains-studio>": "",
       "class<btrfs-assistant>": "",
       "class<scrcpy>": "",
-      "class<com.misti.NvidiaDriverRestart>": "󱄌"
+      "class<com.misti.NvidiaDriverRestart>": "󱄌",
+      "class<XIVLauncher.Core>": "",
+      "class<GParted>": "󰋊",
+      "class<org.gnome.eog>": "",
+      "class<steam_app_3527290>": "",
+      "class<dolphin>": ""
     }
   }
 }

@@ -1,0 +1,16 @@
+[Unit]
+Description=Birdtray Thunderbird tray service
+Documentation=man:systemd.service(5)
+After=graphical-session.target xdg-desktop-autostart.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/sleep 30
+ExecStartPre=/usr/sbin/nm-online -q --timeout=60
+ExecStart=/usr/sbin/birdtray
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=xdg-desktop-autostart.target
