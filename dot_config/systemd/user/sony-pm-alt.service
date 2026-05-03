@@ -1,0 +1,17 @@
+[Unit]
+Description=sony-pm-alt Docker photo sync user service
+After=default.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+Environment=CONTAINER_NAME=sony-pm-alt
+Environment=IMAGE=sony-pm-alt:latest
+ExecStartPre=/usr/bin/mkdir -p %h/Pictures/raw
+ExecStartPre=-/usr/sbin/docker rm -f ${CONTAINER_NAME}
+ExecStart=/usr/sbin/docker run --name=${CONTAINER_NAME} --net=host -v %h/Pictures/raw:/var/lib/Sony ${IMAGE}
+ExecStop=/usr/sbin/docker stop ${CONTAINER_NAME}
+
+[Install]
+WantedBy=default.target
