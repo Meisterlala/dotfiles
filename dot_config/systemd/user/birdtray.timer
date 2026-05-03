@@ -1,0 +1,10 @@
+[Unit]
+Description=Delayed start for Birdtray Thunderbird tray service
+PartOf=graphical-session.target
+
+[Timer]
+OnActiveSec=30s
+Unit=birdtray.service
+
+[Install]
+WantedBy=xdg-desktop-autostart.target
