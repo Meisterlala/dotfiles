@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CONFIG_FILE="$HOME/.config/immich-go/sony-a5100.yaml"
+API_KEY_FILE="$HOME/.config/immich-go/sony-a5100.api-key"
+
+EXTRA_ARGS=()
+if [[ "${1:-}" == "--dry-run" ]]; then
+  EXTRA_ARGS+=("--dry-run")
+  shift
+fi
+
+SOURCE_DIR="${1:-$HOME/Pictures/sony-a5100}"
+
+if [[ ! -s "$API_KEY_FILE" ]]; then
+  printf 'Immich API key file is missing or empty: %s\n' "$API_KEY_FILE" >&2
+  exit 1
+fi
+
+if [[ ! -d "$SOURCE_DIR" ]]; then
+  printf 'Source directory does not exist: %s\n' "$SOURCE_DIR" >&2
+  exit 1
+fi
+
+API_KEY="$(<"$API_KEY_FILE")"
+
+exec /usr/sbin/immich-go --config "$CONFIG_FILE" "${EXTRA_ARGS[@]}" \
+  upload from-folder \
+  --api-key "$API_KEY" \
+  "$SOURCE_DIR"
