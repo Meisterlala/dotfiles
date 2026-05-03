@@ -6,6 +6,7 @@ PartOf=graphical-session.target
 
 [Service]
 Type=simple
+Environment=QT_QPA_PLATFORM=xcb
 ExecStartPre=/usr/sbin/nm-online -q --timeout=60
 ExecStart=/usr/sbin/birdtray
 Restart=on-failure
