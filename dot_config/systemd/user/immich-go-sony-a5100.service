@@ -1,0 +1,7 @@
+[Unit]
+Description=Upload Sony a5100 photos to Immich
+Documentation=https://github.com/simulot/immich-go
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/upload-sony-a5100 %h/Pictures/sony-a5100
