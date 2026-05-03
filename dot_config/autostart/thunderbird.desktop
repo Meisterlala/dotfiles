@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Thunderbird
+Comment=Send and receive mail with Thunderbird
+Exec=thunderbird %u
+Icon=org.mozilla.Thunderbird
+Terminal=false
+StartupNotify=true
+StartupWMClass=thunderbird
+X-GNOME-Autostart-enabled=false
+X-GNOME-Autostart-Delay=10
+Hidden=true
