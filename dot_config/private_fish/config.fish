@@ -38,7 +38,9 @@ set -g fish_greeting ''
 # Set up fzf
 set -g fzf_history_opts --with-nth=4..
 # And load its key bindings
-fzf_key_bindings
+if functions -q fzf_key_bindings
+    fzf_key_bindings
+end
 
 # Set up tide prompt
 set -g tide_right_prompt_items status cmd_duration context jobs direnv bun node python rustc java php pulumi ruby go gcloud distrobox toolbox terraform aws nix_shell crystal elixir zig shlvl
@@ -71,4 +73,4 @@ set -g ct_base 303446
 set -g ct_mantle 292c3c
 set -g ct_crust 232634
 
-fish_config theme choose "Catppuccin Frappe"
+fish_config theme choose catppuccin-frappe
