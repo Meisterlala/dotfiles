@@ -111,7 +111,7 @@
     }
   },
 
-  "plugin": ["cc-safety-net"],
+  "plugin": ["cc-safety-net", "@plannotator/opencode@latest"],
 
   "mcp": {
     "browsermcp": {

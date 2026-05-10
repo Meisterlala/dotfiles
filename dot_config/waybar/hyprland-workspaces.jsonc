@@ -56,7 +56,14 @@
       "class<GParted>": "󰋊",
       "class<org.gnome.eog>": "",
       "class<steam_app_3527290>": "",
-      "class<dolphin>": ""
+      "class<dolphin>": "",
+      "class<hyprland-share-picker>": "󱒃",
+      "class<steam_app_4159377692>": "",
+      "class<com.usebottles.bottles>": "󰡔",
+      "class<steam_app_2929855285>": "",
+      "class<heroic>": "",
+      "class<steam_proton>": "",
+      "class<steam_app_3713652275>": ""
     }
   }
 }
