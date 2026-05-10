@@ -12,6 +12,8 @@ local file_manager = "nautilus || dolphin || thunar"
 local menu = "rofi -show combi"
 local browser = "zen-browser || firefox || chromium"
 local main_mod = "SUPER"
+local primary_monitor = "DP-3"
+local secondary_monitor = "DP-2"
 
 -- Keep window rule effects out of Lua LSP's stricter generated stubs; the wiki
 -- documents these fields but the current stubs only type the match/name shell.
@@ -47,49 +49,57 @@ hl.config({
 -- Autostart
 ----------------
 
+local startup_commands = {
+	"systemctl --user start hyprland-session.target",
+	"systemctl --user start hyprpolkitagent",
+	"udiskie --smart-tray",
+	"dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_MENU_PREFIX XDG_DATA_DIRS",
+	[[hyprctl plugin load "$HYPR_PLUGIN_DIR/lib/libhyprexpo.so"]],
+	"systemctl --user start hypridle.service",
+	"systemctl --user start waybar.service",
+	"systemctl --user start hyprsunset.service",
+	terminal,
+}
+
 hl.on("hyprland.start", function()
-	hl.exec_cmd("systemctl --user start hyprland-session.target")
-	hl.exec_cmd("systemctl --user start hyprpolkitagent")
-	hl.exec_cmd("udiskie --smart-tray")
-	hl.exec_cmd(
-		"dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_MENU_PREFIX XDG_DATA_DIRS"
-	)
-	hl.exec_cmd([[hyprctl plugin load "$HYPR_PLUGIN_DIR/lib/libhyprexpo.so"]])
-	hl.exec_cmd("systemctl --user start hypridle.service")
-	hl.exec_cmd("systemctl --user start waybar.service")
-	hl.exec_cmd("systemctl --user start hyprsunset.service")
-	hl.exec_cmd(terminal)
+	for _, command in ipairs(startup_commands) do
+		hl.exec_cmd(command)
+	end
 end)
 
 ----------------
 -- Environment
 ----------------
 
-hl.env("GBM_BACKEND", "nvidia-drm")
-hl.env("LIBVA_DRIVER_NAME", "nvidia")
-hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
-hl.env("NVD_BACKEND", "direct")
-hl.env("ELECTRON_OZONE_PLATFORM_HINT", "auto")
-hl.env("XCURSOR_SIZE", "24")
-hl.env("HYPRCURSOR_SIZE", "24")
-hl.env("XDG_MENU_PREFIX", "plasma-")
-hl.env(
-	"XDG_DATA_DIRS",
-	"/home/misti/.local/share-hyprland:/home/misti/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share"
-)
-hl.env("GDK_BACKEND", "wayland,x11,*")
-hl.env("QT_QPA_PLATFORM", "wayland;xcb")
-hl.env("SDL_VIDEODRIVER", "wayland")
-hl.env("CLUTTER_BACKEND", "wayland")
-hl.env("XDG_CURRENT_DESKTOP", "Hyprland")
-hl.env("XDG_SESSION_TYPE", "wayland")
-hl.env("XDG_SESSION_DESKTOP", "Hyprland")
-hl.env("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
-hl.env("QT_QPA_PLATFORM", "xcb;wayland")
-hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1")
-hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
-hl.env("HYPRCURSOR_THEME", "Bibata-Modern-Classic")
-hl.env("HYPRCURSOR_SIZE", "24")
+local env = {
+	{ "GBM_BACKEND", "nvidia-drm" },
+	{ "LIBVA_DRIVER_NAME", "nvidia" },
+	{ "__GLX_VENDOR_LIBRARY_NAME", "nvidia" },
+	{ "NVD_BACKEND", "direct" },
+	{ "ELECTRON_OZONE_PLATFORM_HINT", "auto" },
+	{ "XCURSOR_SIZE", "24" },
+	{ "HYPRCURSOR_SIZE", "24" },
+	{ "XDG_MENU_PREFIX", "plasma-" },
+	{
+		"XDG_DATA_DIRS",
+		"/home/misti/.local/share-hyprland:/home/misti/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share",
+	},
+	{ "GDK_BACKEND", "wayland,x11,*" },
+	{ "SDL_VIDEODRIVER", "wayland" },
+	{ "CLUTTER_BACKEND", "wayland" },
+	{ "XDG_CURRENT_DESKTOP", "Hyprland" },
+	{ "XDG_SESSION_TYPE", "wayland" },
+	{ "XDG_SESSION_DESKTOP", "Hyprland" },
+	{ "QT_AUTO_SCREEN_SCALE_FACTOR", "1" },
+	{ "QT_QPA_PLATFORM", "xcb;wayland" },
+	{ "QT_WAYLAND_DISABLE_WINDOWDECORATION", "1" },
+	{ "QT_QPA_PLATFORMTHEME", "qt6ct" },
+	{ "HYPRCURSOR_THEME", "Bibata-Modern-Classic" },
+}
+
+for _, item in ipairs(env) do
+	hl.env(item[1], item[2])
+end
 
 ----------------
 -- Permissions
@@ -168,7 +178,7 @@ hl.config({
 	cursor = {
 		warp_on_change_workspace = 1,
 		inactive_timeout = 10,
-		default_monitor = "DP-3",
+		default_monitor = primary_monitor,
 	},
 	debug = {
 		full_cm_proto = true,
@@ -222,11 +232,11 @@ hl.animation({ leaf = "workspacesOut", enabled = true, speed = 1.94, bezier = "a
 ----------------
 
 for i = 1, 8 do
-	hl.workspace_rule({ workspace = tostring(i), monitor = "DP-3", default = i == 1, persistent = true })
+	hl.workspace_rule({ workspace = tostring(i), monitor = primary_monitor, default = i == 1, persistent = true })
 end
 
 for i = 11, 18 do
-	hl.workspace_rule({ workspace = tostring(i), monitor = "DP-2", default = i == 11, persistent = true })
+	hl.workspace_rule({ workspace = tostring(i), monitor = secondary_monitor, default = i == 11, persistent = true })
 end
 
 ----------------
@@ -267,7 +277,7 @@ local key_to_workspace = {
 for _, bind in ipairs(key_to_workspace) do
 	local key, workspace = bind[1], bind[2]
 	hl.bind(main_mod .. " + " .. key, hl.dsp.focus({ workspace = workspace }))
-	hl.bind(main_mod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = workspace }))
+	hl.bind(main_mod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = workspace, follow = false }))
 end
 
 hl.bind(main_mod .. " + S", hl.dsp.workspace.toggle_special("magic"))
