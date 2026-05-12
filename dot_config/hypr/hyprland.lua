@@ -35,7 +35,7 @@ hl.monitor({
 hl.monitor({
 	output = "desc:Acer Technologies ED270U P TKYEE0013W01",
 	mode = "2560x1440@165.00",
-	position = "auto-right",
+	position = "2560x0",
 	scale = "1",
 })
 
