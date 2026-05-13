@@ -10,47 +10,22 @@ TARGET_DISABLED=""
 TARGET_DPMS=""
 
 load_target_monitor() {
-    local output line current_name="" current_desc="" current_disabled="false" current_dpms="1"
+    local output monitor
 
     TARGET_NAME=""
     TARGET_DISABLED=""
     TARGET_DPMS=""
 
-    if ! output="$(hyprctl monitors all 2>/dev/null)"; then
+    if ! output="$(hyprctl monitors all -j 2>/dev/null)"; then
         return 1
     fi
 
-    while IFS= read -r line; do
-        case "$line" in
-            Monitor\ *)
-                if [[ "$current_desc" == "$MONITOR_DESC" ]]; then
-                    TARGET_NAME="$current_name"
-                    TARGET_DISABLED="$current_disabled"
-                    TARGET_DPMS="$current_dpms"
-                    return 0
-                fi
-                current_name="${line#Monitor }"
-                current_name="${current_name%% *}"
-                current_desc=""
-                current_disabled="false"
-                current_dpms="1"
-                ;;
-            *description:\ *)
-                current_desc="${line#*description: }"
-                ;;
-            *disabled:\ *)
-                current_disabled="${line#*disabled: }"
-                ;;
-            *dpmsStatus:\ *)
-                current_dpms="${line#*dpmsStatus: }"
-                ;;
-        esac
-    done <<< "$output"
+    if ! monitor="$(jq -r --arg desc "$MONITOR_DESC" 'first(.[] | select(.description == $desc) | [.name, (.disabled | tostring), (.dpmsStatus | tostring)] | @tsv) // empty' <<< "$output")"; then
+        return 1
+    fi
 
-    if [[ "$current_desc" == "$MONITOR_DESC" ]]; then
-        TARGET_NAME="$current_name"
-        TARGET_DISABLED="$current_disabled"
-        TARGET_DPMS="$current_dpms"
+    if [[ -n "$monitor" ]]; then
+        IFS=$'\t' read -r TARGET_NAME TARGET_DISABLED TARGET_DPMS <<< "$monitor"
     fi
 }
 
@@ -91,12 +66,12 @@ enable_monitor() {
         return 1
     fi
 
-    hyprctl dispatch dpms on "$TARGET_NAME" >/dev/null
+    hyprctl dispatch "hl.dsp.dpms({ state = \"on\", monitor = \"$TARGET_NAME\" })" >/dev/null
 }
 
 disable_monitor() {
     require_target_monitor || return 1
-    hyprctl dispatch dpms off "$TARGET_NAME" >/dev/null
+    hyprctl dispatch "hl.dsp.dpms({ state = \"off\", monitor = \"$TARGET_NAME\" })" >/dev/null
 }
 
 toggle_monitor() {
