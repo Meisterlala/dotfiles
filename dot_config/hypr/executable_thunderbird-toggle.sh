@@ -35,10 +35,10 @@ if [ "$workspace" = "$hidden_workspace" ]; then
         special:*) target="1" ;;
     esac
 
-    hyprctl dispatch movetoworkspace "$target,address:$address" >/dev/null
-    hyprctl dispatch focuswindow "address:$address" >/dev/null
+    hyprctl dispatch "hl.dsp.window.move({ workspace = \"$target\", window = \"address:$address\" })" >/dev/null
+    hyprctl dispatch "hl.dsp.focus({ window = \"address:$address\" })" >/dev/null
 else
     mkdir -p "$state_dir"
     printf '%s\n' "$workspace" > "$state_file"
-    hyprctl dispatch movetoworkspacesilent "$hidden_workspace,address:$address" >/dev/null
+    hyprctl dispatch "hl.dsp.window.move({ workspace = \"$hidden_workspace\", window = \"address:$address\", follow = false })" >/dev/null
 fi

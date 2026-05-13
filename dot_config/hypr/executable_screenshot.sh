@@ -8,6 +8,8 @@ year="$(date '+%Y')"
 month="$(date '+%m')"
 stamp="$(date '+%Y%m%d-%H%M')"
 cursor_pos=""
+cursor_x=""
+cursor_y=""
 freeze_pid=""
 watcher_pid=""
 
@@ -27,13 +29,15 @@ random_letters() {
 hide_cursor() {
     if command -v hyprctl >/dev/null 2>&1; then
         cursor_pos="$(hyprctl cursorpos)"
-        hyprctl dispatch movecursor 99999 99999 >/dev/null 2>&1 || true
+        cursor_x="${cursor_pos%, *}"
+        cursor_y="${cursor_pos#*, }"
+        hyprctl dispatch 'hl.dsp.cursor.move({ x = 99999, y = 99999 })' >/dev/null 2>&1 || true
     fi
 }
 
 show_cursor() {
-    if command -v hyprctl >/dev/null 2>&1 && [[ -n "$cursor_pos" ]]; then
-        hyprctl dispatch movecursor ${cursor_pos//, / } >/dev/null 2>&1 || true
+    if command -v hyprctl >/dev/null 2>&1 && [[ -n "$cursor_x" && -n "$cursor_y" ]]; then
+        hyprctl dispatch "hl.dsp.cursor.move({ x = $cursor_x, y = $cursor_y })" >/dev/null 2>&1 || true
     fi
 }
 
@@ -49,7 +53,7 @@ cleanup() {
     fi
 
     if command -v hyprctl >/dev/null 2>&1; then
-        hyprctl keyword animations:enabled true >/dev/null 2>&1 || true
+        hyprctl dispatch '(function() hl.config({ animations = { enabled = true } }); return hl.dsp.no_op() end)()' >/dev/null 2>&1 || true
     fi
 }
 trap cleanup EXIT
@@ -76,7 +80,7 @@ rawfile="${base_dir}/${stamp}-${suffix}.png"
 outfile="${base_dir}/${stamp}-${suffix}-satty.png"
 
 if command -v hyprctl >/dev/null 2>&1; then
-    hyprctl keyword animations:enabled false
+    hyprctl dispatch '(function() hl.config({ animations = { enabled = false } }); return hl.dsp.no_op() end)()'
 fi
 
 if command -v hyprpicker >/dev/null 2>&1; then
