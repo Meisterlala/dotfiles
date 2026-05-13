@@ -1,0 +1,13 @@
+[Unit]
+Description=Quickshell main desktop shell
+PartOf=hyprland-session.target
+After=hyprland-session.target
+
+[Service]
+Type=simple
+ExecStart=qs -c main
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=hyprland-session.target

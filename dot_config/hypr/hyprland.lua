@@ -57,6 +57,7 @@ local startup_commands = {
 	[[hyprctl plugin load "$HYPR_PLUGIN_DIR/lib/libhyprexpo.so"]],
 	"systemctl --user start hypridle.service",
 	"systemctl --user start waybar.service",
+	"systemctl --user start quickshell-main.service",
 	"systemctl --user start hyprsunset.service",
 	terminal,
 }
@@ -124,6 +125,7 @@ hl.permission({
 ----------------
 
 hl.layer_rule({ match = { namespace = "waybar" }, blur = true })
+hl.layer_rule({ match = { namespace = "quickshell" }, blur = true })
 hl.layer_rule({ match = { namespace = "swaync-notification-window" }, no_screen_share = true })
 hl.layer_rule({ match = { namespace = "swaync-control-center" }, no_screen_share = true })
 window_rule({ match = { class = "^(swaync)$" }, no_initial_focus = true })
