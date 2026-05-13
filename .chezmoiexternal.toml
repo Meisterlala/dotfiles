@@ -6,3 +6,10 @@
     type = "git-repo"
     url = "https://github.com/Meisterlala/nvim.git"
     refreshPeriod = "30s"
+
+{{ if ne .chezmoi.os "windows" }}
+[".config/quickshell"]
+    type = "git-repo"
+    url = "https://github.com/Meisterlala/quickshell.git"
+    refreshPeriod = "30s"
+{{ end }}
