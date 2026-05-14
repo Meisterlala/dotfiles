@@ -339,6 +339,7 @@
       "free *": "allow",
       "host *": "allow",
       "vmstat *": "allow",
+      "qmllint *": "allow",
 
       "zstd *": "allow"
     }

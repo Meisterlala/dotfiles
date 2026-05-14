@@ -234,7 +234,8 @@
       "Bash(systemctl --user *)",
       "Bash(docker *)",
       "Bash(python3 /home/misti/.config/habits-server/check_config_schema.py)",
-      "Bash(./*)"
+      "Bash(./*)",
+      "Bash(qmllint *)"
     ],
     "deny": [
       "Bash(sudo*)"

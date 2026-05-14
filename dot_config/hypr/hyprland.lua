@@ -56,7 +56,7 @@ local startup_commands = {
 	"dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_MENU_PREFIX XDG_DATA_DIRS",
 	[[hyprctl plugin load "$HYPR_PLUGIN_DIR/lib/libhyprexpo.so"]],
 	"systemctl --user start hypridle.service",
-	"systemctl --user start waybar.service",
+	-- "systemctl --user start waybar.service",
 	"systemctl --user start quickshell-main.service",
 	"systemctl --user start hyprsunset.service",
 	terminal,
