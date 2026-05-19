@@ -341,6 +341,13 @@
       "vmstat *": "allow",
       "qmllint *": "allow",
 
+      "export CI=true DEBIAN_FRONTEND=noninteractive GIT_TERMINAL_PROMPT=0 GCM_INTERACTIVE=never HOMEBREW_NO_AUTO_UPDATE=1 GIT_EDITOR=: EDITOR=: VISUAL='' GIT_SEQUENCE_EDITOR=: GIT_MERGE_AUTOEDIT=no GIT_PAGER=cat PAGER=cat;": "allow",
+      "gh issue list *": "allow",
+      "gh issue view *": "allow",
+      "gh pr list *": "allow",
+      "gh pr view *": "allow",
+      "gh search *": "allow",
+
       "zstd *": "allow"
     }
   }
