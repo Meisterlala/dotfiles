@@ -30,13 +30,8 @@
             "output": 8192
           },
           "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
+            "input": ["text", "image"],
+            "output": ["text"]
           }
         },
         "gemma4:e4b": {
@@ -48,13 +43,8 @@
             "output": 8192
           },
           "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
+            "input": ["text", "image"],
+            "output": ["text"]
           }
         },
         "gemma4:26b": {
@@ -66,13 +56,8 @@
             "output": 8192
           },
           "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
+            "input": ["text", "image"],
+            "output": ["text"]
           }
         },
         "gemma4:31b": {
@@ -84,13 +69,8 @@
             "output": 8192
           },
           "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
+            "input": ["text", "image"],
+            "output": ["text"]
           }
         }
       }
@@ -135,10 +115,7 @@
     "browsermcp": {
       "enabled": false,
       "type": "local",
-      "command": [
-        "npx",
-        "@browsermcp/mcp@latest"
-      ]
+      "command": ["npx", "@browsermcp/mcp@latest"]
     },
     "chrome-devtools": {
       "enabled": false,
@@ -158,11 +135,7 @@
     "kubernetes": {
       "enabled": false,
       "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "kubernetes-mcp-server@latest"
-      ]
+      "command": ["npx", "-y", "kubernetes-mcp-server@latest"]
     },
     "github": {
       "enabled": true,
@@ -175,11 +148,7 @@
     }
   },
   "watcher": {
-    "ignore": [
-      "node_modules/**",
-      "dist/**",
-      ".git/**"
-    ]
+    "ignore": ["node_modules/**", "dist/**", ".git/**"]
   },
   "permission": {
     "read": "allow",
