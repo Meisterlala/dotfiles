@@ -1,11 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "theme": "system",
-
   "small_model": "github-copilot/gpt-4o",
-
   "lsp": true,
-
   "agent": {
     "commit-review": {
       "description": "Review the current staged git changes. Provide feedback on code quality, style, and potential issues.",
@@ -16,7 +13,6 @@
       }
     }
   },
-
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
@@ -34,8 +30,13 @@
             "output": 8192
           },
           "modalities": {
-            "input": ["text", "image"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
           }
         },
         "gemma4:e4b": {
@@ -47,8 +48,13 @@
             "output": 8192
           },
           "modalities": {
-            "input": ["text", "image"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
           }
         },
         "gemma4:26b": {
@@ -60,8 +66,13 @@
             "output": 8192
           },
           "modalities": {
-            "input": ["text", "image"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
           }
         },
         "gemma4:31b": {
@@ -73,8 +84,13 @@
             "output": 8192
           },
           "modalities": {
-            "input": ["text", "image"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
           }
         }
       }
@@ -110,14 +126,19 @@
       }
     }
   },
-
-  "plugin": ["cc-safety-net", "@plannotator/opencode@latest"],
-
+  "plugin": [
+    "cc-safety-net",
+    "@plannotator/opencode@latest",
+    "oh-my-openagent@latest"
+  ],
   "mcp": {
     "browsermcp": {
       "enabled": false,
       "type": "local",
-      "command": ["npx", "@browsermcp/mcp@latest"]
+      "command": [
+        "npx",
+        "@browsermcp/mcp@latest"
+      ]
     },
     "chrome-devtools": {
       "enabled": false,
@@ -137,7 +158,11 @@
     "kubernetes": {
       "enabled": false,
       "type": "local",
-      "command": ["npx", "-y", "kubernetes-mcp-server@latest"]
+      "command": [
+        "npx",
+        "-y",
+        "kubernetes-mcp-server@latest"
+      ]
     },
     "github": {
       "enabled": true,
@@ -149,9 +174,12 @@
       }
     }
   },
-
   "watcher": {
-    "ignore": ["node_modules/**", "dist/**", ".git/**"]
+    "ignore": [
+      "node_modules/**",
+      "dist/**",
+      ".git/**"
+    ]
   },
   "permission": {
     "read": "allow",
@@ -163,18 +191,14 @@
       "*": "ask",
       "~/.config/nvim/tmp/**": "allow"
     },
-
     "skill": {
       "*": "allow"
     },
-
     "bash": {
       "*": "ask",
       "sudo*": "deny",
       "./*": "allow",
-
       "./scripts/*": "allow",
-
       "awk *": "allow",
       "cat *": "allow",
       "cd *": "allow",
@@ -189,21 +213,18 @@
       "flux get *": "allow",
       "flux logs *": "allow",
       "flux reconcile *": "allow",
-
       "getent *": "allow",
       "git branch *": "allow",
       "git diff *": "allow",
       "git log *": "allow",
       "git show *": "allow",
       "git status *": "allow",
-
       "go mod tidy": "allow",
       "go test *": "allow",
       "gofmt *": "allow",
       "grep *": "allow",
       "gunzip *": "allow",
       "gzip *": "allow",
-
       "head *": "allow",
       "helm get *": "allow",
       "helm link *": "allow",
@@ -214,12 +235,10 @@
       "history *": "allow",
       "htop": "allow",
       "hubble *": "allow",
-
       "ip *": "allow",
       "iostat *": "allow",
       "jq *": "allow",
       "journalctl *": "allow",
-
       "kubectl -n * api-resources *": "allow",
       "kubectl -n * auth can-i *": "allow",
       "kubectl -n * debug *": "allow",
@@ -253,14 +272,11 @@
       "kubectl logs *": "allow",
       "kubectl port-forward *": "allow",
       "kubectl top *": "allow",
-
       "kustomize build *": "allow",
-
       "ls *": "allow",
       "lsblk *": "allow",
       "lsof *": "allow",
       "mkdir *": "allow",
-
       "nslookup *": "allow",
       "pacman -Q *": "allow",
       "pacman -Qi *": "allow",
@@ -270,7 +286,6 @@
       "pstree *": "allow",
       "pwsh -NoProfile ./scripts/validate.ps1": "allow",
       "python3 /home/misti/.config/habits-server/check_config_schema.py": "allow",
-
       "pnpm *": "allow",
       "podman images *": "allow",
       "podman info *": "allow",
@@ -279,7 +294,6 @@
       "podman ps *": "allow",
       "podman stats --no-stream *": "allow",
       "ps *": "allow",
-
       "realpath *": "allow",
       "rg *": "allow",
       "sed *": "allow",
@@ -303,7 +317,6 @@
       "ssh ran *": "allow",
       "ssh raspberry-pi *": "allow",
       "ssh raspberrypi *": "allow",
-
       "tail *": "allow",
       "tar *": "allow",
       "top *": "allow",
@@ -311,20 +324,15 @@
       "tr *": "allow",
       "tree *": "allow",
       "type *": "allow",
-
       "uniq *": "allow",
       "uname *": "allow",
       "unzip *": "allow",
       "unzstd *": "allow",
-
       "wc *": "allow",
       "whereis *": "allow",
       "which *": "allow",
-
       "xargs *": "allow",
-
       "yq *": "allow",
-
       "blkid *": "allow",
       "btop": "allow",
       "df *": "allow",
@@ -340,14 +348,12 @@
       "host *": "allow",
       "vmstat *": "allow",
       "qmllint *": "allow",
-
       "export CI=true DEBIAN_FRONTEND=noninteractive GIT_TERMINAL_PROMPT=0 GCM_INTERACTIVE=never HOMEBREW_NO_AUTO_UPDATE=1 GIT_EDITOR=: EDITOR=: VISUAL='' GIT_SEQUENCE_EDITOR=: GIT_MERGE_AUTOEDIT=no GIT_PAGER=cat PAGER=cat;": "allow",
       "gh issue list *": "allow",
       "gh issue view *": "allow",
       "gh pr list *": "allow",
       "gh pr view *": "allow",
       "gh search *": "allow",
-
       "zstd *": "allow"
     }
   }

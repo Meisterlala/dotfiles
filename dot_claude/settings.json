@@ -235,7 +235,13 @@
       "Bash(docker *)",
       "Bash(python3 /home/misti/.config/habits-server/check_config_schema.py)",
       "Bash(./*)",
-      "Bash(qmllint *)"
+      "Bash(qmllint *)",
+      "Bash(export CI=true DEBIAN_FRONTEND=noninteractive GIT_TERMINAL_PROMPT=0 GCM_INTERACTIVE=never HOMEBREW_NO_AUTO_UPDATE=1 GIT_EDITOR=: EDITOR=: VISUAL='' GIT_SEQUENCE_EDITOR=: GIT_MERGE_AUTOEDIT=no GIT_PAGER=cat PAGER=cat;)",
+      "Bash(gh issue list *)",
+      "Bash(gh issue view *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr view *)",
+      "Bash(gh search *)"
     ],
     "deny": [
       "Bash(sudo*)"
