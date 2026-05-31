@@ -11,6 +11,52 @@ OPENCODE_CONFIG = Path.home() / '.config/opencode/opencode.json'
 CLAUDE_SETTINGS = Path.home() / '.claude/settings.json'
 
 
+def loads_jsonc(content: str):
+    output = []
+    in_string = False
+    escaped = False
+    i = 0
+
+    while i < len(content):
+        char = content[i]
+        next_char = content[i + 1] if i + 1 < len(content) else ''
+
+        if in_string:
+            output.append(char)
+            if escaped:
+                escaped = False
+            elif char == '\\':
+                escaped = True
+            elif char == '"':
+                in_string = False
+            i += 1
+            continue
+
+        if char == '"':
+            in_string = True
+            output.append(char)
+            i += 1
+            continue
+
+        if char == '/' and next_char == '/':
+            i += 2
+            while i < len(content) and content[i] not in '\r\n':
+                i += 1
+            continue
+
+        if char == '/' and next_char == '*':
+            i += 2
+            while i + 1 < len(content) and content[i:i + 2] != '*/':
+                i += 1
+            i += 2
+            continue
+
+        output.append(char)
+        i += 1
+
+    return json.loads(''.join(output))
+
+
 def get_chezmoi_managed_source_path(target_path: Path) -> Path | None:
     chezmoi = shutil.which('chezmoi')
     if not chezmoi:
@@ -50,7 +96,7 @@ def main():
     # Read opencode config
     print(f'Reading opencode config from: {OPENCODE_CONFIG}')
     with open(OPENCODE_CONFIG, 'r') as f:
-        opencode_config = json.load(f)
+        opencode_config = loads_jsonc(f.read())
 
     # Extract bash permissions
     bash_perms = opencode_config.get('permission', {}).get('bash', {})

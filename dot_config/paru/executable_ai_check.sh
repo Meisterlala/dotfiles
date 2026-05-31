@@ -4,7 +4,7 @@ set -euo pipefail
 tmp_file="$(mktemp /tmp/paru-pkgbuild-diff.XXXXXX)"
 trap 'rm -f "$tmp_file"' EXIT
 
-ai_model="${OPENCODE_MODEL:-github-copilot/gemini-3-flash-preview}"
+ai_model="${OPENCODE_MODEL:-github-copilot/gemini-3-5-flash-preview}"
 ai_fallback_models_csv="${OPENCODE_FALLBACK_MODELS:-github-copilot/gpt-4.1,github-copilot/gpt-5-mini,openai/gpt-5.3-codex,openrouter/free,openrouter/openai/oss-80b:free,openrouter/meta-llama/llama-3.3-70b-instruct:free,openrouter/google/gemma-3-12b-it:free}"
 ai_timeout_seconds="${OPENCODE_TIMEOUT_SECONDS:-20}"
 

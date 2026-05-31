@@ -108,8 +108,8 @@
   },
   "plugin": [
     "cc-safety-net",
-    "@plannotator/opencode@latest",
-    "oh-my-openagent@latest"
+    "@plannotator/opencode@latest"
+    // "oh-my-openagent@latest"
   ],
   "mcp": {
     "browsermcp": {
@@ -137,6 +137,17 @@
       "type": "local",
       "command": ["npx", "-y", "kubernetes-mcp-server@latest"]
     },
+    "thunderbird-mail": {
+      "type": "local",
+      "enabled": false,
+      "command": [
+        "npx",
+        "-y",
+        "--package",
+        "github:TKasperczyk/thunderbird-mcp",
+        "thunderbird-mcp"
+      ]
+    },
     "github": {
       "enabled": true,
       "type": "remote",
@@ -156,6 +167,31 @@
     "list": "allow",
     "edit": "allow",
     "webfetch": "allow",
+    "thunderbird-mail_sendMail": "ask",
+    "thunderbird-mail_saveDraft": "ask",
+    "thunderbird-mail_replyToMessage": "ask",
+    "thunderbird-mail_forwardMessage": "ask",
+    "thunderbird-mail_updateMessage": "ask",
+    "thunderbird-mail_deleteMessages": "ask",
+    "thunderbird-mail_emptyTrash": "ask",
+    "thunderbird-mail_emptyJunk": "ask",
+    "thunderbird-mail_createFolder": "ask",
+    "thunderbird-mail_renameFolder": "ask",
+    "thunderbird-mail_moveFolder": "ask",
+    "thunderbird-mail_deleteFolder": "ask",
+    "thunderbird-mail_createFilter": "ask",
+    "thunderbird-mail_updateFilter": "ask",
+    "thunderbird-mail_deleteFilter": "ask",
+    "thunderbird-mail_reorderFilters": "ask",
+    "thunderbird-mail_applyFilters": "ask",
+    "thunderbird-mail_createContact": "ask",
+    "thunderbird-mail_updateContact": "ask",
+    "thunderbird-mail_deleteContact": "ask",
+    "thunderbird-mail_createEvent": "ask",
+    "thunderbird-mail_updateEvent": "ask",
+    "thunderbird-mail_deleteEvent": "ask",
+    "thunderbird-mail_createTask": "ask",
+    "thunderbird-mail_updateTask": "ask",
     "external_directory": {
       "*": "ask",
       "~/.config/nvim/tmp/**": "allow"
@@ -323,7 +359,15 @@
       "gh pr list *": "allow",
       "gh pr view *": "allow",
       "gh search *": "allow",
-      "zstd *": "allow"
+      "zstd *": "allow",
+
+      "cargo search *": "allow",
+      "cargo clippy*": "allow",
+      "cargo fmt*": "allow",
+      "cargo test *": "allow",
+      "cargo build *": "allow",
+      "rustc *": "allow",
+      "cargo info *": "allow"
     }
   }
 }
