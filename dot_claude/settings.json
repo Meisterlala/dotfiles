@@ -248,7 +248,8 @@
       "Bash(cargo test *)",
       "Bash(cargo build *)",
       "Bash(rustc *)",
-      "Bash(cargo info *)"
+      "Bash(cargo info *)",
+      "Bash(woodpecker *)"
     ],
     "deny": [
       "Bash(sudo*)"

@@ -1,0 +1,4 @@
+.DS_Store
+openviking-memory.log
+openviking-session-map.json
+*.corrupted.*

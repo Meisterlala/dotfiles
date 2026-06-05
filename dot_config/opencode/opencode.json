@@ -107,9 +107,10 @@
     }
   },
   "plugin": [
-    "cc-safety-net",
-    "@plannotator/opencode@latest"
+    "cc-safety-net@latest",
+    "@plannotator/opencode@latest",
     // "oh-my-openagent@latest"
+    "openviking-opencode-plugin@latest"
   ],
   "mcp": {
     "browsermcp": {
@@ -357,7 +358,9 @@
       "cargo test *": "allow",
       "cargo build *": "allow",
       "rustc *": "allow",
-      "cargo info *": "allow"
+      "cargo info *": "allow",
+
+      "woodpecker *": "allow"
     }
   }
 }
