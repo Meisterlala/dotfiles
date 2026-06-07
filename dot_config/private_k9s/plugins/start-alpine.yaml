@@ -2,7 +2,7 @@ plugins:
   start-alpine-pod:
     shortCut: Ctrl-T
     confirm: true
-    description: "Start an alpine:latest pod in current context/namespace"
+    description: "Start alpine:latest"
     scopes:
       - pods
       - deployments

@@ -13,7 +13,11 @@ plugins:
       - --
       - $CONTEXT
       - '{namespace="$NAMESPACE",pod="$POD",container="$NAME"}'
+      - --k9s-format
+      - --pager
       - --quiet
+      - --limit
+      - "500"
       - -f
   loki-container-raw:
     shortCut: Ctrl-E
@@ -29,9 +33,31 @@ plugins:
       - $CONTEXT
       - '{namespace="$NAMESPACE",pod="$POD",container="$NAME"}'
       - --quiet
+      - --limit
+      - "500"
       - -f
       - -o
       - raw
+  loki-container-table:
+    shortCut: k
+    description: "loki table"
+    scopes:
+      - containers
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
+      - --
+      - $CONTEXT
+      - '{namespace="$NAMESPACE",pod="$POD",container="$NAME"}'
+      - --k9s-format
+      - --pager
+      - --table
+      - --quiet
+      - --limit
+      - "500"
+      - -f
   loki-pods:
     shortCut: Shift-L
     description: "loki fmt"
@@ -44,8 +70,14 @@ plugins:
       - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
       - --
       - $CONTEXT
-      - '{namespace="$NAMESPACE",pod="$NAME"}'
+      - --pod
+      - $NAMESPACE
+      - $NAME
+      - --k9s-format
+      - --pager
       - --quiet
+      - --limit
+      - "500"
       - -f
   loki-pods-raw:
     shortCut: Ctrl-L
@@ -59,11 +91,101 @@ plugins:
       - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
       - --
       - $CONTEXT
-      - '{namespace="$NAMESPACE",pod="$NAME"}'
+      - --pod
+      - $NAMESPACE
+      - $NAME
       - --quiet
+      - --limit
+      - "500"
       - -f
       - -o
       - raw
+  loki-pods-table:
+    shortCut: k
+    description: "loki table"
+    scopes:
+      - po
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
+      - --
+      - $CONTEXT
+      - --pod
+      - $NAMESPACE
+      - $NAME
+      - --k9s-format
+      - --pager
+      - --table
+      - --quiet
+      - --limit
+      - "500"
+      - -f
+  loki-deployments:
+    shortCut: Shift-L
+    description: "loki fmt"
+    scopes:
+      - deployments
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
+      - --
+      - $CONTEXT
+      - --app
+      - $NAMESPACE
+      - $NAME
+      - --k9s-format
+      - --pager
+      - --quiet
+      - --limit
+      - "500"
+      - -f
+  loki-deployments-raw:
+    shortCut: Ctrl-L
+    description: "loki raw"
+    scopes:
+      - deployments
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
+      - --
+      - $CONTEXT
+      - --app
+      - $NAMESPACE
+      - $NAME
+      - --quiet
+      - --limit
+      - "500"
+      - -f
+      - -o
+      - raw
+  loki-deployments-table:
+    shortCut: k
+    description: "loki table"
+    scopes:
+      - deployments
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
+      - --
+      - $CONTEXT
+      - --app
+      - $NAMESPACE
+      - $NAME
+      - --k9s-format
+      - --pager
+      - --table
+      - --quiet
+      - --limit
+      - "500"
+      - -f
   loki-node:
     shortCut: Shift-L
     description: "loki fmt"
@@ -77,7 +199,11 @@ plugins:
       - --
       - $CONTEXT
       - '{node_name="$NAME"}'
+      - --k9s-format
+      - --pager
       - --quiet
+      - --limit
+      - "500"
       - -f
   loki-node-raw:
     shortCut: Ctrl-L
@@ -93,9 +219,31 @@ plugins:
       - $CONTEXT
       - '{node_name="$NAME"}'
       - --quiet
+      - --limit
+      - "500"
       - -f
       - -o
       - raw
+  loki-node-table:
+    shortCut: k
+    description: "loki table"
+    scopes:
+      - node
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
+      - --
+      - $CONTEXT
+      - '{node_name="$NAME"}'
+      - --k9s-format
+      - --pager
+      - --table
+      - --quiet
+      - --limit
+      - "500"
+      - -f
   loki-ns:
     shortCut: Shift-L
     description: "loki fmt"
@@ -109,7 +257,11 @@ plugins:
       - --
       - $CONTEXT
       - '{namespace="$NAME"}'
+      - --k9s-format
+      - --pager
       - --quiet
+      - --limit
+      - "500"
       - -f
   loki-ns-raw:
     shortCut: Ctrl-L
@@ -125,6 +277,28 @@ plugins:
       - $CONTEXT
       - '{namespace="$NAME"}'
       - --quiet
+      - --limit
+      - "500"
       - -f
       - -o
       - raw
+  loki-ns-table:
+    shortCut: k
+    description: "loki table"
+    scopes:
+      - namespace
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
+      - --
+      - $CONTEXT
+      - '{namespace="$NAME"}'
+      - --k9s-format
+      - --pager
+      - --table
+      - --quiet
+      - --limit
+      - "500"
+      - -f
