@@ -1,95 +1,130 @@
 plugins:
-  # https://grafana.com/docs/loki/latest/query/logcli/
-  # you must set the LOKI_ADDR environment variable ("export LOKI_ADDR=https://loki.internal" in bash) before starting k9s to use logcli
+  # Starts a local Loki port-forward on first use, then queries it with logcli.
   loki-container:
     shortCut: Shift-L
     description: "loki fmt"
     scopes:
       - containers
-    command: logcli
+    command: sh
     background: false
     args:
-      - query
-      - '{ namespace = "$NAMESPACE", pod = "$POD", container = "$NAME" }'
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
+      - --
+      - $CONTEXT
+      - '{namespace="$NAMESPACE",pod="$POD",container="$NAME"}'
+      - --quiet
       - -f
   loki-container-raw:
     shortCut: Ctrl-E
     description: "loki raw"
     scopes:
       - containers
-    command: logcli
+    command: sh
     background: false
     args:
-      - query
-      - '{ namespace = "$NAMESPACE", pod = "$POD", container = "$NAME" }'
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
+      - --
+      - $CONTEXT
+      - '{namespace="$NAMESPACE",pod="$POD",container="$NAME"}'
+      - --quiet
       - -f
-      - -oraw
+      - -o
+      - raw
   loki-pods:
     shortCut: Shift-L
     description: "loki fmt"
     scopes:
       - po
-    command: logcli
+    command: sh
     background: false
     args:
-      - query
-      - '{ namespace = "$NAMESPACE", pod = "$NAME" }'
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
+      - --
+      - $CONTEXT
+      - '{namespace="$NAMESPACE",pod="$NAME"}'
+      - --quiet
       - -f
   loki-pods-raw:
     shortCut: Ctrl-L
     description: "loki raw"
     scopes:
       - po
-    command: logcli
+    command: sh
     background: false
     args:
-      - query
-      - '{ namespace = "$NAMESPACE", pod = "$NAME" }'
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
+      - --
+      - $CONTEXT
+      - '{namespace="$NAMESPACE",pod="$NAME"}'
+      - --quiet
       - -f
-      - -oraw
+      - -o
+      - raw
   loki-node:
     shortCut: Shift-L
     description: "loki fmt"
     scopes:
       - node
-    command: logcli
+    command: sh
     background: false
     args:
-      - query
-      - '{ node_name = "$NAME" }'
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
+      - --
+      - $CONTEXT
+      - '{node_name="$NAME"}'
+      - --quiet
       - -f
   loki-node-raw:
     shortCut: Ctrl-L
     description: "loki raw"
     scopes:
       - node
-    command: logcli
+    command: sh
     background: false
     args:
-      - query
-      - '{ node_name = "$NAME" }'
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
+      - --
+      - $CONTEXT
+      - '{node_name="$NAME"}'
+      - --quiet
       - -f
-      - -oraw
+      - -o
+      - raw
   loki-ns:
     shortCut: Shift-L
     description: "loki fmt"
     scopes:
       - namespace
-    command: logcli
+    command: sh
     background: false
     args:
-      - query
-      - '{ namespace = "$NAME" }'
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
+      - --
+      - $CONTEXT
+      - '{namespace="$NAME"}'
+      - --quiet
       - -f
   loki-ns-raw:
     shortCut: Ctrl-L
     description: "loki raw"
     scopes:
       - namespace
-    command: logcli
+    command: sh
     background: false
     args:
-      - query
-      - '{ namespace = "$NAME" }'
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/loki-logcli" "$@"
+      - --
+      - $CONTEXT
+      - '{namespace="$NAME"}'
+      - --quiet
       - -f
-      - -oraw
+      - -o
+      - raw

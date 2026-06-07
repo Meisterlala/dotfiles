@@ -1,15 +1,17 @@
 plugins:
-  # Sends logs over to jq for processing. This leverages kubectl plugin kubectl-jq.
+  # Streams pod logs through jq without requiring the kubectl-jq plugin.
   jqlogs:
     shortCut: Ctrl-J
     confirm: false
     description: "Logs (jq)"
     scopes:
       - po
-    command: kubectl
+    command: sh
     background: false
     args:
-      - jq
+      - -c
+      - kubectl logs --context "$3" --namespace "$2" "$1" --follow --ignore-errors=true | jq --unbuffered -R 'fromjson? // .'
+      - --
       - $NAME
       - $NAMESPACE
       - $CONTEXT
