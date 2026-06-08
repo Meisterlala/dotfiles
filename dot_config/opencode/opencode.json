@@ -130,14 +130,10 @@
     "cc-safety-net@latest",
     "@plannotator/opencode@latest",
     // "oh-my-openagent@latest"
-    "openviking-opencode-plugin@latest"
+    "openviking-opencode-plugin@latest",
+    "@prevalentware/opencode-goal-plugin"
   ],
   "mcp": {
-    "browsermcp": {
-      "enabled": false,
-      "type": "local",
-      "command": ["npx", "@browsermcp/mcp@latest"]
-    },
     "chrome-devtools": {
       "enabled": false,
       "type": "local",
@@ -145,7 +141,8 @@
         "npx",
         "-y",
         "chrome-devtools-mcp@latest",
-        "--no-usage-statistics"
+        "--no-usage-statistics",
+        "--autoConnect"
       ]
     },
     "livekit-docs": {
@@ -380,7 +377,8 @@
       "rustc *": "allow",
       "cargo info *": "allow",
 
-      "woodpecker *": "allow"
+      "woodpecker *": "allow",
+      "skopeo inspect *": "allow"
     }
   }
 }

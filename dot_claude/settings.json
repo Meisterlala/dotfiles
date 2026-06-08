@@ -249,7 +249,8 @@
       "Bash(cargo build *)",
       "Bash(rustc *)",
       "Bash(cargo info *)",
-      "Bash(woodpecker *)"
+      "Bash(woodpecker *)",
+      "Bash(skopeo inspect *)"
     ],
     "deny": [
       "Bash(sudo*)"
