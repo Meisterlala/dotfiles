@@ -135,7 +135,7 @@
   ],
   "mcp": {
     "chrome-devtools": {
-      "enabled": false,
+      "enabled": true,
       "type": "local",
       "command": [
         "npx",
@@ -173,6 +173,15 @@
       "oauth": false,
       "headers": {
         "Authorization": "Bearer {env:GITHUB_PAT}"
+      }
+    },
+    "agentgateway": {
+      "enabled": true,
+      "type": "remote",
+      "url": "https://mcp.meisterlala.dev",
+      "oauth": false,
+      "headers": {
+        "Authorization": "Bearer {env:AGENTGATEWAY_KEY}"
       }
     }
   },
