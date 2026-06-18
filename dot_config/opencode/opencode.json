@@ -166,6 +166,11 @@
         "thunderbird-mcp"
       ]
     },
+    "k6": {
+      "type": "local",
+      "enabled": false,
+      "command": ["k6", "x", "mcp"]
+    },
     "github": {
       "enabled": true,
       "type": "remote",
