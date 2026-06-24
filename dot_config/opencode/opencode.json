@@ -130,7 +130,7 @@
     "cc-safety-net@latest",
     "@plannotator/opencode@latest",
     // "oh-my-openagent@latest"
-    "openviking-opencode-plugin@latest",
+    "./plugins/openviking.mjs",
     "@prevalentware/opencode-goal-plugin"
   ],
   "mcp": {
@@ -144,6 +144,11 @@
         "--no-usage-statistics",
         "--autoConnect"
       ]
+    },
+    "playwright": {
+      "enabled": true,
+      "type": "local",
+      "command": ["npx", "-y", "playwright/mcp@latest"]
     },
     "livekit-docs": {
       "enabled": false,
