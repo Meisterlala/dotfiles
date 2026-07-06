@@ -13,7 +13,16 @@ abbr -a zd "zellij --layout dev"
 abbr -a watch "watch -c -n 1 --"
 
 # Initialize zoxide if installed
+# Initialize zoxide and let it override cd.
 if command -q zoxide
+    # Work around fish 4.x + zoxide reading missing $__fish_data_dir/functions/cd.fish.
+    # Define zoxide's internal "real cd" copy from fish's loaded cd function instead.
+    if not functions -q __zoxide_cd_internal
+        functions cd |
+            string replace --regex -- '^function cd\s' 'function __zoxide_cd_internal ' |
+            source
+    end
+
     zoxide init fish --cmd cd | source
 end
 
