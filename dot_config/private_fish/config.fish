@@ -2,6 +2,11 @@ if status is-interactive
     # Commands to run in interactive sessions can go here
 end
 
+# Raise max open files on macOS (default 256 is too low for nvim's file watchers/swap/sockets)
+if test (uname) = Darwin
+    ulimit -n 32768
+end
+
 # General abbr
 abbr -a .. 'cd ..'
 abbr -a cc "claude"
