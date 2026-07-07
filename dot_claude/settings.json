@@ -2,6 +2,7 @@
   "cleanupPeriodDays": 999999999,
   "permissions": {
     "allow": [
+      "*plugin:chrome-devtools-mcp*",
       "mcp__ide",
       "mcp__atlassian__atlassianUserInfo",
       "mcp__atlassian__fetch",
@@ -252,17 +253,23 @@
       "Bash(woodpecker *)",
       "Bash(skopeo inspect *)"
     ],
-    "deny": [
-      "Bash(sudo*)"
-    ],
-    "ask": [
-      "Bash(flux reconcile *)"
-    ]
+    "deny": ["Bash(sudo*)"],
+    "ask": ["Bash(flux reconcile *)"]
   },
   "spinnerTipsEnabled": false,
   "effortLevel": "medium",
   "autoConnectToIde": true,
   "autoconnectToIde": true,
   "autoCompactEnabled": false,
-  "remoteControlAtStartup": false
+  "remoteControlAtStartup": false,
+
+  "enabledPlugins": {
+    "lua-lsp@claude-plugins-official": true
+  },
+  "mcpServers": {
+    "mail": {
+      "command": "uvx",
+      "args": ["apple-mail-mcp", "--watch"]
+    }
+  }
 }
