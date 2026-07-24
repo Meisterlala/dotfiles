@@ -131,7 +131,7 @@
     "@plannotator/opencode@latest",
     // "oh-my-openagent@latest"
     "./plugins/openviking.mjs",
-    "@prevalentware/opencode-goal-plugin@latest"
+    "@prevalentware/opencode-goal-plugin"
   ],
   "mcp": {
     "chrome-devtools": {
@@ -150,12 +150,6 @@
       "type": "local",
       "command": ["npx", "-y", "open-computer-use@latest", "mcp"]
     },
-    // "playwright": {
-    //   "enabled": true,
-    //   "type": "local",
-    //   "command": ["npx", "-y", "@playwright/mcp@latest", "--extension"]
-    // },
-    // With systemd-run to avoid issues in jai
     "playwright": {
       "enabled": true,
       "type": "local",
