@@ -2,4 +2,6 @@
 .dmux
 .dmux*
 
+.playwright-mcp
+
 .sisyphus
