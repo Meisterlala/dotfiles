@@ -4,8 +4,8 @@ set -euo pipefail
 tmp_file="$(mktemp /tmp/paru-pkgbuild-diff.XXXXXX)"
 trap 'rm -f "$tmp_file"' EXIT
 
-ai_model="${OPENCODE_MODEL:-github-copilot/gemini-3-5-flash-preview}"
-ai_fallback_models_csv="${OPENCODE_FALLBACK_MODELS:-github-copilot/gpt-4.1,github-copilot/gpt-5-mini,openai/gpt-5.3-codex,openrouter/free,openrouter/openai/oss-80b:free,openrouter/meta-llama/llama-3.3-70b-instruct:free,openrouter/google/gemma-3-12b-it:free}"
+ai_model="${OPENCODE_MODEL:-openai/gpt-5.6-luna}"
+ai_fallback_models_csv="${OPENCODE_FALLBACK_MODELS:-openai/gpt-5.6-terra,openai/gpt-5.4-mini}"
 ai_timeout_seconds="${OPENCODE_TIMEOUT_SECONDS:-20}"
 
 if ! [[ "$ai_timeout_seconds" =~ ^[0-9]+$ ]] || [ "$ai_timeout_seconds" -lt 1 ]; then
@@ -171,7 +171,7 @@ $(cat "$tmp_file")" 2>&1)" || ai_exit=$?
 should_fallback() {
   [ "$ai_exit" -eq 124 ] || [ "$ai_exit" -eq 137 ] && return 0
 
-  if printf '%s\n' "$ai_output" | grep -Eiq '(rate limit|quota|resource exhausted|too many requests|429|insufficient.*credit|billing|model.*not found|not available|access denied|forbidden)'; then
+  if printf '%s\n' "$ai_output" | grep -Eiq '(rate limit|quota|resource exhausted|too many requests|429|insufficient.*credit|billing|model.*not found|provider not found|not available|access denied|forbidden|unexpected server error|unknownerror)'; then
     return 0
   fi
 

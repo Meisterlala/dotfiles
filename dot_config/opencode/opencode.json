@@ -319,6 +319,7 @@
       "kubectl explain *": "allow",
       "kubectl get *": "allow",
       "kubectl logs *": "allow",
+      "kubectl wiat *": "allow",
       "kubectl port-forward *": "allow",
       "kubectl top *": "allow",
       "kustomize build *": "allow",

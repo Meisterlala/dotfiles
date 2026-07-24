@@ -252,7 +252,8 @@
       "Bash(woodpecker *)",
       "Bash(skopeo inspect *)",
       "mcp__plugin_chrome-devtools-mcp_chrome-devtools__*",
-      "mcp__chrome-devtools-mcp__*"
+      "mcp__chrome-devtools-mcp__*",
+      "Bash(kubectl wiat *)"
     ],
     "deny": [
       "Bash(sudo*)"
