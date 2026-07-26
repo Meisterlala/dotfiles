@@ -1,0 +1,149 @@
+plugins:
+  victoria-container-raw:
+    shortCut: Shift-L
+    description: "VictoriaLogs raw"
+    scopes: [containers]
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/victoria-tui-launcher" "$@"
+      - --
+      - $CONTEXT
+      - --container
+      - $NAMESPACE
+      - $POD
+      - $NAME
+      - raw
+  victoria-container-table:
+    shortCut: k
+    description: "VictoriaLogs table"
+    scopes: [containers]
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/victoria-tui-launcher" "$@"
+      - --
+      - $CONTEXT
+      - --container
+      - $NAMESPACE
+      - $POD
+      - $NAME
+      - table
+  victoria-pods-raw:
+    shortCut: Shift-L
+    description: "VictoriaLogs raw"
+    scopes: [po]
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/victoria-tui-launcher" "$@"
+      - --
+      - $CONTEXT
+      - --pod
+      - $NAMESPACE
+      - $NAME
+      - raw
+  victoria-pods-table:
+    shortCut: k
+    description: "VictoriaLogs table"
+    scopes: [po]
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/victoria-tui-launcher" "$@"
+      - --
+      - $CONTEXT
+      - --pod
+      - $NAMESPACE
+      - $NAME
+      - table
+  victoria-deployments-raw:
+    shortCut: Shift-L
+    description: "VictoriaLogs raw"
+    scopes: [deployments]
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/victoria-tui-launcher" "$@"
+      - --
+      - $CONTEXT
+      - --deployment
+      - $NAMESPACE
+      - $NAME
+      - raw
+  victoria-deployments-table:
+    shortCut: k
+    description: "VictoriaLogs table"
+    scopes: [deployments]
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/victoria-tui-launcher" "$@"
+      - --
+      - $CONTEXT
+      - --deployment
+      - $NAMESPACE
+      - $NAME
+      - table
+  victoria-node-raw:
+    shortCut: Shift-L
+    description: "VictoriaLogs raw"
+    scopes: [node]
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/victoria-tui-launcher" "$@"
+      - --
+      - $CONTEXT
+      - --node
+      - $NAME
+      - raw
+  victoria-node-table:
+    shortCut: k
+    description: "VictoriaLogs table"
+    scopes: [node]
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/victoria-tui-launcher" "$@"
+      - --
+      - $CONTEXT
+      - --node
+      - $NAME
+      - table
+  victoria-ns-raw:
+    shortCut: Shift-L
+    description: "VictoriaLogs raw"
+    scopes: [namespace]
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/victoria-tui-launcher" "$@"
+      - --
+      - $CONTEXT
+      - --namespace
+      - $NAME
+      - raw
+  victoria-ns-table:
+    shortCut: k
+    description: "VictoriaLogs table"
+    scopes: [namespace]
+    command: sh
+    background: false
+    args:
+      - -c
+      - exec "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins/victoria-tui-launcher" "$@"
+      - --
+      - $CONTEXT
+      - --namespace
+      - $NAME
+      - table

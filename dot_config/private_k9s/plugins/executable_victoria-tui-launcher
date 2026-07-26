@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/k9s/plugins"
+source_dir="$config_dir/victoria-tui"
+binary="$config_dir/victoria-tui-bin"
+
+if [ ! -x "$binary" ] || find "$source_dir" -type f \( -name '*.go' -o -name 'go.mod' -o -name 'go.sum' \) -newer "$binary" -print -quit | grep -q .; then
+  temporary="$binary.$$"
+  trap 'rm -f "$temporary"' EXIT INT TERM
+  printf 'Building VictoriaLogs TUI...\n' >&2
+  (cd "$source_dir" && go build -o "$temporary" .)
+  mv "$temporary" "$binary"
+  trap - EXIT INT TERM
+fi
+
+exec "$binary" "$@"

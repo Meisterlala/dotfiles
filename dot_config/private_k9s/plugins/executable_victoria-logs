@@ -1,0 +1,276 @@
+#!/bin/sh
+set -eu
+
+usage() {
+  echo "usage: victoria-logs <context> <--container|--pod|--deployment|--node|--namespace> <values...> <raw|table>" >&2
+  exit 2
+}
+
+context="${1:-}"
+selector="${2:-}"
+[ -n "$selector" ] || usage
+shift 2
+
+quote_value() {
+  jq -Rn --arg value "$1" '$value'
+}
+
+regex_escape() {
+  printf '%s' "$1" | sed 's/[][(){}.^$*+?|\\]/\\&/g'
+}
+
+table_scope=query
+case "$selector" in
+  --container)
+    [ "$#" -ge 3 ] || usage
+    namespace="$1" pod="$2" container="$3"
+    shift 3
+    query="namespace:=$(quote_value "$namespace") and pod:=$(quote_value "$pod") and container:=$(quote_value "$container")"
+    table_scope=container
+    ;;
+  --pod)
+    [ "$#" -ge 2 ] || usage
+    namespace="$1" pod="$2"
+    shift 2
+    query="namespace:=$(quote_value "$namespace") and pod:=$(quote_value "$pod")"
+    table_scope=pod
+    ;;
+  --deployment)
+    [ "$#" -ge 2 ] || usage
+    namespace="$1" deployment="$2"
+    shift 2
+    # Deployment pod names retain this prefix across ReplicaSet rollouts.
+    pod_pattern="^$(regex_escape "$deployment")-[a-z0-9]+-[a-z0-9]+$"
+    query="namespace:=$(quote_value "$namespace") and pod:~$(quote_value "$pod_pattern")"
+    table_scope=deployment
+    ;;
+  --node)
+    [ "$#" -ge 1 ] || usage
+    node="$1"
+    shift
+    query="node:=$(quote_value "$node")"
+    table_scope=node
+    ;;
+  --namespace)
+    [ "$#" -ge 1 ] || usage
+    namespace="$1"
+    shift
+    query="namespace:=$(quote_value "$namespace")"
+    table_scope=namespace
+    ;;
+  *) usage ;;
+esac
+
+columns_json='[]'
+mode="${1:-}"
+[ "$#" -eq 1 ] || usage
+case "$mode" in raw|table) ;; *) usage ;; esac
+
+addr=http://localhost:9428
+if [ -n "${XDG_RUNTIME_DIR:-}" ] && [ -d "$XDG_RUNTIME_DIR" ]; then
+  runtime_dir="$XDG_RUNTIME_DIR"
+elif [ -d /dev/shm ]; then
+  runtime_dir=/dev/shm
+else
+  runtime_dir=/tmp
+fi
+
+state_dir="$runtime_dir/k9s-victoria-logs-port-forward"
+session_dir="$state_dir/sessions"
+pid_file="$state_dir/pid"
+janitor_pid_file="$state_dir/janitor.pid"
+port_forward_log="$state_dir/kubectl.log"
+tail_log="$state_dir/tail.log"
+session_file="$session_dir/$$"
+mkdir -p "$session_dir"
+
+is_alive() {
+  [ -n "${1:-}" ] && kill -0 "$1" 2>/dev/null
+}
+
+kill_tree() {
+  pid="${1:-}"
+  [ -n "$pid" ] || return 0
+  for child in $(pgrep -P "$pid" 2>/dev/null || true); do
+    kill_tree "$child"
+  done
+  kill "$pid" 2>/dev/null || true
+}
+
+is_victoria_logs_up() {
+  curl -fsS --max-time 1 "$addr/health" >/dev/null 2>&1
+}
+
+k9s_running() {
+  pgrep -x k9s >/dev/null 2>&1
+}
+
+release_session() {
+  rm -f "$session_file"
+}
+
+start_janitor() {
+  k9s_running || return 0
+  if [ -f "$janitor_pid_file" ]; then
+    janitor_pid="$(sed -n '1p' "$janitor_pid_file" 2>/dev/null || true)"
+    is_alive "$janitor_pid" && return 0
+  fi
+  (
+    while pgrep -x k9s >/dev/null 2>&1; do sleep 5; done
+    if [ -f "$pid_file" ]; then
+      pid="$(sed -n '1p' "$pid_file" 2>/dev/null || true)"
+      is_alive "$pid" && kill "$pid" 2>/dev/null || true
+      rm -f "$pid_file"
+    fi
+    rm -f "$janitor_pid_file"
+  ) >/dev/null 2>&1 &
+  printf '%s\n' "$!" >"$janitor_pid_file"
+}
+
+start_port_forward() {
+  if [ -f "$pid_file" ]; then
+    pid="$(sed -n '1p' "$pid_file" 2>/dev/null || true)"
+    if is_alive "$pid" && is_victoria_logs_up; then return 0; fi
+  fi
+  is_victoria_logs_up && return 0
+  : >"$port_forward_log"
+  if [ -n "$context" ]; then
+    kubectl --context "$context" port-forward -n victoria-metrics service/vlsingle-logs 9428:9428 --address localhost >>"$port_forward_log" 2>&1 &
+  else
+    kubectl port-forward -n victoria-metrics service/vlsingle-logs 9428:9428 --address localhost >>"$port_forward_log" 2>&1 &
+  fi
+  pf_pid="$!"
+  printf '%s\n' "$pf_pid" >"$pid_file"
+  i=0
+  while [ "$i" -lt 50 ]; do
+    is_victoria_logs_up && return 0
+    if ! is_alive "$pf_pid"; then
+      sed -n '1,200p' "$port_forward_log" >&2
+      exit 1
+    fi
+    i=$((i + 1))
+    sleep 0.1
+  done
+  sed -n '1,200p' "$port_forward_log" >&2
+  exit 1
+}
+
+query_logs() {
+  curl -fsS --no-buffer --get "$addr/select/logsql/query" \
+    --data-urlencode "query=$query" \
+    --data-urlencode 'limit=10' \
+    --data-urlencode 'start=24h'
+}
+
+tail_logs() {
+  curl -fsS --no-buffer --get "$addr/select/logsql/tail" \
+    --data-urlencode "query=$query"
+}
+
+tail_logs_with_history() {
+  curl -fsS --no-buffer --get "$addr/select/logsql/tail" \
+    --data-urlencode "query=$query" \
+    --data-urlencode 'start_offset=1m'
+}
+
+format_table() {
+  jq --unbuffered -r --argjson columns "$columns_json" '
+    def clean: tostring | gsub("[|\\t\\r\\n]"; " ");
+    [$columns[] as $key
+      | .[$key]
+      | if . == null then ""
+        elif type == "object" or type == "array" then tojson
+        else tostring end
+      | clean]
+    | join(" | ")
+  '
+}
+
+format_raw() {
+  jq --unbuffered -c '
+    with_entries(select(.key as $key
+      | ($key | startswith("kubernetes.") | not)
+        and (["_stream", "_stream_id", "_time", "app", "collector", "container", "namespace", "node", "pod", "source_type", "timestamp"] | index($key) | not)
+    ))
+    | .message = (._msg // .message // "")
+    | del(._msg)
+    | if .level then .level = (.level | tostring | ascii_upcase) else . end
+  '
+}
+
+discover_table_columns() {
+  columns_json="$(jq -sc --arg scope "$table_scope" '
+    map(keys[]) | unique as $all
+    | ["_stream", "_stream_id", "_time", "app", "collector", "container", "namespace", "node", "pod", "source_type", "timestamp"] as $excluded
+    | (if $scope == "pod" then ["container"]
+       elif $scope == "deployment" or $scope == "namespace" then ["pod", "container"]
+       elif $scope == "node" then ["namespace", "pod", "container"]
+       else [] end) as $context
+    | [$context[] | select(. as $key | $all | index($key))]
+      + ([$all[]
+          | select(. as $key
+            | ($excluded | index($key) | not)
+              and ($context | index($key) | not)
+              and ($key | startswith("kubernetes.") | not))]
+         | sort_by(if . == "_msg" then "message" else . end))
+  ' "$1")"
+}
+
+table_header() {
+  jq -nr --argjson columns "$columns_json" '
+    def clean: gsub("[|\\t\\r\\n]"; " ");
+    def header:
+      if . == "_time" then "TIME"
+      elif . == "_msg" then "MESSAGE"
+      else ltrimstr("_") | ascii_upcase end;
+    $columns | map(header | clean) | join(" | ")
+  '
+}
+
+run_table() {
+  tmp_file="$state_dir/logs.$$"
+  query_file="$state_dir/query.$$"
+  producer_pid=""
+  cleanup_table() {
+    if [ -n "${producer_pid:-}" ]; then
+      kill_tree "$producer_pid"
+      wait "$producer_pid" 2>/dev/null || true
+      producer_pid=""
+    fi
+    rm -f "$tmp_file" "$query_file"
+  }
+  trap 'cleanup_table; release_session' EXIT INT TERM
+  query_logs >"$query_file"
+  discover_table_columns "$query_file"
+  table_header >"$tmp_file"
+  format_table <"$query_file" >>"$tmp_file"
+  : >"$tail_log"
+  (tail_logs 2>>"$tail_log" | format_table >>"$tmp_file") 2>>"$tail_log" &
+  producer_pid="$!"
+  if command -v ov >/dev/null 2>&1; then
+    ov --follow-mode --align --column-mode --column-rainbow --column-delimiter '|' --header 1 --multi-color 'ERROR,FATAL,PANIC,WARN,WARNING,INFO,DEBUG,TRACE,UNKNOWN' "$tmp_file"
+  elif command -v less >/dev/null 2>&1; then
+    less -R +F "$tmp_file"
+  else
+    more "$tmp_file"
+  fi
+  cleanup_table
+}
+
+run_raw() {
+  if command -v less >/dev/null 2>&1; then
+    tail_logs_with_history | format_raw | less -R +F
+  else
+    tail_logs_with_history | format_raw | more
+  fi
+}
+
+: >"$session_file"
+trap release_session EXIT INT TERM
+start_port_forward
+start_janitor
+
+case "$mode" in
+  raw) run_raw ;;
+  table) run_table ;;
+esac
