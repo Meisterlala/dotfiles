@@ -23,3 +23,8 @@ Documents
 # pycache
 __pycache__/
 *.pyc
+
+# k9s Victoria TUI build artifacts
+.config/k9s/plugins/victoria-tui-bin
+.config/k9s/plugins/victoria-tui-bin.*
+.config/k9s/plugins/victoria-tui/victoria-tui

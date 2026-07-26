@@ -11,6 +11,7 @@ end
 abbr -a .. 'cd ..'
 abbr -a cc "claude"
 abbr -a oc "jai -j opencode opencode"
+abbr -a oca "jai -j opencode opencode --auto"
 abbr -a co "codex"
 abbr -a v "nvim"
 abbr -a z "zellij"
