@@ -111,6 +111,32 @@ func TestLiveEntriesAlwaysAppend(t *testing.T) {
 	}
 }
 
+func TestSteadyLiveAppendKeepsExistingTableCells(t *testing.T) {
+	v := newViewer(config{scope: "pod", mode: "raw"}, nil, nil, func() {})
+	items := make([]entry, 12)
+	for i := range items {
+		items[i] = entry{"_stream_id": fmt.Sprint(i), "_time": fmt.Sprintf("2026-01-01T00:00:%02dZ", i), "_msg": fmt.Sprint(i)}
+	}
+	v.addEntries(items, true)
+	v.following = false
+	first := v.table.GetCell(v.rowForEntry(0), 0)
+	v.addEntries([]entry{{"_stream_id": "live", "_time": "2026-01-01T00:01:00Z", "_msg": "live"}}, false)
+	if v.table.GetCell(v.rowForEntry(0), 0) != first {
+		t.Fatal("steady live append rebuilt existing table cells")
+	}
+}
+
+func TestWrappedLinesAreCached(t *testing.T) {
+	v := newViewer(config{scope: "pod", mode: "raw"}, nil, nil, func() {})
+	v.wrap = true
+	v.wrapWidth = 20
+	v.addEntries([]entry{{"_stream_id": "1", "_time": "2026-01-01T00:00:00Z", "_msg": "a sufficiently long message to wrap"}}, true)
+	first, second := v.rawLines(0), v.rawLines(0)
+	if len(first) == 0 || &first[0] != &second[0] {
+		t.Fatal("wrapped lines were recalculated instead of reused")
+	}
+}
+
 func TestVisibleColumns(t *testing.T) {
 	got := strings.Join(visibleColumns([]string{"pod", "container", "level"}, map[string]bool{"container": true}), ",")
 	if got != "pod,level" {

@@ -12,6 +12,15 @@ import (
 	"github.com/rivo/tview"
 )
 
+type entryRender struct {
+	id         string
+	raw        string
+	lines      []string
+	wrap       bool
+	width      int
+	timestamps bool
+}
+
 type viewer struct {
 	app        *tview.Application
 	table      *tview.Table
@@ -23,6 +32,8 @@ type viewer struct {
 	backend    *backend
 	config     config
 	entries    []entry
+	renders    []*entryRender
+	rowOffsets []int
 	seen       map[string]bool
 	columns    []string
 	hidden     map[string]bool
@@ -40,11 +51,12 @@ type viewer struct {
 	newBelow   bool
 	wrapWidth  int
 	selected   tcell.Style
+	styled     int
 }
 
 func newViewer(cfg config, c *client, backend *backend, cancel context.CancelFunc) *viewer {
 	selected := tcell.StyleDefault.Reverse(true).Bold(true)
-	v := &viewer{app: tview.NewApplication(), table: tview.NewTable().SetSelectable(true, true).SetSelectedStyle(selected), topBar: tview.NewTextView().SetDynamicColors(true).SetTextAlign(tview.AlignCenter), status: tview.NewTextView().SetDynamicColors(true), client: c, backend: backend, config: cfg, seen: make(map[string]bool), hidden: make(map[string]bool), loading: true, hasMore: true, following: true, columnsOn: cfg.mode == "table", cancel: cancel, selected: selected}
+	v := &viewer{app: tview.NewApplication(), table: tview.NewTable().SetSelectable(true, true).SetSelectedStyle(selected), topBar: tview.NewTextView().SetDynamicColors(true).SetTextAlign(tview.AlignCenter), status: tview.NewTextView().SetDynamicColors(true), client: c, backend: backend, config: cfg, seen: make(map[string]bool), hidden: make(map[string]bool), loading: true, hasMore: true, following: true, columnsOn: cfg.mode == "table", cancel: cancel, selected: selected, styled: -1}
 	v.table.SetBorder(false)
 	v.table.SetSelectionChangedFunc(func(row, _ int) {
 		if v.rebuilding {
@@ -84,6 +96,7 @@ func newViewer(cfg config, c *client, backend *backend, cancel context.CancelFun
 			row, _ := v.table.GetSelection()
 			index := v.entryIndexAtRow(row)
 			v.wrapWidth = width
+			v.invalidateRenderLayout()
 			v.rebuildKeepingSelection(index)
 		}
 		return false
@@ -178,32 +191,76 @@ func (v *viewer) loadOlder(ctx context.Context) {
 func (v *viewer) addEntries(items []entry, older bool) {
 	selectedID := ""
 	selectedLine := 0
+	oldEntryCount := len(v.entries)
 	row, _ := v.table.GetSelection()
 	offsetRow, offsetColumn := v.table.GetOffset()
 	oldEntryStart := v.entryStartRow()
 	oldRenderedRows := v.renderedRowCount()
 	if index := v.entryIndexAtRow(row); index >= 0 {
-		selectedID = v.entries[index].id()
+		v.ensureRenders()
+		selectedID = v.renders[index].id
 		selectedLine = row - v.rowForEntry(index)
 	}
-	fresh := make([]entry, 0, len(items))
+	type freshEntry struct {
+		item   entry
+		render *entryRender
+	}
+	fresh := make([]freshEntry, 0, len(items))
 	for _, item := range items {
 		id := item.id()
 		if v.seen[id] {
 			continue
 		}
 		v.seen[id] = true
-		fresh = append(fresh, item)
+		fresh = append(fresh, freshEntry{item: item, render: &entryRender{id: id}})
 	}
 	added := len(fresh)
 	if added == 0 {
 		return
 	}
 	if older {
-		sort.SliceStable(fresh, func(i, j int) bool { return fresh[i].timestamp() < fresh[j].timestamp() })
-		v.entries = append(fresh, v.entries...)
+		sort.SliceStable(fresh, func(i, j int) bool { return fresh[i].item.timestamp() < fresh[j].item.timestamp() })
+		items := make([]entry, len(fresh))
+		renders := make([]*entryRender, len(fresh))
+		for i, item := range fresh {
+			items[i], renders[i] = item.item, item.render
+		}
+		v.entries = append(items, v.entries...)
+		v.renders = append(renders, v.renders...)
 	} else {
-		v.entries = append(v.entries, fresh...)
+		for _, item := range fresh {
+			v.entries = append(v.entries, item.item)
+			v.renders = append(v.renders, item.render)
+		}
+	}
+	if older {
+		v.rowOffsets = nil
+	} else {
+		for index := oldEntryCount; index < len(v.entries); index++ {
+			rows := 1
+			if !v.columnsOn {
+				rows = len(v.rawLines(index))
+			}
+			v.rowOffsets = append(v.rowOffsets, v.rowOffsets[len(v.rowOffsets)-1]+rows)
+		}
+	}
+	columnsChanged := false
+	if v.columnsOn {
+		merged := mergeColumns(v.columns, discoverColumns(v.entries[oldEntryCount:], v.config.scope))
+		columnsChanged = len(merged) != len(v.columns)
+		v.columns = merged
+	}
+	incremental := !older && oldEntryCount > 0 && oldEntryStart == v.entryStartRow() && !columnsChanged
+	if incremental {
+		v.appendTableRows(oldEntryCount, oldRenderedRows)
+		if v.following {
+			v.newBelow = false
+			v.table.Select(v.lastRow(), 0)
+		} else {
+			v.newBelow = !v.bottomVisible()
+		}
+		v.updateStatus("")
+		return
 	}
 	v.rebuild()
 	if v.following && !older {
@@ -214,8 +271,8 @@ func (v *viewer) addEntries(items []entry, older bool) {
 		return
 	}
 	if selectedID != "" {
-		for i, item := range v.entries {
-			if item.id() == selectedID {
+		for i, render := range v.renders {
+			if render.id == selectedID {
 				lines := v.entryRowCount(i)
 				if selectedLine >= lines {
 					selectedLine = lines - 1
@@ -243,6 +300,7 @@ func (v *viewer) addEntries(items []entry, older bool) {
 
 func (v *viewer) rebuild() {
 	v.rebuilding = true
+	v.styled = -1
 	defer func() { v.rebuilding = false }()
 	v.table.Clear()
 	v.table.SetFixed(v.headerRows(), 0)
@@ -252,8 +310,8 @@ func (v *viewer) rebuild() {
 	}
 	if !v.columnsOn {
 		row := entryStart
-		for _, item := range v.entries {
-			for _, line := range v.rawLines(item) {
+		for index := range v.entries {
+			for _, line := range v.rawLines(index) {
 				v.table.SetCell(row, 0, tview.NewTableCell(line).SetExpansion(1))
 				row++
 			}
@@ -275,6 +333,33 @@ func (v *viewer) rebuild() {
 				cell.SetTextColor(levelColor(stringValue(item[name])))
 			}
 			v.table.SetCell(row+entryStart, column, cell)
+		}
+	}
+}
+
+func (v *viewer) appendTableRows(firstEntry, firstRow int) {
+	entryStart := v.entryStartRow()
+	if !v.columnsOn {
+		row := entryStart + firstRow
+		for index := firstEntry; index < len(v.entries); index++ {
+			for _, line := range v.rawLines(index) {
+				v.table.SetCell(row, 0, tview.NewTableCell(line).SetExpansion(1))
+				row++
+			}
+		}
+		return
+	}
+	renderColumns := visibleColumns(v.columns, v.hidden)
+	if v.timestamps {
+		renderColumns = append([]string{"_time"}, renderColumns...)
+	}
+	for index := firstEntry; index < len(v.entries); index++ {
+		for column, name := range renderColumns {
+			cell := tview.NewTableCell(displayValue(v.entries[index][name]))
+			if name == "level" {
+				cell.SetTextColor(levelColor(stringValue(v.entries[index][name])))
+			}
+			v.table.SetCell(entryStart+index, column, cell)
 		}
 	}
 }
@@ -344,11 +429,13 @@ func (v *viewer) handleKey(event *tcell.EventKey) *tcell.EventKey {
 		return nil
 	case 'c':
 		v.columnsOn = !v.columnsOn
+		v.invalidateRenderLayout()
 		v.rebuildKeepingSelection(entryIndex)
 		v.updateStatus("")
 		return nil
 	case 't':
 		v.timestamps = !v.timestamps
+		v.invalidateRenderLayout()
 		v.rebuildKeepingSelection(entryIndex)
 		v.updateStatus("")
 		return nil
@@ -357,6 +444,7 @@ func (v *viewer) handleKey(event *tcell.EventKey) *tcell.EventKey {
 			return event
 		}
 		v.wrap = !v.wrap
+		v.invalidateRenderLayout()
 		v.rebuildKeepingSelection(entryIndex)
 		v.updateStatus("")
 		return nil
@@ -506,14 +594,16 @@ func (v *viewer) visibleDataRows() int {
 	}
 	return rows
 }
-func (v *viewer) rawLines(item entry) []string {
-	text := sourceJSON(item)
-	if v.timestamps {
-		text = item.timestamp() + "  " + text
+func (v *viewer) ensureRenders() {
+	for len(v.renders) < len(v.entries) {
+		item := v.entries[len(v.renders)]
+		v.renders = append(v.renders, &entryRender{id: item.id()})
 	}
-	if !v.wrap {
-		return []string{text}
-	}
+}
+func (v *viewer) invalidateRenderLayout() { v.rowOffsets = nil }
+func (v *viewer) rawLines(index int) []string {
+	v.ensureRenders()
+	render := v.renders[index]
 	width := v.wrapWidth
 	if width <= 0 {
 		_, _, width, _ = v.table.GetInnerRect()
@@ -521,50 +611,57 @@ func (v *viewer) rawLines(item entry) []string {
 	if width <= 0 {
 		width = 80
 	}
-	lines := tview.WordWrap(text, width)
-	if len(lines) == 0 {
-		return []string{""}
+	if render.lines != nil && render.wrap == v.wrap && render.width == width && render.timestamps == v.timestamps {
+		return render.lines
 	}
-	return lines
+	if render.raw == "" {
+		render.raw = sourceJSON(v.entries[index])
+	}
+	text := render.raw
+	if v.timestamps {
+		text = v.entries[index].timestamp() + "  " + text
+	}
+	if !v.wrap {
+		render.lines = []string{text}
+	} else {
+		render.lines = tview.WordWrap(text, width)
+		if len(render.lines) == 0 {
+			render.lines = []string{""}
+		}
+	}
+	render.wrap, render.width, render.timestamps = v.wrap, width, v.timestamps
+	return render.lines
+}
+func (v *viewer) ensureRowOffsets() {
+	if len(v.rowOffsets) == len(v.entries)+1 {
+		return
+	}
+	v.rowOffsets = make([]int, len(v.entries)+1)
+	for index := range v.entries {
+		rows := 1
+		if !v.columnsOn {
+			rows = len(v.rawLines(index))
+		}
+		v.rowOffsets[index+1] = v.rowOffsets[index] + rows
+	}
 }
 func (v *viewer) renderedRowCount() int {
-	if v.columnsOn {
-		return len(v.entries)
-	}
-	rows := 0
-	for _, item := range v.entries {
-		rows += len(v.rawLines(item))
-	}
-	return rows
+	v.ensureRowOffsets()
+	return v.rowOffsets[len(v.entries)]
 }
 func (v *viewer) entryRowCount(index int) int {
 	if index < 0 || index >= len(v.entries) {
 		return 0
 	}
-	if v.columnsOn {
-		return 1
-	}
-	return len(v.rawLines(v.entries[index]))
+	v.ensureRowOffsets()
+	return v.rowOffsets[index+1] - v.rowOffsets[index]
 }
 func (v *viewer) entryIndexAtRow(row int) int {
 	logicalRow := row - v.entryStartRow()
-	if logicalRow < 0 {
+	if logicalRow < 0 || logicalRow >= v.renderedRowCount() {
 		return -1
 	}
-	if v.columnsOn {
-		if logicalRow < len(v.entries) {
-			return logicalRow
-		}
-		return -1
-	}
-	for index, item := range v.entries {
-		lines := len(v.rawLines(item))
-		if logicalRow < lines {
-			return index
-		}
-		logicalRow -= lines
-	}
-	return -1
+	return sort.Search(len(v.entries), func(index int) bool { return v.rowOffsets[index+1] > logicalRow })
 }
 func (v *viewer) rowForEntry(index int) int {
 	if index < 0 {
@@ -573,32 +670,27 @@ func (v *viewer) rowForEntry(index int) int {
 	if index > len(v.entries) {
 		index = len(v.entries)
 	}
-	row := v.entryStartRow()
-	if v.columnsOn {
-		return row + index
-	}
-	for _, item := range v.entries[:index] {
-		row += len(v.rawLines(item))
-	}
-	return row
+	v.ensureRowOffsets()
+	return v.entryStartRow() + v.rowOffsets[index]
 }
 func (v *viewer) styleRawSelection(selectedIndex int) {
 	if v.columnsOn || !v.wrap {
 		return
 	}
+	v.ensureRowOffsets()
 	normal := tcell.StyleDefault.Foreground(tview.Styles.PrimaryTextColor).Background(tview.Styles.PrimitiveBackgroundColor)
-	row := v.entryStartRow()
-	for index, item := range v.entries {
-		isSelected := index == selectedIndex
-		for range v.rawLines(item) {
-			cell := v.table.GetCell(row, 0)
-			if isSelected {
-				cell.SetStyle(v.selected).SetSelectedStyle(v.selected).SetTransparency(false)
-			} else {
-				cell.SetStyle(normal).SetSelectedStyle(v.selected).SetTransparency(true)
-			}
-			row++
+	if v.styled >= 0 && v.styled < len(v.entries) && v.styled != selectedIndex {
+		for row := v.rowForEntry(v.styled); row < v.rowForEntry(v.styled)+v.entryRowCount(v.styled); row++ {
+			v.table.GetCell(row, 0).SetStyle(normal).SetSelectedStyle(v.selected).SetTransparency(true)
 		}
+	}
+	if selectedIndex >= 0 && selectedIndex < len(v.entries) {
+		for row := v.rowForEntry(selectedIndex); row < v.rowForEntry(selectedIndex)+v.entryRowCount(selectedIndex); row++ {
+			v.table.GetCell(row, 0).SetStyle(v.selected).SetSelectedStyle(v.selected).SetTransparency(false)
+		}
+		v.styled = selectedIndex
+	} else {
+		v.styled = -1
 	}
 }
 func (v *viewer) bottomVisible() bool {
