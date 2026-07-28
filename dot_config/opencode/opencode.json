@@ -3,12 +3,23 @@
   "theme": "system",
   "small_model": "openai/gpt-5.6-terra",
   "lsp": true,
+  "formatter": true,
   "agent": {
     "general": {
       "model": "openai/gpt-5.6-terra"
     },
+    "adversarial-review": {
+      "model": "openai/gpt-5.6-luna",
+      "description": "Do an adversarial review of the changes.",
+      "prompt": "Review thes change and find problems with it. Report them. Why do you think its bad. What is bad. And maybe even a proposal for a better solution. Be very critical and adversarial.",
+      "permission": {
+        "write": "deny",
+        "edit": "deny",
+        "read": "allow"
+      }
+    },
     "explore": {
-      "model": "openai/gpt-5.6-terra"
+      "model": "openai/gpt-5.6-luna"
     },
     "commit-review": {
       "model": "openai/gpt-5.6-terra",
