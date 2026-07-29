@@ -10,9 +10,11 @@ export async function readState(path) {
     return {
       sessions: value.sessions && typeof value.sessions === "object" ? value.sessions : {},
       pending: value.pending && typeof value.pending === "object" ? value.pending : {},
+      reviewing: value.reviewing && typeof value.reviewing === "object" ? value.reviewing : {},
+      reviewers: value.reviewers && typeof value.reviewers === "object" ? value.reviewers : {},
     }
   } catch (error) {
-    if (error?.code === "ENOENT") return { sessions: {}, pending: {} }
+    if (error?.code === "ENOENT") return { sessions: {}, pending: {}, reviewing: {}, reviewers: {} }
     throw error
   }
 }

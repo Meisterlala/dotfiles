@@ -9,6 +9,8 @@ const tui: TuiPlugin = async (api, options) => {
   const defaultShowStatus = options?.["show-status"] !== false
   const [defaults, setDefaults] = createSignal<Status>({ dcg: false, aiReview: false, showStatus: defaultShowStatus })
   const [status, setStatus] = createSignal<Status>(defaults())
+  const [reviewing, setReviewing] = createSignal(false)
+  const [spinner, setSpinner] = createSignal("⠋")
   const sessionID = () => api.route.current.name === "session" ? api.route.current.params.sessionID : undefined
   const file = () => statePath(api.state.path.state)
 
@@ -31,11 +33,19 @@ const tui: TuiPlugin = async (api, options) => {
     const id = sessionID()
     const key = id ?? ""
     const configured = defaults()
-    setStatus({
+    const next = {
       dcg: layerEnabled(state, key, "dcg", configured.dcg),
       aiReview: layerEnabled(state, key, "aiReview", configured.aiReview),
       showStatus: layerEnabled(state, key, "showStatus", configured.showStatus),
-    })
+    }
+    setStatus((current) =>
+      current.dcg === next.dcg &&
+      current.aiReview === next.aiReview &&
+      current.showStatus === next.showStatus
+        ? current
+        : next,
+    )
+    setReviewing(state.reviewing[key] === true)
   }
 
   async function toggle(layer: "dcg" | "aiReview" | "showStatus") {
@@ -111,7 +121,7 @@ const tui: TuiPlugin = async (api, options) => {
         const active = [value.dcg ? "DCG" : undefined, value.aiReview ? "AI" : undefined]
           .filter(Boolean)
           .join("+")
-        return <text fg={active === "DCG+AI" ? "#7fd88f" : active ? "#f5c542" : "#f26d6d"}>{active || "Safety OFF"}</text>
+        return <text fg={active === "DCG+AI" ? "#7fd88f" : active ? "#f5c542" : "#f26d6d"}>{reviewing() ? `${spinner()} ` : ""}{active || "Safety OFF"}</text>
       },
       session_prompt_right() {
         const value = status()
@@ -119,13 +129,23 @@ const tui: TuiPlugin = async (api, options) => {
         const active = [value.dcg ? "DCG" : undefined, value.aiReview ? "AI" : undefined]
           .filter(Boolean)
           .join("+")
-        return <text fg={active === "DCG+AI" ? "#7fd88f" : active ? "#f5c542" : "#f26d6d"}>{active || "Safety OFF"}</text>
+        return <text fg={active === "DCG+AI" ? "#7fd88f" : active ? "#f5c542" : "#f26d6d"}>{reviewing() ? `${spinner()} ` : ""}{active || "Safety OFF"}</text>
       },
     },
   })
 
   await loadDefaults()
   await refresh()
+  const refreshTimer = setInterval(() => void refresh().catch(() => {}), 200)
+  const spinnerTimer = setInterval(() => {
+    if (!reviewing()) return
+    const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+    setSpinner((current) => frames[(frames.indexOf(current) + 1) % frames.length])
+  }, 120)
+  api.lifecycle.onDispose(() => {
+    clearInterval(refreshTimer)
+    clearInterval(spinnerTimer)
+  })
 }
 
 const plugin: TuiPluginModule & { id: string } = { id: "safety-watch", tui }
