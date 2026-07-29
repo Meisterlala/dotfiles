@@ -40,8 +40,8 @@ const tui: TuiPlugin = async (api, options) => {
     }
     setStatus((current) =>
       current.dcg === next.dcg &&
-      current.aiReview === next.aiReview &&
-      current.showStatus === next.showStatus
+        current.aiReview === next.aiReview &&
+        current.showStatus === next.showStatus
         ? current
         : next,
     )
@@ -136,7 +136,7 @@ const tui: TuiPlugin = async (api, options) => {
 
   await loadDefaults()
   await refresh()
-  const refreshTimer = setInterval(() => void refresh().catch(() => {}), 200)
+  const refreshTimer = setInterval(() => void refresh().catch(() => { }), 200)
   const spinnerTimer = setInterval(() => {
     if (!reviewing()) return
     const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]

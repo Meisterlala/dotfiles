@@ -1,12 +1,20 @@
 import { layerEnabled, readState, statePath, writeState } from "./state.js";
 import { unwrap } from "./utils.js";
 
-export function createStateController({ client, directory, dcgEnabled, aiReviewEnabled }) {
+export function createStateController({
+  client,
+  directory,
+  dcgEnabled,
+  aiReviewEnabled,
+}) {
   let path;
 
   async function getPath() {
     if (!path) {
-      const paths = unwrap(await client.path.get({ query: { directory } }), "resolving Safety Watch state path");
+      const paths = unwrap(
+        await client.path.get({ query: { directory } }),
+        "resolving Safety Watch state path",
+      );
       path = statePath(paths.state);
     }
     return path;
@@ -26,8 +34,16 @@ export function createStateController({ client, directory, dcgEnabled, aiReviewE
     },
     async applyPendingSettings(sessionID) {
       const state = await load();
-      if (!Object.values(state.pending).some((value) => typeof value === "boolean")) return;
-      state.sessions[sessionID] = { ...state.pending, ...state.sessions[sessionID] };
+      if (
+        !Object.values(state.pending).some(
+          (value) => typeof value === "boolean",
+        )
+      )
+        return;
+      state.sessions[sessionID] = {
+        ...state.pending,
+        ...state.sessions[sessionID],
+      };
       state.pending = {};
       await writeState(await getPath(), state);
     },

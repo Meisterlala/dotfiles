@@ -11,7 +11,8 @@ export function commandText(tool, args, limit) {
 }
 
 export function unwrap(response, operation) {
-  if (response?.error) throw new Error(`${operation} failed: ${compact(response.error, 500)}`);
+  if (response?.error)
+    throw new Error(`${operation} failed: ${compact(response.error, 500)}`);
   if (!response?.data) throw new Error(`${operation} returned no data`);
   return response.data;
 }
@@ -20,13 +21,21 @@ export function parseDecision(text) {
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) throw new Error("reviewer returned no JSON decision");
   const decision = JSON.parse(match[0]);
-  if (typeof decision.allow !== "boolean" || typeof decision.reason !== "string" || !decision.reason.trim()) {
+  if (
+    typeof decision.allow !== "boolean" ||
+    typeof decision.reason !== "string" ||
+    !decision.reason.trim()
+  ) {
     throw new Error("reviewer returned an invalid decision");
   }
   return decision;
 }
 
 export function matchesTool(toolName, patterns) {
-  return patterns.some((pattern) => pattern === "*" ||
-    (pattern.startsWith("*.") && toolName.endsWith(pattern.slice(1))) || toolName === pattern);
+  return patterns.some(
+    (pattern) =>
+      pattern === "*" ||
+      (pattern.startsWith("*.") && toolName.endsWith(pattern.slice(1))) ||
+      toolName === pattern,
+  );
 }
