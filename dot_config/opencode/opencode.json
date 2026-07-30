@@ -105,16 +105,19 @@
     "@plannotator/opencode@latest",
     // "oh-my-openagent@latest"
     [
-      "./plugins/safety-watch/index.js",
+      "/home/misti/source/safety-watch/index.js",
       {
         "enabled": true,
-        "model": "ollama/safety-watch",
+        "stage1": {
+          "model": "ollama/safety-watch",
+          "think": "low"
+        },
         "dcg": false,
         "ai-review": true
       }
     ],
     "./plugins/openviking.mjs",
-    "file:///home/misti/source/opencode-telegram/src/index.ts"
+    "/home/misti/source/opencode-telegram/src/index.ts"
   ],
 
   "mcp": {
@@ -128,11 +131,6 @@
         "--no-usage-statistics",
         "--autoConnect"
       ]
-    },
-    "open-computer-use": {
-      "enabled": true,
-      "type": "local",
-      "command": ["npx", "-y", "open-computer-use@latest", "mcp"]
     },
     "playwright": {
       "enabled": true,
