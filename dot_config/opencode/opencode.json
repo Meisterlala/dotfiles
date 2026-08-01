@@ -110,11 +110,15 @@
         "enabled": true,
         "stage1": {
           "model": "ollama/safety-watch",
-          "think": "none"
+          "options": {
+            "reasoningEffort": "none"
+          }
         },
         "stage2": {
           "model": "openai/gpt-5.6-luna",
-          "think": "low"
+          "options": {
+            "reasoningEffort": "low"
+          }
         },
         "dcg": true,
         "ai-review": true,
