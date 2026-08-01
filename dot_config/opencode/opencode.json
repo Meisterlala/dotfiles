@@ -110,10 +110,34 @@
         "enabled": true,
         "stage1": {
           "model": "ollama/safety-watch",
+          "think": "none"
+        },
+        "stage2": {
+          "model": "openai/gpt-5.6-luna",
           "think": "low"
         },
-        "dcg": false,
-        "ai-review": true
+        "dcg": true,
+        "ai-review": true,
+        "approve-on-fail": true,
+        "notifications": {
+          "enabled": false,
+          "sound": false,
+          "volume": 1,
+          // "sound-file": "~/sound/default.mp3",
+          "on-error": {
+            "enabled": true
+          },
+          // "on-block": {
+          //   "enabled": false
+          // },
+          "on-ask": {
+            "enabled": true,
+            "sound": true
+          }
+          // "on-cache-miss": {
+          //   "enabled": false
+          // }
+        }
       }
     ],
     "./plugins/openviking.mjs",
