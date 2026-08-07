@@ -21,3 +21,4 @@ fi
 
 /home/misti/.cargo/bin/wp mode static >/dev/null 2>&1 || true
 swaync-client -dn -sw >/dev/null 2>&1 || true
+systemctl --user freeze llama-server.service >/dev/null 2>&1 || true

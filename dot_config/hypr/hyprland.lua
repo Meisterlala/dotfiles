@@ -59,6 +59,7 @@ local startup_commands = {
 	-- "systemctl --user start waybar.service",
 	"systemctl --user start quickshell-main.service",
 	"systemctl --user start hyprsunset.service",
+	"~/.config/hypr/mic-push-to-mute.sh watch",
 	terminal,
 }
 
@@ -309,6 +310,9 @@ hl.bind(
 	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),
 	{ locked = true, repeating = true }
 )
+-- hl.bind("F14", hl.dsp.exec_cmd("~/.config/hypr/mic-push-to-mute.sh unmute"), { locked = true })
+-- hl.bind("F14", hl.dsp.exec_cmd("~/.config/hypr/mic-push-to-mute.sh mute"), { locked = true, release = true })
+-- hl.bind("F14", hl.dsp.pass({ window = "class:^(discord|vesktop)$" }))
 hl.bind(
 	"XF86AudioMicMute",
 	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
@@ -323,7 +327,7 @@ hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true 
 
 hl.bind("Print", hl.dsp.exec_cmd("bash ~/.config/hypr/screenshot.sh"))
 hl.bind(main_mod .. " + x", hl.dsp.exec_cmd("swaync-client -t -sw"))
-hl.bind("F14", hl.dsp.pass({ window = "class:^(discord|vesktop)$" }))
+-- hl.bind("F14", hl.dsp.pass({ window = "class:^(discord|vesktop)$" }))
 hl.bind("F18", hl.dsp.exec_cmd("/usr/bin/python3 ~/source/MySuperWhisper/remote_control.py --start"))
 hl.bind("F18", hl.dsp.exec_cmd("/usr/bin/python3 ~/source/MySuperWhisper/remote_control.py --stop"), { release = true })
 

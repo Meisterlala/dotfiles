@@ -4,6 +4,11 @@
   "lsp": true,
   "formatter": true,
   "agent": {
+    "build": {
+      "permission": {
+        "agentgateway_*": "deny"
+      }
+    },
     "general": {
       "model": "openai/gpt-5.6-terra"
     },
@@ -31,6 +36,142 @@
     }
   },
   "provider": {
+    "meta": {
+      "npm": "@ai-sdk/openai",
+      "name": "Meta",
+      "options": {
+        "baseURL": "https://api.meta.ai/v1"
+      }
+    },
+    "llama-cpp": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Llama.cpp",
+      "options": {
+        "baseURL": "http://127.0.0.1:11435/v1"
+      },
+      "models": {
+        "gemma4-12b": {
+          "name": "Gemma 4 12B",
+          "family": "gemma4",
+          "attachment": true,
+          "tool_call": true,
+          "reasoning": true,
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        },
+        "gemma4-26b-a4b": {
+          "name": "Gemma 4 26B-A4B",
+          "family": "gemma4",
+          "attachment": true,
+          "tool_call": true,
+          "reasoning": true,
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        },
+        "gemma4-e4b": {
+          "name": "Gemma 4 E4B",
+          "family": "gemma4",
+          "attachment": true,
+          "tool_call": true,
+          "reasoning": true,
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        },
+        "safety-watch": {
+          "name": "Safety Watch (Qwen 3.5 4B)",
+          "family": "qwen3.5",
+          "attachment": false,
+          "tool_call": true,
+          "reasoning": true,
+          "limit": {
+            "context": 32768,
+            "output": 8192
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
+        "qwen35-2b": {
+          "name": "Qwen 3.5 2B",
+          "family": "qwen3.5",
+          "attachment": true,
+          "tool_call": true,
+          "reasoning": true,
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        },
+        "qwen35-4b": {
+          "name": "Qwen 3.5 4B",
+          "family": "qwen3.5",
+          "attachment": true,
+          "tool_call": true,
+          "reasoning": true,
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        },
+        "qwen35-4b-128": {
+          "name": "Qwen 3.5 4B 128k",
+          "family": "qwen3.5",
+          "attachment": true,
+          "tool_call": true,
+          "reasoning": true,
+          "limit": {
+            "context": 131072,
+            "output": 32768
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
+        "qwen35-9b": {
+          "name": "Qwen 3.5 9B",
+          "family": "qwen3.5",
+          "attachment": true,
+          "tool_call": true,
+          "reasoning": true,
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        }
+      }
+    },
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
       "name": "Ollama",
@@ -105,13 +246,13 @@
     "@plannotator/opencode@latest",
     // "oh-my-openagent@latest"
     [
-      "/home/misti/source/safety-watch/index.js",
+      "/home/misti/source/safety-watch/index.ts",
       {
         "enabled": true,
         "stage1": {
-          "model": "ollama/safety-watch",
+          "model": "llama-cpp/safety-watch",
           "options": {
-            "reasoningEffort": "none"
+            "reasoningEffort": "low"
           }
         },
         "stage2": {
@@ -231,6 +372,57 @@
     "list": "allow",
     "edit": "allow",
     "webfetch": "allow",
+    "playwright_browser_wait_for": "deny",
+    "agentgateway_*": "deny",
+    "agentgateway_dbhub-http_*": "allow",
+    "agentgateway_grafana-mcp-http_query_prometheus": "allow",
+    "agentgateway_grafana-mcp-http_query_loki_logs": "allow",
+    "agentgateway_grafana-mcp-http_query_loki_stats": "allow",
+    "agentgateway_grafana-mcp-http_list_prometheus_metric_names": "allow",
+    "agentgateway_grafana-mcp-http_list_prometheus_label_names": "allow",
+    "agentgateway_grafana-mcp-http_list_prometheus_label_values": "allow",
+    "agentgateway_grafana-mcp-http_list_loki_label_names": "allow",
+    "agentgateway_grafana-mcp-http_list_loki_label_values": "allow",
+    "agentgateway_grafana-mcp-http_list_datasources": "allow",
+    "agentgateway_grafana-mcp-http_search_dashboards": "allow",
+    "agentgateway_grafana-mcp-http_get_dashboard_summary": "allow",
+    "agentgateway_grafana-mcp-http_get_dashboard_property": "allow",
+    "agentgateway_grafana-mcp-http_get_dashboard_panel_queries": "allow",
+    "agentgateway_grafana-mcp-http_alerting_manage_rules": "allow",
+    "agentgateway_grafana-mcp-http_alerting_manage_routing": "allow",
+    "agentgateway_grafana-mcp-http_generate_deeplink": "allow",
+    "agentgateway_grafana-mcp-http_grafana_api_request": "allow",
+    "agentgateway_grafana-mcp-http_get_annotations": "allow",
+    "agentgateway_grafana-mcp-http_list_alert_groups": "allow",
+    "agentgateway_grafana-mcp-http_list_incidents": "allow",
+    "agentgateway_kubernetes-mcp-server-http_*": "allow",
+    "agentgateway_mcp-server-mcp_temporal_list_callable_workflows": "allow",
+    "agentgateway_mcp-server-mcp_temporal_start_workflow": "allow",
+    "agentgateway_mcp-server-mcp_temporal_get_workflow": "allow",
+    "agentgateway_mcp-server-mcp_temporal_get_result": "allow",
+    "agentgateway_mcp-server-mcp_temporal_list_workflows": "allow",
+    "agentgateway_mcp-server-mcp_temporal_query_workflow": "allow",
+    "agentgateway_mcp-server-mcp_temporal_signal_workflow": "allow",
+    "agentgateway_mcp-server-mcp_temporal_update_workflow": "allow",
+    "agentgateway_mcp-server-mcp_temporal_get_update_result": "allow",
+    "agentgateway_mcp-server-mcp_temporal_cancel_workflow": "allow",
+    "agentgateway_mcp-server-mcp_temporal_agent_conversation": "allow",
+    "agentgateway_mcp-server-mcp_temporal_mail_*": "allow",
+    "agentgateway_mcp-server-mcp_temporal_telegram_*": "allow",
+    "agentgateway_nextcloud-mcp-http_nc_calendar_get_*": "allow",
+    "agentgateway_nextcloud-mcp-http_nc_calendar_list_*": "allow",
+    "agentgateway_nextcloud-mcp-http_nc_calendar_search_todos": "allow",
+    "agentgateway_nextcloud-mcp-http_nc_mail_get_*": "allow",
+    "agentgateway_nextcloud-mcp-http_nc_mail_list_*": "allow",
+    "agentgateway_nextcloud-mcp-http_nc_share_get": "allow",
+    "agentgateway_nextcloud-mcp-http_nc_share_list": "allow",
+    "agentgateway_nextcloud-mcp-http_nc_webdav_find_*": "allow",
+    "agentgateway_nextcloud-mcp-http_nc_webdav_list_*": "allow",
+    "agentgateway_nextcloud-mcp-http_nc_webdav_read_file": "allow",
+    "agentgateway_nextcloud-mcp-http_nc_webdav_search_files": "allow",
+    "agentgateway_openai-usage_get_openai_codex_usage": "allow",
+    "agentgateway_yazio-mcp-http_get_*": "allow",
+    "agentgateway_yazio-mcp-http_search_products": "allow",
     "thunderbird-mail_*": "ask",
     "thunderbird-mail_getAccountAccess": "allow",
     "thunderbird-mail_listAccounts": "allow",

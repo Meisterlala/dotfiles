@@ -12,3 +12,4 @@ fi
 
 /home/misti/.cargo/bin/wp mode random >/dev/null 2>&1 || true
 swaync-client -df -sw >/dev/null 2>&1 || true
+systemctl --user thaw llama-server.service >/dev/null 2>&1 || true
