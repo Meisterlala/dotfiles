@@ -25,6 +25,7 @@
     "agentgateway_plane_get_project_members": true,
     "agentgateway_plane_list_labels": true,
     "agentgateway_plane_list_states": true,
+    "agentgateway_plane_list_work_items": true,
     "agentgateway_plane_list_work_item_activities": true,
     "agentgateway_plane_list_work_item_comments": true,
     "agentgateway_plane_manage_work_item_assignee": true,
