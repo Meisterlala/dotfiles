@@ -3,12 +3,60 @@
   "small_model": "openai/gpt-5.6-terra",
   "lsp": true,
   "formatter": true,
+  "tools": {
+    "agentgateway_*": false,
+    "github_*": false,
+    "memadd": false,
+    "memcommit": false,
+    "memqueue": false,
+    "memremove": false,
+    "agentgateway_grafana-mcp-http_list_datasources": true,
+    "agentgateway_grafana-mcp-http_search_dashboards": true,
+    "agentgateway_grafana-mcp-http_get_dashboard_summary": true,
+    "agentgateway_grafana-mcp-http_get_dashboard_property": true,
+    "agentgateway_grafana-mcp-http_get_dashboard_panel_queries": true,
+    "agentgateway_grafana-mcp-http_generate_deeplink": true,
+    "agentgateway_grafana-mcp-http_grafana_api_request": true,
+    "agentgateway_grafana-mcp-http_get_annotations": true,
+    "agentgateway_kubernetes-mcp-server-http_*": true,
+    "agentgateway_plane_create_work_item": true,
+    "agentgateway_plane_create_work_item_comment": true,
+    "agentgateway_plane_create_work_item_relation": true,
+    "agentgateway_plane_delete_work_item_comment": true,
+    "agentgateway_plane_get_project_members": true,
+    "agentgateway_plane_list_labels": true,
+    "agentgateway_plane_list_states": true,
+    "agentgateway_plane_list_work_item_activities": true,
+    "agentgateway_plane_list_work_item_comments": true,
+    "agentgateway_plane_list_work_item_relation_definitions": true,
+    "agentgateway_plane_list_work_item_relations": true,
+    "agentgateway_plane_list_work_items": true,
+    "agentgateway_plane_manage_work_item_assignee": true,
+    "agentgateway_plane_manage_work_item_label": true,
+    "agentgateway_plane_remove_work_item_relation": true,
+    "agentgateway_plane_retrieve_work_item": true,
+    "agentgateway_plane_retrieve_work_item_by_identifier": true,
+    "agentgateway_plane_search_work_items": true,
+    "agentgateway_plane_update_work_item": true,
+    "agentgateway_plane_update_work_item_comment": true,
+    "github_get_me": true,
+    "github_get_file_contents": true,
+    "github_list_branches": true,
+    "github_list_commits": true,
+    "github_get_commit": true,
+    "github_list_issues": true,
+    "github_search_issues": true,
+    "github_issue_read": true,
+    "github_issue_write": true,
+    "github_list_pull_requests": true,
+    "github_search_pull_requests": true,
+    "github_pull_request_read": true,
+    "github_create_pull_request": true,
+    "github_update_pull_request": true,
+    "github_merge_pull_request": true,
+    "github_add_issue_comment": true
+  },
   "agent": {
-    "build": {
-      "permission": {
-        "agentgateway_*": "deny"
-      }
-    },
     "general": {
       "model": "openai/gpt-5.6-terra"
     },
@@ -20,10 +68,22 @@
         "write": "deny",
         "edit": "deny",
         "read": "allow"
+      },
+      "tools": {
+        "agentgateway_*": false,
+        "github_*": false,
+        "mem*": false,
+        "codesearch": false,
+        "codeoutline": false,
+        "codeexpand": false
       }
     },
     "explore": {
-      "model": "openai/gpt-5.6-luna"
+      "model": "openai/gpt-5.6-luna",
+      "tools": {
+        "agentgateway_*": false,
+        "github_*": false
+      }
     },
     "commit-review": {
       "model": "openai/gpt-5.6-terra",
@@ -32,10 +92,39 @@
       "permission": {
         "write": "ask",
         "edit": "ask"
+      },
+      "tools": {
+        "agentgateway_*": false,
+        "github_*": false,
+        "mem*": false,
+        "codesearch": false,
+        "codeoutline": false,
+        "codeexpand": false
       }
     }
   },
   "provider": {
+    "openrouter": {
+      "models": {
+        "openai/gpt-5.6-luna-flex": {
+          "id": "openai/gpt-5.6-luna",
+          "name": "GPT-5.6 Luna Flex",
+          "options": {
+            "serviceTier": "flex",
+            "reasoningEffort": "low"
+          }
+        },
+        "~deepseek/deepseek-v4-flash-latest": {
+          "id": "~deepseek/deepseek-v4-flash-latest",
+          "name": "DeepSeek V4 Flash (offical provider)",
+          "options": {
+            "provider": {
+              "only": ["deepseek"]
+            }
+          }
+        }
+      }
+    },
     "meta": {
       "npm": "@ai-sdk/openai",
       "name": "Meta",
@@ -285,8 +374,8 @@
         }
       }
     ],
-    "./plugins/openviking.mjs",
-    "/home/misti/source/opencode-telegram/src/index.ts"
+    "./plugins/openviking.mjs"
+    //"/home/misti/source/opencode-telegram/src/index.ts"
   ],
 
   "mcp": {
@@ -353,6 +442,11 @@
         "Authorization": "Bearer {env:GITHUB_PAT}"
       }
     },
+    "computer-use-linux": {
+      "enabled": false,
+      "type": "local",
+      "command": ["computer-use-linux", "mcp"]
+    },
     "agentgateway": {
       "enabled": true,
       "type": "remote",
@@ -373,71 +467,6 @@
     "edit": "allow",
     "webfetch": "allow",
     "playwright_browser_wait_for": "deny",
-    "agentgateway_*": "deny",
-    "agentgateway_dbhub-http_*": "allow",
-    "agentgateway_grafana-mcp-http_query_prometheus": "allow",
-    "agentgateway_grafana-mcp-http_query_loki_logs": "allow",
-    "agentgateway_grafana-mcp-http_query_loki_stats": "allow",
-    "agentgateway_grafana-mcp-http_list_prometheus_metric_names": "allow",
-    "agentgateway_grafana-mcp-http_list_prometheus_label_names": "allow",
-    "agentgateway_grafana-mcp-http_list_prometheus_label_values": "allow",
-    "agentgateway_grafana-mcp-http_list_loki_label_names": "allow",
-    "agentgateway_grafana-mcp-http_list_loki_label_values": "allow",
-    "agentgateway_grafana-mcp-http_list_datasources": "allow",
-    "agentgateway_grafana-mcp-http_search_dashboards": "allow",
-    "agentgateway_grafana-mcp-http_get_dashboard_summary": "allow",
-    "agentgateway_grafana-mcp-http_get_dashboard_property": "allow",
-    "agentgateway_grafana-mcp-http_get_dashboard_panel_queries": "allow",
-    "agentgateway_grafana-mcp-http_alerting_manage_rules": "allow",
-    "agentgateway_grafana-mcp-http_alerting_manage_routing": "allow",
-    "agentgateway_grafana-mcp-http_generate_deeplink": "allow",
-    "agentgateway_grafana-mcp-http_grafana_api_request": "allow",
-    "agentgateway_grafana-mcp-http_get_annotations": "allow",
-    "agentgateway_grafana-mcp-http_list_alert_groups": "allow",
-    "agentgateway_grafana-mcp-http_list_incidents": "allow",
-    "agentgateway_kubernetes-mcp-server-http_*": "allow",
-    "agentgateway_mcp-server-mcp_temporal_list_callable_workflows": "allow",
-    "agentgateway_mcp-server-mcp_temporal_start_workflow": "allow",
-    "agentgateway_mcp-server-mcp_temporal_get_workflow": "allow",
-    "agentgateway_mcp-server-mcp_temporal_get_result": "allow",
-    "agentgateway_mcp-server-mcp_temporal_list_workflows": "allow",
-    "agentgateway_mcp-server-mcp_temporal_query_workflow": "allow",
-    "agentgateway_mcp-server-mcp_temporal_signal_workflow": "allow",
-    "agentgateway_mcp-server-mcp_temporal_update_workflow": "allow",
-    "agentgateway_mcp-server-mcp_temporal_get_update_result": "allow",
-    "agentgateway_mcp-server-mcp_temporal_cancel_workflow": "allow",
-    "agentgateway_mcp-server-mcp_temporal_agent_conversation": "allow",
-    "agentgateway_mcp-server-mcp_temporal_mail_*": "allow",
-    "agentgateway_mcp-server-mcp_temporal_telegram_*": "allow",
-    "agentgateway_nextcloud-mcp-http_nc_calendar_get_*": "allow",
-    "agentgateway_nextcloud-mcp-http_nc_calendar_list_*": "allow",
-    "agentgateway_nextcloud-mcp-http_nc_calendar_search_todos": "allow",
-    "agentgateway_nextcloud-mcp-http_nc_mail_get_*": "allow",
-    "agentgateway_nextcloud-mcp-http_nc_mail_list_*": "allow",
-    "agentgateway_nextcloud-mcp-http_nc_share_get": "allow",
-    "agentgateway_nextcloud-mcp-http_nc_share_list": "allow",
-    "agentgateway_nextcloud-mcp-http_nc_webdav_find_*": "allow",
-    "agentgateway_nextcloud-mcp-http_nc_webdav_list_*": "allow",
-    "agentgateway_nextcloud-mcp-http_nc_webdav_read_file": "allow",
-    "agentgateway_nextcloud-mcp-http_nc_webdav_search_files": "allow",
-    "agentgateway_openai-usage_get_openai_codex_usage": "allow",
-    "agentgateway_yazio-mcp-http_get_*": "allow",
-    "agentgateway_yazio-mcp-http_search_products": "allow",
-    "thunderbird-mail_*": "ask",
-    "thunderbird-mail_getAccountAccess": "allow",
-    "thunderbird-mail_listAccounts": "allow",
-    "thunderbird-mail_getRecentMessages": "allow",
-    "thunderbird-mail_searchMessages": "allow",
-    "thunderbird-mail_getMessage": "allow",
-    "thunderbird-mail_getMessages": "allow",
-    "thunderbird-mail_displayMessage": "allow",
-    "thunderbird-mail_listFolders": "allow",
-    "thunderbird-mail_listFilters": "allow",
-    "thunderbird-mail_searchContacts": "allow",
-    "thunderbird-mail_listCalendars": "allow",
-    "thunderbird-mail_listCategories": "allow",
-    "thunderbird-mail_listEvents": "allow",
-    "thunderbird-mail_listTasks": "allow",
     "external_directory": {
       "*": "ask",
       "~/.config/nvim/tmp/**": "allow"
@@ -448,6 +477,11 @@
     "bash": {
       "*": "ask",
       "sudo*": "deny",
+      "git commit *": "deny",
+      "git push *": "deny",
+      "git reset *": "deny",
+      "git clean *": "deny",
+
       "./*": "allow",
       "./scripts/*": "allow",
       "awk *": "allow",
@@ -564,11 +598,6 @@
       "systemctl show *": "allow",
       "systemctl status *": "allow",
       "systemd-analyze *": "allow",
-      "ssh baldr *": "allow",
-      "ssh odin *": "allow",
-      "ssh ran *": "allow",
-      "ssh raspberry-pi *": "allow",
-      "ssh raspberrypi *": "allow",
       "tail *": "allow",
       "tar *": "allow",
       "top *": "allow",
@@ -600,7 +629,6 @@
       "host *": "allow",
       "vmstat *": "allow",
       "qmllint *": "allow",
-      "export CI=true DEBIAN_FRONTEND=noninteractive GIT_TERMINAL_PROMPT=0 GCM_INTERACTIVE=never HOMEBREW_NO_AUTO_UPDATE=1 GIT_EDITOR=: EDITOR=: VISUAL='' GIT_SEQUENCE_EDITOR=: GIT_MERGE_AUTOEDIT=no GIT_PAGER=cat PAGER=cat;": "allow",
       "gh issue list *": "allow",
       "gh issue view *": "allow",
       "gh pr list *": "allow",

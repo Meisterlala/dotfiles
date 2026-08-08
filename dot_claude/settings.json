@@ -256,7 +256,11 @@
       "Bash(kubectl wiat *)"
     ],
     "deny": [
-      "Bash(sudo*)"
+      "Bash(sudo*)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git reset *)",
+      "Bash(git clean *)"
     ],
     "ask": [
       "Bash(flux reconcile *)"
