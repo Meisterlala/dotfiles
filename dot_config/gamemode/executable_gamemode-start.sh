@@ -23,10 +23,13 @@ fi
 /home/misti/.cargo/bin/wp mode static >/dev/null 2>&1 || true
 swaync-client -dn -sw >/dev/null 2>&1 || true
 
-# Save the router's state, then stop it so child models release VRAM.
-if /usr/bin/systemctl --user is-active --quiet llama-swap.service; then
-    printf '%s\n' active > "$LLAMA_STATE"
-else
-    printf '%s\n' inactive > "$LLAMA_STATE"
+# Save the initial router state only once, then stop it so child models release VRAM.
+# Keeping an existing state file makes repeated start calls idempotent.
+if [ ! -f "$LLAMA_STATE" ]; then
+    if /usr/bin/systemctl --user is-active --quiet llama-swap.service; then
+        printf '%s\n' active > "$LLAMA_STATE"
+    else
+        printf '%s\n' inactive > "$LLAMA_STATE"
+    fi
 fi
 /usr/bin/systemctl --user stop llama-swap.service >/dev/null 2>&1 || true
