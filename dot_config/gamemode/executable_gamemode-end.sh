@@ -1,15 +1,8 @@
 #!/bin/sh
+# Restore llama-swap only if GameMode stopped a previously running service.
+marker="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/llama-swap-gamemode.was-active"
 
-PID_FILE="${XDG_RUNTIME_DIR:-/tmp}/gamemode-inhibit.pid"
-
-if [ -f "$PID_FILE" ]; then
-    pid=$(cat "$PID_FILE" 2>/dev/null)
-    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
-        kill "$pid" >/dev/null 2>&1 || true
-    fi
-    rm -f "$PID_FILE"
+if [ -f "$marker" ]; then
+    rm -f "$marker"
+    /usr/bin/systemctl --user start llama-swap.service
 fi
-
-/home/misti/.cargo/bin/wp mode random >/dev/null 2>&1 || true
-swaync-client -df -sw >/dev/null 2>&1 || true
-systemctl --user thaw llama-server.service >/dev/null 2>&1 || true

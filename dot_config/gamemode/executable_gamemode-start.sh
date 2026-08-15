@@ -1,24 +1,10 @@
 #!/bin/sh
+# Stop the router itself so background clients cannot reload models while gaming.
+marker="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/llama-swap-gamemode.was-active"
 
-PID_FILE="${XDG_RUNTIME_DIR:-/tmp}/gamemode-inhibit.pid"
-
-if [ -f "$PID_FILE" ]; then
-    pid=$(cat "$PID_FILE" 2>/dev/null)
-    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
-        :
-    else
-        rm -f "$PID_FILE"
-    fi
+if /usr/bin/systemctl --user is-active --quiet llama-swap.service; then
+    : > "$marker"
+    /usr/bin/systemctl --user stop llama-swap.service
+else
+    rm -f "$marker"
 fi
-
-if [ ! -f "$PID_FILE" ] && command -v systemd-inhibit >/dev/null 2>&1; then
-    systemd-inhibit --what=idle:sleep --who="gamemode" --why="GameMode active" /usr/bin/sleep infinity >/dev/null 2>&1 &
-    pid=$!
-    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
-        printf '%s\n' "$pid" > "$PID_FILE"
-    fi
-fi
-
-/home/misti/.cargo/bin/wp mode static >/dev/null 2>&1 || true
-swaync-client -dn -sw >/dev/null 2>&1 || true
-systemctl --user freeze llama-server.service >/dev/null 2>&1 || true

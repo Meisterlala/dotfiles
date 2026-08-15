@@ -19,8 +19,22 @@ Use Plane as durable shared state for work spanning agents or sessions. Do not u
 
 ## Configuration
 
-- Default project ID: `b987cd75-93c3-4671-b892-252e9fd3fc09`
-- Use another project only when the user or current task explicitly identifies one.
+### Known projects
+
+| Project    | Identifier | Project ID                             |
+| ---------- | ---------- | -------------------------------------- |
+| Default    | `UNKNOWN`  | `b987cd75-93c3-4671-b892-252e9fd3fc09` |
+| Kubernetes | `K8S`      | `43add642-70fe-44f1-b715-ef2794b4f785` |
+| Road       | `ROAD`     | `955a3557-d01c-48d2-bba2-7ff84059eefd` |
+
+- Default project: `UNKNOWN` (`b987cd75-93c3-4671-b892-252e9fd3fc09`).
+- Use a known project when the user identifies it by name or identifier. Use the
+  default project only when no project is specified.
+- When an unknown project must be identified, use
+  `agentgateway_plane_search_work_items` with the supplied project identifier
+  or concrete project terms, then obtain its `project_id` from a match. Report
+  this limitation if no matching work item exists: the configured Plane tools
+  have no project-list endpoint.
 - Use the exact `agentgateway_plane_*` MCP tools named in this skill. Do not guess aliases or shortened tool names.
 - Resolve opaque IDs instead of copying them from examples:
   - states: `agentgateway_plane_list_states`
@@ -429,25 +443,6 @@ Use when new information shows the item is no longer ready or its scope must be 
 Use for duplicates, invalid findings, obsolete work, superseded approaches, or an explicit decision not to proceed. Add a reason and link the canonical or superseding item when applicable.
 
 Do not silently reopen Done. Comment with the failed criterion or regression, then move to an appropriate active state or create a linked bug when it is meaningfully separate work.
-
-## Multi-agent claim protocol
-
-Plane may be accessed through one shared MCP identity, so assignment alone may not identify the real agent. Use a stable agent name and run/session ID in coordination comments.
-
-Before claiming:
-
-1. Retrieve the item with `agentgateway_plane_retrieve_work_item` and read `agentgateway_plane_list_work_item_comments`.
-2. Confirm it is Todo, ready, and not already claimed or blocked.
-3. Check project members with `agentgateway_plane_get_project_members` only when assignment must be resolved, then inspect the current assignee and latest claim/handoff comment.
-
-To claim:
-
-1. Set the assignee when meaningful with `agentgateway_plane_manage_work_item_assignee`.
-2. Resolve In Progress with `agentgateway_plane_list_states` and move the item with `agentgateway_plane_update_work_item`.
-3. Add one claim comment with `agentgateway_plane_create_work_item_comment`, including agent identity, run ID, intended outcome, and immediate plan.
-4. Retrieve the item again with `agentgateway_plane_retrieve_work_item`. If another agent claimed it concurrently, do not duplicate work; coordinate or back out.
-
-Do not take over an In Progress item merely because it appears idle. Take over only after explicit handoff, user instruction, or a configured stale-claim policy. Record why takeover is safe.
 
 ## Asking for more information
 
