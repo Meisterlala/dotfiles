@@ -310,9 +310,10 @@ hl.bind(
 	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),
 	{ locked = true, repeating = true }
 )
--- hl.bind("F14", hl.dsp.exec_cmd("~/.config/hypr/mic-push-to-mute.sh unmute"), { locked = true })
--- hl.bind("F14", hl.dsp.exec_cmd("~/.config/hypr/mic-push-to-mute.sh mute"), { locked = true, release = true })
--- hl.bind("F14", hl.dsp.pass({ window = "class:^(discord|vesktop)$" }))
+-- The evdev listener handles PTT below Hyprland. Consume both edges here so
+-- F14 (including key repeat) is not forwarded to the focused application.
+hl.bind("F14", hl.dsp.exec_cmd("true"), { locked = true })
+hl.bind("F14", hl.dsp.exec_cmd("true"), { locked = true, release = true })
 hl.bind(
 	"XF86AudioMicMute",
 	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
@@ -327,7 +328,6 @@ hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true 
 
 hl.bind("Print", hl.dsp.exec_cmd("bash ~/.config/hypr/screenshot.sh"))
 hl.bind(main_mod .. " + x", hl.dsp.exec_cmd("swaync-client -t -sw"))
--- hl.bind("F14", hl.dsp.pass({ window = "class:^(discord|vesktop)$" }))
 hl.bind("F18", hl.dsp.exec_cmd("/usr/bin/python3 ~/source/MySuperWhisper/remote_control.py --start"))
 hl.bind("F18", hl.dsp.exec_cmd("/usr/bin/python3 ~/source/MySuperWhisper/remote_control.py --stop"), { release = true })
 
