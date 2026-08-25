@@ -346,7 +346,7 @@
             "reasoningEffort": "low"
           }
         },
-        "dcg": true,
+        "dcg": false,
         "ai-review": true,
         "approve-on-fail": true,
         "notifications": {
