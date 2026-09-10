@@ -172,6 +172,8 @@ hl.config({
 		new_status = "master",
 	},
 	misc = {
+		-- Keep render_unfocused windows (OBS) smooth; Hyprland allows up to 120 FPS.
+		render_unfocused_fps = 120,
 		force_default_wallpaper = -1,
 		disable_hyprland_logo = false,
 		middle_click_paste = false,
@@ -350,6 +352,9 @@ window_rule({
 	match = { class = "^$", title = "^$", xwayland = true, float = true, fullscreen = false, pin = false },
 	no_focus = true,
 })
+
+-- Keep OBS rendering when hidden or on an inactive workspace.
+window_rule({ match = { class = "^(obs|com\\.obsproject\\.Studio)$" }, render_unfocused = true })
 
 -- Converted from windowrules.conf, which was sourced by hyprland.conf.
 window_rule({ match = { title = ".*- YouTube.*" }, opaque = true })
