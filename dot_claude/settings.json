@@ -266,16 +266,25 @@
       "Bash(flux reconcile *)"
     ]
   },
-  "model": "sonnet",
+  "worktree": {
+    "baseRef": "fresh"
+  },
   "enabledPlugins": {
     "lua-lsp@claude-plugins-official": true,
-    "chrome-devtools-mcp@claude-plugins-official": true
+    "chrome-devtools-mcp@claude-plugins-official": true,
+    "mattpocock-skills@claude-plugins-official": true
   },
   "spinnerTipsEnabled": false,
   "effortLevel": "medium",
   "tui": "fullscreen",
-  "autoCompactEnabled": false,
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "autoMemoryEnabled": true,
+  "autoCompactEnabled": true,
   "remoteControlAtStartup": false,
+  "voiceEnabled": true,
   "autoConnectToIde": true,
   "autoconnectToIde": true,
   "mcpServers": {
