@@ -87,6 +87,9 @@ local env = {
 		"/home/misti/.local/share-hyprland:/home/misti/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share",
 	},
 	{ "GDK_BACKEND", "wayland,x11,*" },
+	-- GTK 4.24 disables compositor blur for GTK windows; fall back to Hyprland's blur.
+	-- https://github.com/hyprwm/Hyprland/discussions/16507#discussioncomment-18832324
+	{ "GDK_WAYLAND_DISABLE", "ext_background_effect_manager_v1" },
 	{ "SDL_VIDEODRIVER", "wayland" },
 	{ "CLUTTER_BACKEND", "wayland" },
 	{ "XDG_CURRENT_DESKTOP", "Hyprland" },
@@ -127,9 +130,7 @@ hl.permission({
 
 hl.layer_rule({ match = { namespace = "waybar" }, blur = true })
 hl.layer_rule({ match = { namespace = "quickshell" }, blur = true })
-hl.layer_rule({ match = { namespace = "swaync-notification-window" }, no_screen_share = true })
-hl.layer_rule({ match = { namespace = "swaync-control-center" }, no_screen_share = true })
-window_rule({ match = { class = "^(swaync)$" }, no_initial_focus = true })
+hl.layer_rule({ match = { namespace = "^quickshell-(notifications|notification-center)$" }, no_screen_share = true })
 
 hl.config({
 	general = {
@@ -329,9 +330,8 @@ hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = tru
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
 
 hl.bind("Print", hl.dsp.exec_cmd("bash ~/.config/hypr/screenshot.sh"))
-hl.bind(main_mod .. " + x", hl.dsp.exec_cmd("swaync-client -t -sw"))
-hl.bind("F18", hl.dsp.exec_cmd("/usr/bin/python3 ~/source/MySuperWhisper/remote_control.py --start"))
-hl.bind("F18", hl.dsp.exec_cmd("/usr/bin/python3 ~/source/MySuperWhisper/remote_control.py --stop"), { release = true })
+hl.bind(main_mod .. " + x", hl.dsp.exec_cmd("qs ipc -c main call notifications toggle"))
+hl.bind("F18", hl.dsp.exec_cmd("/usr/bin/python3 ~/source/MySuperWhisper/remote_control.py --hold"))
 
 ----------------
 -- Windows And Workspaces
@@ -346,11 +346,27 @@ window_rule({ match = { workspace = "f[1]s[false]", float = false }, rounding = 
 
 hl.workspace_rule({ workspace = "special:magic", gaps_out = 32, no_shadow = true, on_created_empty = terminal })
 window_rule({ match = { workspace = "special:magic", float = false }, rounding = 12 })
-window_rule({ match = { class = "scrcpy" }, workspace = "special:magic silent" })
+window_rule({
+	match = { class = "scrcpy" },
+	workspace = "special:magic",
+	float = true,
+	center = true,
+})
 window_rule({ match = { class = ".*" }, suppress_event = "maximize" })
 window_rule({
 	match = { class = "^$", title = "^$", xwayland = true, float = true, fullscreen = false, pin = false },
 	no_focus = true,
+})
+
+window_rule({
+	match = { class = "^(yurios-desktop-shell)$" },
+	float = true,
+	size = { 360, 640 },
+	no_blur = true,
+	no_shadow = true,
+	border_size = 0,
+	rounding = 0,
+	opaque = true,
 })
 
 -- Keep OBS rendering when hidden or on an inactive workspace.
@@ -364,6 +380,7 @@ window_rule({ match = { title = ".*HiAnime\\.to.*" }, opaque = true })
 window_rule({ match = { title = ".*n\\.eko.*" }, opaque = true })
 window_rule({ match = { title = ".*Watch2Gether.*" }, opaque = true })
 window_rule({ match = { class = "jellyfin-desktop" }, opaque = true })
+window_rule({ match = { class = "^net\\.nullsum\\.JelliumDesktop$" }, opaque = true })
 window_rule({ match = { class = "cafe\\.avery\\.Delfin" }, opaque = true })
 window_rule({ match = { class = "Jellyfin Media Player" }, opaque = true })
 window_rule({ match = { class = "affinity.exe" }, opaque = true })

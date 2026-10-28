@@ -4,18 +4,31 @@ set -euo pipefail
 sound_file="${HOME}/.config/hypr/sounds/discord-ptt-stop.mp3"
 sound_volume=49152
 release_delay_seconds=0.05
-capture_app_binaries=("Discord")
+capture_apps=("Discord" "yurios-desktop-shell")
 
 state_prefix="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/mic-push-to-mute-${UID}"
 generation_file="${state_prefix}.generation"
 lock_file="${state_prefix}.lock"
 
 is_capture_app() {
-    local candidate="$1"
-    local binary
+    local binary="$1"
+    local pid="$2"
+    local app
+    local arg
+    local identity="$binary"
 
-    for binary in "${capture_app_binaries[@]}"; do
-        [[ "$candidate" == "$binary" ]] && return 0
+    # Electron's binary is generic; its per-app Chromium profile identifies it.
+    if [[ "$binary" == "electron" && "$pid" =~ ^[0-9]+$ && -r "/proc/$pid/cmdline" ]]; then
+        while IFS= read -r -d '' arg; do
+            if [[ "$arg" == --user-data-dir=* ]]; then
+                identity="${arg##*/}"
+                break
+            fi
+        done < "/proc/$pid/cmdline"
+    fi
+
+    for app in "${capture_apps[@]}"; do
+        [[ "$identity" == "$app" ]] && return 0
     done
     return 1
 }
@@ -24,15 +37,16 @@ set_capture_apps_mute() {
     local muted="$1"
     local index
     local binary
+    local pid
 
-    while IFS=$'\t' read -r index binary; do
+    while IFS=$'\t' read -r index binary pid; do
         [[ -n "$index" ]] || continue
-        if is_capture_app "$binary"; then
+        if is_capture_app "$binary" "$pid"; then
             pactl set-source-output-mute "$index" "$muted" || true
         fi
     done < <(
         pactl --format=json list source-outputs |
-            jq -r '.[] | [.index, (.properties["application.process.binary"] // "")] | @tsv'
+            jq -r '.[] | [.index, (.properties["application.process.binary"] // ""), (.properties["application.process.id"] // "")] | @tsv'
     )
 }
 

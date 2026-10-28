@@ -12,7 +12,7 @@ if [ -f "$PID_FILE" ]; then
 fi
 
 /home/misti/.cargo/bin/wp mode random >/dev/null 2>&1 || true
-swaync-client -df -sw >/dev/null 2>&1 || true
+qs ipc --any-display -c main call notifications setDnd false >/dev/null 2>&1 || true
 
 if [ "$(cat "$LLAMA_STATE" 2>/dev/null)" = active ]; then
     /usr/bin/systemctl --user start llama-swap.service >/dev/null 2>&1 || true

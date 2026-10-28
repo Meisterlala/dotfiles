@@ -21,7 +21,7 @@ if [ ! -f "$PID_FILE" ] && command -v systemd-inhibit >/dev/null 2>&1; then
 fi
 
 /home/misti/.cargo/bin/wp mode static >/dev/null 2>&1 || true
-swaync-client -dn -sw >/dev/null 2>&1 || true
+qs ipc --any-display -c main call notifications setDnd true >/dev/null 2>&1 || true
 
 # Save the initial router state only once, then stop it so child models release VRAM.
 # Keeping an existing state file makes repeated start calls idempotent.
