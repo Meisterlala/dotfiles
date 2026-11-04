@@ -393,5 +393,6 @@ window_rule({ match = { class = "(firefox|zen|chromium)" }, focus_on_activate = 
 window_rule({ match = { class = "(Element)" }, focus_on_activate = true })
 window_rule({ match = { class = "(discord|vesktop)" }, workspace = "11 silent" })
 window_rule({ match = { class = "(discord|vesktop)" }, no_screen_share = true })
+window_rule({ match = { class = "org.telegram.desktop" }, no_screen_share = true })
 window_rule({ match = { class = "com.gabm.satty" }, float = true })
 window_rule({ match = { class = "Emulator" }, float = true })
