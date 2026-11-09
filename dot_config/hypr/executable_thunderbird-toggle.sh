@@ -1,44 +1,41 @@
-#!/bin/sh
-set -eu
+#!/bin/bash
+# Toggle a persistent mail overlay, never minimize/unmap or quit Thunderbird.
+set -euo pipefail
 
-class="org.mozilla.Thunderbird"
-hidden_workspace="special:thunderbird"
-state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/hypr"
-state_file="$state_dir/thunderbird-last-workspace"
+exec 9>"${XDG_RUNTIME_DIR:?}/thunderbird-toggle.lock"
+flock -n 9 || exit 0
 
 get_client() {
-    hyprctl clients -j | jq -c --arg class "$class" '[.[] | select(.class == $class)][0] // empty'
+    hyprctl clients -j | jq -c '
+        [.[] | select((.class | ascii_downcase) == "thunderbird"
+            or .class == "org.mozilla.Thunderbird")]
+        | sort_by(.floating) | .[0] // empty'
+}
+
+fail() {
+    command -v notify-send >/dev/null && notify-send "Thunderbird" "$1" || true
+    printf '%s\n' "$1" >&2
+    exit 1
 }
 
 client=$(get_client)
-
-if [ -z "$client" ]; then
-    birdtray --show-tb >/dev/null 2>&1 || systemctl --user start thunderbird-xwayland.service
-    sleep 0.5
-    client=$(get_client)
+if [[ -z "$client" ]]; then
+    # Start directly: Birdtray can return success without actually launching TB.
+    systemctl --user start --no-block thunderbird-xwayland.service
+    for ((i=0; i<150; i++)); do
+        client=$(get_client)
+        [[ -n "$client" ]] && break
+        sleep 0.2
+    done
+    [[ -n "$client" ]] || fail "No Thunderbird window appeared within 30 seconds. Check thunderbird-xwayland.service."
 fi
 
-if [ -z "$client" ]; then
-    exit 0
+address=$(jq -r '.address' <<<"$client")
+workspace=$(jq -r '.workspace.name' <<<"$client")
+if [[ "$workspace" != "special:thunderbird" ]]; then
+    hyprctl dispatch "hl.dsp.window.move({ workspace = \"special:thunderbird\", window = \"address:$address\", follow = false })" >/dev/null
 fi
 
-address=$(printf '%s' "$client" | jq -r '.address')
-workspace=$(printf '%s' "$client" | jq -r '.workspace.name')
-
-if [ "$workspace" = "$hidden_workspace" ]; then
-    target="1"
-    if [ -f "$state_file" ]; then
-        target=$(sed -n '1p' "$state_file")
-    fi
-
-    case "$target" in
-        special:*) target="1" ;;
-    esac
-
-    hyprctl dispatch "hl.dsp.window.move({ workspace = \"$target\", window = \"address:$address\" })" >/dev/null
-    hyprctl dispatch "hl.dsp.focus({ window = \"address:$address\" })" >/dev/null
-else
-    mkdir -p "$state_dir"
-    printf '%s\n' "$workspace" > "$state_file"
-    hyprctl dispatch "hl.dsp.window.move({ workspace = \"$hidden_workspace\", window = \"address:$address\", follow = false })" >/dev/null
-fi
+# One toggle shows it here, hides it if already here, or transfers it from
+# another monitor. Do not double-toggle: that transfers it and then hides it.
+hyprctl dispatch 'hl.dsp.workspace.toggle_special("thunderbird")' >/dev/null

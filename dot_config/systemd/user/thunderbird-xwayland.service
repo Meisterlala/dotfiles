@@ -1,14 +1,16 @@
 [Unit]
-Description=Thunderbird for Birdtray under XWayland
+Description=Persistent Thunderbird mail client under XWayland
 Documentation=man:systemd.service(5)
-After=graphical-session.target xdg-desktop-autostart.target
+After=graphical-session-pre.target
 PartOf=graphical-session.target
 
 [Service]
 Type=simple
 ExecStart=/home/misti/.local/bin/thunderbird-xwayland
-Restart=on-failure
-RestartSec=10
+# Even an accidental normal quit should not stop background mail checks.
+# An explicit systemctl stop still stops the service.
+Restart=always
+RestartSec=3
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical-session.target

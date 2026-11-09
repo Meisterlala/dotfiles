@@ -256,6 +256,8 @@ hl.bind(main_mod .. " + E", hl.dsp.exec_cmd(file_manager))
 hl.bind(main_mod .. " + R", hl.dsp.exec_cmd(menu))
 hl.bind(main_mod .. " + T", hl.dsp.exec_cmd(terminal))
 hl.bind(main_mod .. " + G", hl.dsp.exec_cmd(browser))
+-- Hyprland owns visibility; Birdtray only supplies the unread tray indicator.
+hl.bind("CTRL + SHIFT + T", hl.dsp.exec_cmd("~/.config/hypr/thunderbird-toggle.sh"))
 hl.bind(main_mod .. " + ALT + T", hl.dsp.exec_cmd("~/.config/hypr/thunderbird-toggle.sh"))
 hl.bind(main_mod .. " + P", hl.dsp.exec_cmd("$HOME/.cargo/bin/wp next"))
 hl.bind(main_mod .. " + SHIFT + M", hl.dsp.exec_cmd("uwsm stop"))
@@ -344,6 +346,12 @@ window_rule({ match = { workspace = "w[tv1]s[false]", float = false }, border_si
 window_rule({ match = { workspace = "w[tv1]s[false]", float = false }, rounding = 0 })
 window_rule({ match = { workspace = "f[1]s[false]", float = false }, border_size = 0 })
 window_rule({ match = { workspace = "f[1]s[false]", float = false }, rounding = 0 })
+
+-- A dedicated mail overlay follows the focused monitor when toggled.
+-- Keep the main window tiled so it is sized correctly on either monitor.
+hl.workspace_rule({ workspace = "special:thunderbird", gaps_out = 64, gaps_in = 8 })
+window_rule({ match = { class = "^(thunderbird|Thunderbird|org\\.mozilla\\.Thunderbird)$" }, workspace = "special:thunderbird silent" })
+window_rule({ match = { workspace = "special:thunderbird", float = false }, rounding = 12 })
 
 hl.workspace_rule({ workspace = "special:magic", gaps_out = 32, no_shadow = true, on_created_empty = terminal })
 window_rule({ match = { workspace = "special:magic", float = false }, rounding = 12 })
