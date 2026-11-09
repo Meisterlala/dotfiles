@@ -331,6 +331,7 @@ hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true 
 
 hl.bind("Print", hl.dsp.exec_cmd("bash ~/.config/hypr/screenshot.sh"))
 hl.bind(main_mod .. " + x", hl.dsp.exec_cmd("qs ipc -c main call notifications toggle"))
+hl.bind("F16", hl.dsp.exec_cmd("/usr/bin/game-rec save"))
 hl.bind("F18", hl.dsp.exec_cmd("/usr/bin/python3 ~/source/MySuperWhisper/remote_control.py --hold"))
 
 ----------------
