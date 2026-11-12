@@ -4,9 +4,11 @@ set -euo pipefail
 tmp_file="$(mktemp /tmp/paru-pkgbuild-diff.XXXXXX)"
 trap 'rm -f "$tmp_file"' EXIT
 
-ai_model="${OPENCODE_MODEL:-openai/gpt-5.6-luna}"
-ai_fallback_models_csv="${OPENCODE_FALLBACK_MODELS:-openai/gpt-5.6-terra,openai/gpt-5.4-mini}"
-ai_timeout_seconds="${OPENCODE_TIMEOUT_SECONDS:-20}"
+ai_model="${PARU_AI_MODEL:-chatgpt/gpt-6-luna}"
+ai_fallback_models_csv="${PARU_AI_FALLBACK_MODELS:-}"
+ai_timeout_seconds="${PARU_AI_TIMEOUT_SECONDS:-20}"
+ai_base_url="${PARU_AI_BASE_URL:-https://litellm.meisterlala.dev/v1}"
+ai_key_file="${PARU_AI_KEY_FILE:-${XDG_CONFIG_HOME:-$HOME/.config}/paru/private/litellm-key}"
 
 if ! [[ "$ai_timeout_seconds" =~ ^[0-9]+$ ]] || [ "$ai_timeout_seconds" -lt 1 ]; then
   ai_timeout_seconds=20
@@ -76,8 +78,8 @@ show_diff() {
   fi
 }
 
-if ! command -v opencode >/dev/null 2>&1; then
-  printf 'WARNING: opencode is not installed. Showing PKGBUILD diff.\n\n' >&2
+if ! command -v python3 >/dev/null 2>&1; then
+  printf 'WARNING: python3 is not installed. Showing PKGBUILD diff.\n\n' >&2
   show_diff
   exit 0
 fi
@@ -150,15 +152,55 @@ run_ai_for_model() {
   local model="$1"
   local parsed_result
   ai_exit=0
-  if command -v timeout >/dev/null 2>&1; then
-    ai_output="$(timeout --kill-after=3s "${ai_timeout_seconds}s" opencode run --model "$model" -- "$ai_prompt
---- BEGIN DIFF ---
-$(cat "$tmp_file")" 2>&1)" || ai_exit=$?
-  else
-    ai_output="$(opencode run --model "$model" -- "$ai_prompt
---- BEGIN DIFF ---
-$(cat "$tmp_file")" 2>&1)" || ai_exit=$?
-  fi
+  ai_output="$(python3 - "$model" "$ai_base_url" "$ai_key_file" "$ai_timeout_seconds" "$tmp_file" "$ai_prompt" 2>&1 <<'PY'
+import json
+import os
+import sys
+import urllib.error
+import urllib.request
+
+model, base_url, key_file, timeout, diff_file, prompt = sys.argv[1:]
+try:
+    key = os.environ.get("PARU_AI_API_KEY")
+    if not key:
+        with open(key_file) as handle:
+            key = handle.read().strip()
+    if not key:
+        raise ValueError("API key is empty")
+    if not base_url.startswith("https://"):
+        raise ValueError("API endpoint must use HTTPS")
+    with open(diff_file) as handle:
+        diff = handle.read()
+    payload = {"model": model, "messages": [
+        {"role": "system", "content": prompt},
+        {"role": "user", "content": "--- BEGIN DIFF ---\n" + diff + "\n--- END DIFF ---"},
+    ]}
+    request = urllib.request.Request(
+        base_url.rstrip("/") + "/chat/completions",
+        data=json.dumps(payload).encode(),
+        headers={"Authorization": "Bearer " + key, "Content-Type": "application/json"},
+    )
+    # Never forward the credential to a redirect target.
+    class NoRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self, req, fp, code, msg, headers, newurl):
+            return None
+    with urllib.request.build_opener(NoRedirect).open(request, timeout=int(timeout)) as response:
+        result = json.load(response)
+    content = result["choices"][0]["message"]["content"]
+    if not isinstance(content, str) or not content.strip():
+        raise ValueError("API returned no text")
+    print(content)
+except urllib.error.HTTPError as error:
+    print("LiteLLM HTTP error:", error.code)
+    sys.exit(1)
+except (TimeoutError, urllib.error.URLError) as error:
+    print("LiteLLM request failed:", type(error).__name__)
+    sys.exit(124 if isinstance(error, TimeoutError) else 1)
+except Exception as error:
+    print("LiteLLM request/configuration error:", type(error).__name__)
+    sys.exit(1)
+PY
+)" || ai_exit=$?
 
   if [ "$ai_exit" -eq 0 ]; then
     parsed_result="$(printf '%s\n' "$ai_output" | sed -E 's/\x1B\[[0-9;]*[[:alpha:]]//g' | sed -n 's/.*RESULT:[[:space:]]*//p' | head -n 1 | tr '[:lower:]' '[:upper:]')"

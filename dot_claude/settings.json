@@ -251,7 +251,8 @@
       "Bash(skopeo inspect *)",
       "mcp__plugin_chrome-devtools-mcp_chrome-devtools__*",
       "mcp__chrome-devtools-mcp__*",
-      "Bash(kubectl wiat *)"
+      "Bash(kubectl wiat *)",
+      "Bash(python3 /home/misti/.config/habits-server/check_config_schema.py)"
     ],
     "deny": [
       "Bash(sudo*)",
