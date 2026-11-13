@@ -1,0 +1,27 @@
+[general]
+# Do not rewrite ~/.claude/settings.json when invoked by other agents.
+self_heal_hook = false
+
+[packs]
+enabled = [
+    "apigateway",
+    "backup",
+    "cicd",
+    "cloud",
+    "containers",
+    "database",
+    "dns",
+    "infrastructure",
+    "kubernetes",
+    "loadbalancer",
+    "messaging",
+    "monitoring",
+    "package_managers",
+    "platform",
+    "remote",
+    "search",
+    "secrets",
+    "storage",
+    "strict_git",
+    "system",
+]

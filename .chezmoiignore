@@ -20,9 +20,10 @@ Documents
 # Oh-my-posh theme
 !.config/oh-my-posh.yaml
 
-# pycache
-__pycache__/
-*.pyc
+# Python bytecode caches (at any depth)
+**/__pycache__
+**/__pycache__/**
+**/*.pyc
 
 # k9s Victoria TUI build artifacts
 .config/k9s/plugins/victoria-tui-bin
