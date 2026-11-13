@@ -53,7 +53,9 @@ local startup_commands = {
 	"systemctl --user start hyprland-session.target",
 	"systemctl --user start hyprpolkitagent",
 	"udiskie --smart-tray",
-	"dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_MENU_PREFIX XDG_DATA_DIRS",
+	-- The controller's Steam XTEST listener needs the graphical environment.
+	-- Restart only after importing it: the service also starts before login.
+	"dbus-update-activation-environment --systemd DISPLAY XAUTHORITY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_MENU_PREFIX XDG_DATA_DIRS && systemctl --user restart mic-push-to-mute.service",
 	[[hyprctl plugin load "$HYPR_PLUGIN_DIR/lib/libhyprexpo.so"]],
 	"systemctl --user start hypridle.service",
 	-- "systemctl --user start waybar.service",
