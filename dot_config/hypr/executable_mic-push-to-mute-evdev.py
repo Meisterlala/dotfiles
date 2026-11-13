@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import queue
 import selectors
 import subprocess
@@ -79,11 +80,103 @@ def watch_steam_keys(events):
         time.sleep(2)
 
 
+def controller_r5(report):
+    # SDL's TritonMTUNoQuat{,32TS}: report ID, sequence, LE uint32 buttons.
+    # https://github.com/libsdl-org/SDL/blob/main/src/joystick/hidapi/SDL_hidapi_steam_triton.c
+    if len(report) < 46 or report[0] not in (0x42, 0x45, 0x47):
+        return None
+    return bool(int.from_bytes(report[2:6], "little") & 0x100)
+
+
+class ControllerR5:
+    def __init__(self):
+        self.armed = False
+        self.down = False
+
+    def update(self, down):
+        # Connecting while held must not open the mic. Require release first.
+        if not down:
+            self.armed = True
+        down = down and self.armed
+        if down == self.down:
+            return None
+        self.down = down
+        return down
+
+
+def watch_controller(events):
+    # Passive hidraw reads: no grabs, feature writes, or Steam configuration changes.
+    selector = selectors.DefaultSelector()
+    devices = {}
+
+    def remove(path):
+        fd, button, _ = devices.pop(path)
+        selector.unregister(fd)
+        os.close(fd)
+        events.put((path, False))
+
+    next_discovery = 0
+    while True:
+        now = time.monotonic()
+        if now >= next_discovery:
+            for node in Path("/sys/class/hidraw").glob("hidraw*"):
+                path = str(Path("/dev") / node.name)
+                if path in devices:
+                    continue
+                fd = None
+                try:
+                    identity = (node / "device/uevent").read_text()
+                    if not any(value in identity for value in (
+                        "HID_ID=0003:000028DE:00001304",  # Steam Controller Puck
+                        "HID_ID=0003:000028DE:00001302",  # Wired Triton
+                    )):
+                        continue
+                    if b"\x85\x42" not in (node / "device/report_descriptor").read_bytes():
+                        continue
+                    fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
+                    selector.register(fd, selectors.EVENT_READ, path)
+                    devices[path] = [fd, ControllerR5(), now]
+                    print(f"Listening directly to Steam Controller R5: {path}", flush=True)
+                except OSError:
+                    if fd is not None:
+                        os.close(fd)
+            next_discovery = now + 1
+        for ready, _ in selector.select(timeout=0.05):
+            path = ready.data
+            try:
+                report = os.read(ready.fd, 256)
+                if not report:
+                    remove(path)
+                    continue
+                down = controller_r5(report)
+                if down is not None:
+                    devices[path][2] = time.monotonic()
+                    changed = devices[path][1].update(down)
+                    if changed is not None:
+                        print(f"Controller R5 {'pressed' if changed else 'released'}", flush=True)
+                        events.put((path, changed))
+            except BlockingIOError:
+                pass
+            except OSError:
+                remove(path)
+        for path, (_, button, last_report) in list(devices.items()):
+            if time.monotonic() - last_report > 0.5:
+                # Radio loss can leave hidraw open: fail closed and re-arm on release.
+                if button.down:
+                    print("Controller R5 released (input timeout)", flush=True)
+                    events.put((path, False))
+                button.down = False
+                button.armed = False
+            if not Path(path).exists():
+                remove(path)
+
+
 def main():
     selector = selectors.DefaultSelector()
     devices = {}
     ptt = PushToTalk()
     steam_events = queue.SimpleQueue()
+    controller_events = queue.SimpleQueue()
 
     def remove(path):
         dev = devices.pop(path)
@@ -114,6 +207,7 @@ def main():
     # Always start muted; only a fresh press opens the microphone.
     mic("mute")
     threading.Thread(target=watch_steam_keys, args=(steam_events,), daemon=True).start()
+    threading.Thread(target=watch_controller, args=(controller_events,), daemon=True).start()
     next_discovery = 0
     try:
         while True:
@@ -122,6 +216,9 @@ def main():
                 next_discovery = time.monotonic() + 1
             while not steam_events.empty():
                 ptt.update("steam-xtest", steam_events.get_nowait())
+            while not controller_events.empty():
+                path, down = controller_events.get_nowait()
+                ptt.update(path, down)
             for ready, _ in selector.select(timeout=0.01):
                 dev = ready.fileobj
                 key = DEVICE_KEYS[dev.name]
