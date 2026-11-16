@@ -61,7 +61,6 @@ local startup_commands = {
 	-- "systemctl --user start waybar.service",
 	"systemctl --user start quickshell-main.service",
 	"systemctl --user start hyprsunset.service",
-	"~/.config/hypr/mic-push-to-mute.sh watch",
 	terminal,
 }
 
