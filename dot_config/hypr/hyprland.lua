@@ -316,10 +316,8 @@ hl.bind(
 	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),
 	{ locked = true, repeating = true }
 )
--- The evdev listener handles PTT below Hyprland. Consume both edges here so
--- F14 (including key repeat) is not forwarded to the focused application.
-hl.bind("F14", hl.dsp.exec_cmd("true"), { locked = true })
-hl.bind("F14", hl.dsp.exec_cmd("true"), { locked = true, release = true })
+-- The mic service listens for F14 via evdev. Leave it unbound here:
+-- consuming it in Hyprland interferes with movement in games.
 hl.bind(
 	"XF86AudioMicMute",
 	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
