@@ -29,3 +29,6 @@ Documents
 .config/k9s/plugins/victoria-tui-bin
 .config/k9s/plugins/victoria-tui-bin.*
 .config/k9s/plugins/victoria-tui/victoria-tui
+
+# Git credentials are per-machine and never synced
+.git-credentials
