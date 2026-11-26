@@ -164,7 +164,7 @@ def main():
     # Write back to Claude settings
     print(f'\nWriting updated settings to: {claude_settings_path}')
     with open(claude_settings_path, 'w') as f:
-        json.dump(claude_settings, f, indent=2)
+        json.dump(claude_settings, f, indent=2, ensure_ascii=False)
         f.write('\n')
 
     if should_apply_with_chezmoi:
