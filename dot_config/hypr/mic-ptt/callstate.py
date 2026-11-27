@@ -38,9 +38,11 @@ def find_discord():
             if (node / "comm").read_text().strip() != "Discord":
                 continue
             args = (node / "cmdline").read_bytes().split(b"\0")
-            if not args[0] or Path(os.fsdecode(args[0])).name != "Discord":
+            # Electron can rewrite argv into one space-separated process title.
+            executable = Path(os.readlink(node / "exe")).name.removesuffix(" (deleted)")
+            if executable != "Discord":
                 continue
-            if any(arg.startswith(b"--type=") for arg in args):
+            if any(b"--type=" in arg for arg in args):
                 continue
             return process_key(node.name)
         except (OSError, ValueError, IndexError):
