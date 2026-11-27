@@ -97,8 +97,8 @@ def main():
         def on_tick():
             state.tick(ptt, time.monotonic(), audio.set_muted, play_sound)
             audio.pump()
-            # Input threads wake the selector directly; idle audio needs less polling.
-            timeout = 0.01 if audio.operations or audio.sound_busy() else 0.05
+            # Refill the running cue stream often enough to avoid underruns.
+            timeout = 0.01 if audio.operations or audio.sound_active() else 0.05
             if ptt["deadline"] is not None:
                 timeout = min(timeout, max(0, ptt["deadline"] - time.monotonic()))
             return timeout

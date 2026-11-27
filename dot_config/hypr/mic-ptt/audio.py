@@ -55,7 +55,7 @@ muted = True
 controlling = False
 failure = None
 stream = None
-drain = None
+sound_offset = None
 sound_deadline = None
 SOUND_START_TIMEOUT = 0.25
 pcm = b""
@@ -89,9 +89,7 @@ def load_library():
         "pa_stream_connect_playback": (C.c_int, [P, C.c_char_p, C.POINTER(BufferAttr), C.c_int, C.POINTER(Volume), P]),
         "pa_stream_get_state": (C.c_int, [P]),
         "pa_stream_write": (C.c_int, [P, P, C.c_size_t, P, C.c_int64, C.c_int]),
-        "pa_stream_drain": (P, [P, P, P]),
-        "pa_stream_cork": (P, [P, C.c_int, P, P]),
-        "pa_stream_flush": (P, [P, P, P]),
+        "pa_stream_writable_size": (C.c_size_t, [P]),
         "pa_stream_disconnect": (C.c_int, [P]),
         "pa_stream_unref": (None, [P]),
     }
@@ -228,8 +226,14 @@ def set_muted(value):
 
 
 def pump():
-    if lib.pa_mainloop_iterate(loop, 0, None) < 0:
-        raise RuntimeError("PulseAudio mainloop failed")
+    # Drain ready protocol work rather than waiting a full input poll between
+    # messages. Bound the loop so a busy server cannot starve input handling.
+    for _ in range(32):
+        dispatched = lib.pa_mainloop_iterate(loop, 0, None)
+        if dispatched < 0:
+            raise RuntimeError("PulseAudio mainloop failed")
+        if not dispatched:
+            break
     if failure:
         raise RuntimeError(failure)
     if lib.pa_context_get_state(context) in (5, 6):
@@ -255,44 +259,34 @@ def open_sound():
         volume.values[i] = 49152  # Preserve the old paplay volume.
     frame = 2 * spec.channels  # S16LE
     default = 0xffffffff
-    # Nonzero prebuffering stops the read cursor on underrun, so the next
-    # cue does not get written behind it. Each cue is queued in one write.
-    # Keep a small prebuffer, but do not request a lower hardware/graph
-    # latency when a notification starts. The whole cue is queued up front.
-    buf = BufferAttr(default, default, (spec.rate // 100) * frame, default, default)
-    flags = 0x0001  # START_CORKED
-    if lib.pa_stream_connect_playback(stream, None, C.byref(buf), flags, C.byref(volume), None) < 0:
+    # Run continuously so a cue doesn't pause, flush, or wake the output node.
+    # Set only the client buffer, not the sink/graph latency.
+    buf = BufferAttr(default, (spec.rate * 120 // 1000) * frame,
+                     (spec.rate * 40 // 1000) * frame,
+                     (spec.rate * 16 // 1000) * frame, default)
+    if lib.pa_stream_connect_playback(stream, None, C.byref(buf), 0, C.byref(volume), None) < 0:
         log.warning("Could not connect notification stream: %s", error_message())
         close_sound()
 
 
 def play_sound():
-    global sound_deadline
-    if not pcm:
-        return
-    cancel_sound()
+    global sound_offset, sound_deadline
+    if not pcm or sound_offset is not None:
+        return  # Coalesce releases while a cue is queued; never cut it mid-wave.
     if not stream:
         open_sound()
     if stream:
+        sound_offset = 0
         sound_deadline = time.monotonic() + SOUND_START_TIMEOUT
         pump_sound()
 
 
-def sound_busy():
-    return sound_deadline is not None or drain is not None
-
-
-def sound_operation(op):
-    if not op:
-        log.warning("Could not update notification playback: %s", error_message())
-        close_sound()
-        return False
-    lib.pa_operation_unref(op)
-    return True
+def sound_active():
+    return stream is not None
 
 
 def pump_sound():
-    global drain, sound_deadline
+    global sound_offset, sound_deadline
     if not stream:
         return
     stream_state = lib.pa_stream_get_state(stream)
@@ -301,47 +295,43 @@ def pump_sound():
             log.warning("Notification playback failed: %s", error_message())
         close_sound()
         return
-    if drain and lib.pa_operation_get_state(drain) != 0:
-        lib.pa_operation_unref(drain)
-        drain = None
-        sound_operation(lib.pa_stream_cork(stream, 1, None, None))
-    if sound_deadline is None:
-        return
-    if time.monotonic() >= sound_deadline:
-        sound_deadline = None  # Never play a stale cue after a slow reconnect.
-        return
+    if sound_deadline is not None and time.monotonic() >= sound_deadline:
+        cancel_sound()
     if stream_state != 2:  # READY
         return
-    sound_deadline = None
-    # Queue the whole sample before uncorking (already above the prebuffer threshold).
-    if lib.pa_stream_write(stream, pcm, len(pcm), None, 0, 0) < 0:
-        log.warning("Could not write notification sound: %s", error_message())
+    size = lib.pa_stream_writable_size(stream)
+    if size == C.c_size_t(-1).value:
+        log.warning("Could not query notification buffer: %s", error_message())
         close_sound()
         return
-    if not sound_operation(lib.pa_stream_cork(stream, 0, None, None)):
+    size -= size % (2 * spec.channels)
+    if not size:
         return
-    drain = lib.pa_stream_drain(stream, None, None)
-    if not drain:
-        log.warning("Could not drain notification sound: %s", error_message())
+    chunk = b""
+    if sound_offset is not None:
+        chunk = pcm[sound_offset:sound_offset + size]
+        sound_offset += len(chunk)
+        sound_deadline = None
+        if sound_offset == len(pcm):
+            sound_offset = None
+    # Keep the sink running on silence between beeps; no drain or cork cycle.
+    if lib.pa_stream_write(stream, chunk.ljust(size, b"\0"), size, None, 0, 0) < 0:
+        log.warning("Could not write notification audio: %s", error_message())
         close_sound()
 
 
 def cancel_sound():
-    global drain, sound_deadline
+    global sound_offset, sound_deadline
+    # Drop only an unstarted cue. Cutting a partly submitted waveform clicks.
+    if sound_offset == 0:
+        sound_offset = None
     sound_deadline = None
-    if drain:
-        lib.pa_operation_unref(drain)
-        drain = None
-        if sound_operation(lib.pa_stream_cork(stream, 1, None, None)):
-            sound_operation(lib.pa_stream_flush(stream, None, None))
 
 
 def close_sound():
-    global stream, drain, sound_deadline
+    global stream, sound_offset, sound_deadline
+    sound_offset = None
     sound_deadline = None
-    if drain:
-        lib.pa_operation_unref(drain)
-        drain = None
     if stream:
         lib.pa_stream_disconnect(stream)
         lib.pa_stream_unref(stream)
