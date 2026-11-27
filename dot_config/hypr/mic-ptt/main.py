@@ -44,8 +44,11 @@ def main():
             logging.info("Discord in call: %s", "yes" if callstate.in_call() else "no")
             return
 
-        # One worker serializes log reads; it sleeps between button presses.
+        # Read Discord's existing logs at startup, before the first short tap.
+        # Subsequent checks only need to read new entries.
         checker = ThreadPoolExecutor(max_workers=1, thread_name_prefix="call-check")
+        call_check = checker.submit(callstate.in_call)
+        call_checked_at = time.monotonic()
 
         def on_event(source, down, deliberate=True):
             nonlocal call_check, call_checked_at
@@ -84,7 +87,7 @@ def main():
             nonlocal call_check, call_checked_at
             blocked_sources.update(ptt["held"])
             state.reset(ptt, audio.set_muted)
-            audio.close_sound()
+            audio.cancel_sound()
             if call_check is not None:
                 call_check.cancel()
             call_check = None
@@ -95,7 +98,7 @@ def main():
             state.tick(ptt, time.monotonic(), audio.set_muted, play_sound)
             audio.pump()
             # Input threads wake the selector directly; idle audio needs less polling.
-            timeout = 0.01 if audio.operations or audio.stream else 0.05
+            timeout = 0.01 if audio.operations or audio.sound_busy() else 0.05
             if ptt["deadline"] is not None:
                 timeout = min(timeout, max(0, ptt["deadline"] - time.monotonic()))
             return timeout

@@ -20,6 +20,10 @@ class SampleSpec(C.Structure):
     _fields_ = [("format", C.c_int), ("rate", U), ("channels", C.c_uint8)]
 
 
+class BufferAttr(C.Structure):
+    _fields_ = [(name, U) for name in ("maxlength", "tlength", "prebuf", "minreq", "fragsize")]
+
+
 class ChannelMap(C.Structure):
     _fields_ = [("channels", C.c_uint8), ("map", C.c_int * 32)]
 
@@ -52,6 +56,8 @@ controlling = False
 failure = None
 stream = None
 drain = None
+sound_deadline = None
+SOUND_START_TIMEOUT = 0.25
 pcm = b""
 spec = None
 
@@ -80,10 +86,12 @@ def load_library():
         "pa_operation_get_state": (C.c_int, [P]),
         "pa_operation_unref": (None, [P]),
         "pa_stream_new": (P, [P, C.c_char_p, C.POINTER(SampleSpec), P]),
-        "pa_stream_connect_playback": (C.c_int, [P, C.c_char_p, P, C.c_int, C.POINTER(Volume), P]),
+        "pa_stream_connect_playback": (C.c_int, [P, C.c_char_p, C.POINTER(BufferAttr), C.c_int, C.POINTER(Volume), P]),
         "pa_stream_get_state": (C.c_int, [P]),
         "pa_stream_write": (C.c_int, [P, P, C.c_size_t, P, C.c_int64, C.c_int]),
         "pa_stream_drain": (P, [P, P, P]),
+        "pa_stream_cork": (P, [P, C.c_int, P, P]),
+        "pa_stream_flush": (P, [P, P, P]),
         "pa_stream_disconnect": (C.c_int, [P]),
         "pa_stream_unref": (None, [P]),
     }
@@ -170,7 +178,8 @@ def connect(sound, *, control=True):
             if wav.getsampwidth() != 2 or wav.getcomptype() != "NONE":
                 raise ValueError("notification must be 16-bit PCM WAV")
             spec = SampleSpec(3, wav.getframerate(), wav.getnchannels())  # S16LE
-            pcm = wav.readframes(wav.getnframes())
+            # The WAV starts at nonzero amplitude; fade in to avoid a click.
+            pcm = fade_in(wav.readframes(wav.getnframes()))
     except (OSError, ValueError, wave.Error) as error:
         log.warning("Notification disabled: %s", error)
     try:
@@ -189,9 +198,23 @@ def connect(sound, *, control=True):
         lib.pa_context_set_subscribe_callback(context, source_event, None)
         operation(lib.pa_context_subscribe(context, 8, subscribed, None))  # SOURCE_OUTPUT
         refresh()
+        if controlling and pcm:
+            open_sound()
     except BaseException:
         close()
         raise
+
+
+def fade_in(data):
+    frame_size = spec.channels * 2
+    frames = min(spec.rate // 500, len(data) // frame_size)  # 2 ms
+    softened = bytearray(data)
+    for frame in range(frames):
+        for channel in range(spec.channels):
+            offset = frame * frame_size + channel * 2
+            sample = int.from_bytes(data[offset:offset + 2], "little", signed=True)
+            softened[offset:offset + 2] = (sample * frame // frames).to_bytes(2, "little", signed=True)
+    return bytes(softened)
 
 
 def refresh():
@@ -221,11 +244,8 @@ def pump():
     pump_sound()
 
 
-def play_sound():
+def open_sound():
     global stream
-    if not pcm:
-        return
-    close_sound()
     stream = lib.pa_stream_new(context, b"PTT release", C.byref(spec), None)
     if not stream:
         log.warning("Could not create notification stream")
@@ -233,31 +253,92 @@ def play_sound():
     volume = Volume(spec.channels)
     for i in range(spec.channels):
         volume.values[i] = 49152  # Preserve the old paplay volume.
-    if lib.pa_stream_connect_playback(stream, None, None, 0, C.byref(volume), None) < 0:
+    frame = 2 * spec.channels  # S16LE
+    default = 0xffffffff
+    # Nonzero prebuffering stops the read cursor on underrun, so the next
+    # cue does not get written behind it. Each cue is queued in one write.
+    # Keep a small prebuffer, but do not request a lower hardware/graph
+    # latency when a notification starts. The whole cue is queued up front.
+    buf = BufferAttr(default, default, (spec.rate // 100) * frame, default, default)
+    flags = 0x0001  # START_CORKED
+    if lib.pa_stream_connect_playback(stream, None, C.byref(buf), flags, C.byref(volume), None) < 0:
+        log.warning("Could not connect notification stream: %s", error_message())
         close_sound()
+
+
+def play_sound():
+    global sound_deadline
+    if not pcm:
+        return
+    cancel_sound()
+    if not stream:
+        open_sound()
+    if stream:
+        sound_deadline = time.monotonic() + SOUND_START_TIMEOUT
+        pump_sound()
+
+
+def sound_busy():
+    return sound_deadline is not None or drain is not None
+
+
+def sound_operation(op):
+    if not op:
+        log.warning("Could not update notification playback: %s", error_message())
+        close_sound()
+        return False
+    lib.pa_operation_unref(op)
+    return True
 
 
 def pump_sound():
-    global drain
+    global drain, sound_deadline
     if not stream:
         return
-    state = lib.pa_stream_get_state(stream)
-    if state in (3, 4):  # FAILED / TERMINATED
+    stream_state = lib.pa_stream_get_state(stream)
+    if stream_state in (3, 4):  # FAILED / TERMINATED
+        if stream_state == 3:
+            log.warning("Notification playback failed: %s", error_message())
         close_sound()
-    elif state == 2 and not drain:  # READY
-        # NULL free callback asks libpulse to copy the short PCM sample.
-        if lib.pa_stream_write(stream, pcm, len(pcm), None, 0, 0) < 0:
-            close_sound()
-            return
-        drain = lib.pa_stream_drain(stream, None, None)
-        if not drain:
-            close_sound()
-    elif drain and lib.pa_operation_get_state(drain) != 0:
+        return
+    if drain and lib.pa_operation_get_state(drain) != 0:
+        lib.pa_operation_unref(drain)
+        drain = None
+        sound_operation(lib.pa_stream_cork(stream, 1, None, None))
+    if sound_deadline is None:
+        return
+    if time.monotonic() >= sound_deadline:
+        sound_deadline = None  # Never play a stale cue after a slow reconnect.
+        return
+    if stream_state != 2:  # READY
+        return
+    sound_deadline = None
+    # Queue the whole sample before uncorking (already above the prebuffer threshold).
+    if lib.pa_stream_write(stream, pcm, len(pcm), None, 0, 0) < 0:
+        log.warning("Could not write notification sound: %s", error_message())
         close_sound()
+        return
+    if not sound_operation(lib.pa_stream_cork(stream, 0, None, None)):
+        return
+    drain = lib.pa_stream_drain(stream, None, None)
+    if not drain:
+        log.warning("Could not drain notification sound: %s", error_message())
+        close_sound()
+
+
+def cancel_sound():
+    global drain, sound_deadline
+    sound_deadline = None
+    if drain:
+        lib.pa_operation_unref(drain)
+        drain = None
+        if sound_operation(lib.pa_stream_cork(stream, 1, None, None)):
+            sound_operation(lib.pa_stream_flush(stream, None, None))
 
 
 def close_sound():
-    global stream, drain
+    global stream, drain, sound_deadline
+    sound_deadline = None
     if drain:
         lib.pa_operation_unref(drain)
         drain = None
